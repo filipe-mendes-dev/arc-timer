@@ -16,3 +16,9 @@ export const msToSeconds = (
             return Math.round(ms / 1000);
     }
 };
+
+export const formatShortTime = (timestampMs: number, locale?: string): string =>
+    new Date(timestampMs).toLocaleTimeString(locale, {
+        hour: '2-digit',
+        minute: '2-digit',
+    });

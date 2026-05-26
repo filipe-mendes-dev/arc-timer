@@ -10,6 +10,9 @@ export interface ThemeLayout {
     section: {
         gap: number;
     };
+    grid: {
+        gap: number;
+    };
     card: {
         padding: number;
         borderRadius: number;
@@ -23,6 +26,9 @@ export interface ThemeLayout {
         gap: number;
     };
     footer: {
+        padding: number;
+    };
+    modal: {
         padding: number;
     };
 }
@@ -39,6 +45,9 @@ const BASE_LAYOUT: ThemeLayout = {
     section: {
         gap: 16,
     },
+    grid: {
+        gap: 14,
+    },
     card: {
         padding: 14,
         borderRadius: 14,
@@ -51,6 +60,9 @@ const BASE_LAYOUT: ThemeLayout = {
     },
     footer: {
         padding: 12,
+    },
+    modal: {
+        padding: 20,
     },
 };
 
@@ -65,6 +77,9 @@ export const createLayout = (scale: number): ThemeLayout => ({
     },
     section: {
         gap: Math.round(BASE_LAYOUT.section.gap * scale),
+    },
+    grid: {
+        gap: Math.round(BASE_LAYOUT.grid.gap * scale),
     },
     card: {
         padding: Math.round(BASE_LAYOUT.card.padding * scale),
@@ -82,5 +97,8 @@ export const createLayout = (scale: number): ThemeLayout => ({
     },
     footer: {
         padding: Math.round(BASE_LAYOUT.footer.padding * scale),
+    },
+    modal: {
+        padding: Math.round(BASE_LAYOUT.modal.padding * scale),
     },
 });
