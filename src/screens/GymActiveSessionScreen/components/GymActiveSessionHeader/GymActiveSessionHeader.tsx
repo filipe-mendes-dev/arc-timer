@@ -1,8 +1,8 @@
 import { View } from 'react-native';
-import { Feather, Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
 import { ScreenHeaderBar } from '@src/components/layout/ScreenHeaderBar';
+import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { useTheme } from '@src/theme/ThemeProvider';
 
@@ -30,8 +30,8 @@ export const GymActiveSessionHeader = ({
             <View style={st.headerTopRow}>
                 <View style={st.titleBlock}>
                     <View style={st.titleRow}>
-                        <Ionicons
-                            name="barbell-outline"
+                        <AppIcon
+                            id="exercise"
                             size={16}
                             color={theme.palette.text.primary}
                         />
@@ -50,8 +50,8 @@ export const GymActiveSessionHeader = ({
                 </View>
 
                 <View style={st.durationContainer}>
-                    <Ionicons
-                        name="timer-outline"
+                    <AppIcon
+                        id="time"
                         size={16}
                         color={theme.palette.text.primary}
                         style={st.durationIcon}
@@ -68,8 +68,8 @@ export const GymActiveSessionHeader = ({
 
             <View style={st.metricsRow}>
                 <View style={st.metricItem}>
-                    <Feather
-                        name="activity"
+                    <AppIcon
+                        id="intensity"
                         size={14}
                         color={theme.palette.text.muted}
                         style={st.metricIcon}
@@ -89,8 +89,8 @@ export const GymActiveSessionHeader = ({
                 <View style={st.metricDivider} />
 
                 <View style={st.metricItem}>
-                    <Feather
-                        name="repeat"
+                    <AppIcon
+                        id="sets"
                         size={14}
                         color={theme.palette.text.muted}
                         style={st.metricIcon}

@@ -1,9 +1,9 @@
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
 import { FooterBar } from '@src/components/layout/FooterBar';
 import { CircleIconButton } from '@src/components/ui/CircleIconButton/CircleIconButton';
+import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { useTheme } from '@src/theme/ThemeProvider';
 
@@ -32,8 +32,8 @@ export const GymActiveSessionFooter = ({
                     variant="secondary"
                     size={54}
                 >
-                    <Ionicons
-                        name="chevron-back"
+                    <AppIcon
+                        id="back"
                         size={22}
                         color={theme.palette.button.text.secondary}
                     />
@@ -49,8 +49,8 @@ export const GymActiveSessionFooter = ({
                     variant="primary"
                     size={72}
                 >
-                    <Ionicons
-                        name="add"
+                    <AppIcon
+                        id="add"
                         size={32}
                         color={theme.palette.text.inverted}
                     />
@@ -66,8 +66,8 @@ export const GymActiveSessionFooter = ({
 
             <View style={st.actionItem}>
                 <CircleIconButton onPress={onEnd} variant="secondary" size={54}>
-                    <Ionicons
-                        name="stop"
+                    <AppIcon
+                        id="end"
                         size={22}
                         color={theme.palette.button.text.secondary}
                     />

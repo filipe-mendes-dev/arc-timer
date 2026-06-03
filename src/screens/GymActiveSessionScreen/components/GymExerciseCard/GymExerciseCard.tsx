@@ -132,7 +132,7 @@ export const GymExerciseCard = ({
                     <View style={st.metaRow}>
                         <AppIcon
                             id="sets"
-                            size={14}
+                            size={10}
                             color={theme.palette.text.secondary}
                         />
                         <AppText variant="bodySmall" tone="secondary">
