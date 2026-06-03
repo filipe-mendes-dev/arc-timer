@@ -163,7 +163,7 @@ export const GymExerciseCard = ({
             collapsibleContent={
                 <View style={st.body}>
                     <View style={st.setsContainer}>
-                        {record.sets.map((set) => (
+                        {record.sets.map((set, index) => (
                             <View key={set.id} style={st.setRow}>
                                 <AppIcon
                                     id={getSetStatusIconId(set)}
@@ -179,7 +179,7 @@ export const GymExerciseCard = ({
                                         numberOfLines={1}
                                     >
                                         {t('gymExerciseData.setWithIndex', {
-                                            index: set.setIndex + 1,
+                                            index: index + 1,
                                         })}
                                         :
                                     </AppText>

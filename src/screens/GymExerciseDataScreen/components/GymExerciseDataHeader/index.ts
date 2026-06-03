@@ -1,0 +1,1 @@
+export { GymExerciseDataHeader } from './GymExerciseDataHeader';

@@ -1,0 +1,82 @@
+import type { TFunction } from 'i18next';
+
+import type { GymExerciseRecordSet } from '@src/core/entities/gym.interfaces';
+
+import type { SetDraft, TrackingFields } from './GymExerciseDataScreen.types';
+
+export const DEFAULT_REPS = 10;
+export const DEFAULT_WEIGHT_KG = 0;
+
+export const initialTrackingFields: TrackingFields = {
+    hasDistanceMeters: false,
+    hasDurationSec: false,
+    hasReps: true,
+    hasWeight: true,
+};
+
+export const formatWeight = (weightGrams: number): string => {
+    const weightKg = weightGrams / 1000;
+    return Number.isInteger(weightKg) ? `${weightKg}` : weightKg.toFixed(1);
+};
+
+export const getWeightGrams = (weightKg: number): number | undefined => {
+    if (weightKg <= 0) return undefined;
+
+    return Math.round(weightKg * 1000);
+};
+
+export const getPositiveValue = (value: number): number | undefined => {
+    if (value <= 0) return undefined;
+
+    return value;
+};
+
+export const draftFromSet = (set: GymExerciseRecordSet): SetDraft => ({
+    distanceMeters: set.distanceMeters ?? 0,
+    durationSec: set.durationSec ?? 0,
+    id: set.id,
+    reps: set.reps ?? 0,
+    weightKg: set.weightGrams ? set.weightGrams / 1000 : 0,
+});
+
+// TODO: Revisit exercise notes, RPE, and warmup once the gym flow proves a need.
+export const getSetDetails = (
+    set: GymExerciseRecordSet,
+    t: TFunction,
+): string => {
+    const details: string[] = [];
+
+    if (set.reps !== undefined) {
+        details.push(t('gymExerciseData.setDetails.reps', { count: set.reps }));
+    }
+
+    if (set.weightGrams !== undefined) {
+        details.push(
+            t('gymExerciseData.setDetails.weight', {
+                value: formatWeight(set.weightGrams),
+            }),
+        );
+    }
+
+    if (set.durationSec !== undefined) {
+        details.push(
+            t('gymExerciseData.setDetails.duration', {
+                value: set.durationSec,
+            }),
+        );
+    }
+
+    if (set.distanceMeters !== undefined) {
+        details.push(
+            t('gymExerciseData.setDetails.distance', {
+                value: set.distanceMeters,
+            }),
+        );
+    }
+
+    if (details.length === 0) {
+        return t('gymExerciseData.setDetails.empty');
+    }
+
+    return details.join(' · ');
+};
