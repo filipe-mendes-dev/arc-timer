@@ -1,6 +1,7 @@
 export interface ThemeLayout {
     screen: {
         padding: number;
+        fullScreenHorizontalPadding: number;
         paddingVertical: number;
         paddingHorizontal: number;
     };
@@ -36,6 +37,7 @@ export interface ThemeLayout {
 const BASE_LAYOUT: ThemeLayout = {
     screen: {
         padding: 16,
+        fullScreenHorizontalPadding: 28,
         paddingHorizontal: 16,
         paddingVertical: 16,
     },
@@ -69,6 +71,9 @@ const BASE_LAYOUT: ThemeLayout = {
 export const createLayout = (scale: number): ThemeLayout => ({
     screen: {
         padding: Math.round(BASE_LAYOUT.screen.padding * scale),
+        fullScreenHorizontalPadding: Math.round(
+            BASE_LAYOUT.screen.fullScreenHorizontalPadding * scale,
+        ),
         paddingVertical: Math.round(BASE_LAYOUT.screen.padding * scale),
         paddingHorizontal: Math.round(BASE_LAYOUT.screen.padding * scale),
     },
