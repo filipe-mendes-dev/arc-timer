@@ -1,7 +1,7 @@
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
+import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import type {
@@ -14,7 +14,6 @@ import { useGymExerciseCardStyles } from './GymExerciseCard.styles';
 
 interface GymExerciseCardProps {
     exerciseName: string;
-    index: number;
     onRemove: () => void;
     onPress: () => void;
     record: GymExerciseRecord;
@@ -27,7 +26,6 @@ const formatWeight = (weightGrams: number): string => {
 
 export const GymExerciseCard = ({
     exerciseName,
-    index,
     onRemove,
     onPress,
     record,
@@ -36,6 +34,17 @@ export const GymExerciseCard = ({
     const { theme } = useTheme();
     const st = useGymExerciseCardStyles();
     const setCount = record.sets.length;
+    const isComplete = record.completedAtMs !== undefined;
+    const statusText = isComplete
+        ? t('gymActiveSession.status.complete')
+        : t('gymActiveSession.status.inProgress');
+    const statusIconId = isComplete ? 'checkmarkCircle' : 'radioButtonOff';
+    const statusBackgroundColor = isComplete
+        ? theme.palette.accent.primary
+        : theme.palette.accent.soft;
+    const statusTextColor = isComplete
+        ? theme.palette.text.inverted
+        : theme.palette.text.secondary;
     const measureKey = [
         record.id,
         record.sets.length,
@@ -86,25 +95,22 @@ export const GymExerciseCard = ({
         <MetaCard
             measureKey={measureKey}
             topLeftContent={{
-                text: t('common.labels.exerciseWithIndex', {
-                    index: index + 1,
-                }),
+                text: statusText,
                 icon: (
-                    <Ionicons
-                        name="barbell-outline"
+                    <AppIcon
+                        id={statusIconId}
                         size={14}
-                        color={theme.palette.metaCard.topLeftContent.text}
+                        color={statusTextColor}
                     />
                 ),
-                backgroundColor:
-                    theme.palette.metaCard.topLeftContent.background,
-                color: theme.palette.metaCard.topLeftContent.text,
-                borderColor: theme.palette.metaCard.topLeftContent.border,
+                backgroundColor: statusBackgroundColor,
+                color: statusTextColor,
+                borderColor: statusBackgroundColor,
             }}
             actionStrip={{
                 icon: (
-                    <Ionicons
-                        name="trash-outline"
+                    <AppIcon
+                        id="trash"
                         size={18}
                         color={theme.palette.metaCard.actionStrip.icon}
                     />
@@ -124,8 +130,8 @@ export const GymExerciseCard = ({
                     </AppText>
 
                     <View style={st.metaRow}>
-                        <Ionicons
-                            name="repeat-outline"
+                        <AppIcon
+                            id="sets"
                             size={14}
                             color={theme.palette.text.secondary}
                         />

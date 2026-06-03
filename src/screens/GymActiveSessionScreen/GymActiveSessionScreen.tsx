@@ -73,7 +73,6 @@ const GymActiveSessionScreen = () => {
                     {activeSession.exerciseRecords.map((record, index) => (
                         <GymExerciseCard
                             key={record.id}
-                            index={index}
                             record={record}
                             exerciseName={
                                 exerciseNameById.get(
