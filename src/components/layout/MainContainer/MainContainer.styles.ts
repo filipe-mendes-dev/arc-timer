@@ -26,5 +26,5 @@ export const useMainContainerStyles = createStyles(
             viewport: {
                 flex: 1,
             },
-        })
+        }),
 );
