@@ -10,6 +10,8 @@ import { useMainContainerScroll } from '@src/components/layout/MainContainer/Mai
 interface Props {
     value: number;
     onChange: (next: number) => void;
+    allowDecimal?: boolean;
+    decimalPlaces?: number;
     min?: number;
     max?: number;
     step?: number;
@@ -25,9 +27,48 @@ const clamp = (n: number, min?: number, max?: number) =>
         Math.min(max ?? Number.POSITIVE_INFINITY, n),
     );
 
+const roundToDecimalPlaces = (
+    value: number,
+    decimalPlaces?: number,
+): number => {
+    if (decimalPlaces === undefined) {
+        return value;
+    }
+
+    const factor = 10 ** decimalPlaces;
+    return Math.round(value * factor) / factor;
+};
+
+const parseIntegerInput = (txt: string): number => {
+    const n = parseInt((txt || '0').replace(/\D+/g, ''), 10);
+    return Number.isFinite(n) ? n : 0;
+};
+
+const parseDecimalInput = (txt: string): number => {
+    const normalized = (txt || '0').replace(',', '.');
+    const cleaned = normalized.replace(/[^0-9.]+/g, '');
+    const parts = cleaned.split('.');
+    const integerPart = parts[0] ?? '0';
+    const decimalPart = parts.slice(1).join('');
+    const valueText = decimalPart ? `${integerPart}.${decimalPart}` : integerPart;
+    const n = parseFloat(valueText);
+
+    return Number.isFinite(n) ? n : 0;
+};
+
+const parseInputValue = (txt: string, allowDecimal: boolean): number => {
+    if (allowDecimal) {
+        return parseDecimalInput(txt);
+    }
+
+    return parseIntegerInput(txt);
+};
+
 export const Stepper: React.FC<Props> = ({
     value,
     onChange,
+    allowDecimal = false,
+    decimalPlaces,
     min = 0,
     max,
     step = 1,
@@ -37,32 +78,54 @@ export const Stepper: React.FC<Props> = ({
     testID,
 }) => {
     const [isFocused, setIsFocused] = useState(false);
+    const [inputText, setInputText] = useState(String(value));
     const st = useStepperStyles({ isFocused });
     const scrollContext = useMainContainerScroll();
     const anchorRef = useRef<View | null>(null);
 
     const inc = useCallback(
-        () => onChange(clamp(value + step, min, max)),
-        [onChange, value, step, min, max],
+        () => {
+            const next = clamp(
+                roundToDecimalPlaces(value + step, decimalPlaces),
+                min,
+                max,
+            );
+
+            setInputText(String(next));
+            onChange(next);
+        },
+        [decimalPlaces, max, min, onChange, step, value],
     );
 
     const dec = useCallback(
-        () => onChange(clamp(value - step, min, max)),
-        [onChange, value, step, min, max],
+        () => {
+            const next = clamp(
+                roundToDecimalPlaces(value - step, decimalPlaces),
+                min,
+                max,
+            );
+
+            setInputText(String(next));
+            onChange(next);
+        },
+        [decimalPlaces, max, min, onChange, step, value],
     );
 
     const onText = useCallback(
         (txt: string) => {
-            const n = parseInt((txt || '0').replace(/\D+/g, ''), 10);
-            if (Number.isFinite(n)) onChange(clamp(n, min, max));
+            setInputText(txt);
+            const parsed = parseInputValue(txt, allowDecimal);
+            const rounded = roundToDecimalPlaces(parsed, decimalPlaces);
+
+            onChange(clamp(rounded, min, max));
         },
-        [onChange, min, max],
+        [allowDecimal, decimalPlaces, max, min, onChange],
     );
 
     const disableDec = value <= min;
     const disableInc = max !== undefined && value >= max;
-    const inputValue =
-        !isFocused && formatValue ? formatValue(value) : String(value);
+    const formattedValue = formatValue ? formatValue(value) : String(value);
+    const inputValue = isFocused ? inputText : formattedValue;
 
     return (
         <View ref={anchorRef} style={st.wrap}>
@@ -80,11 +143,12 @@ export const Stepper: React.FC<Props> = ({
                 />
 
                 <TextInput
-                    keyboardType="number-pad"
+                    keyboardType={allowDecimal ? 'decimal-pad' : 'number-pad'}
                     value={inputValue}
                     onChangeText={onText}
                     style={st.input}
                     onFocus={() => {
+                        setInputText(String(value));
                         setIsFocused(true);
                         scrollContext?.scrollFocusedInputIntoView(
                             anchorRef,
