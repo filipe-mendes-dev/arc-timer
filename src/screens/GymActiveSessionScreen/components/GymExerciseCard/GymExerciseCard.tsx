@@ -34,7 +34,10 @@ export const GymExerciseCard = ({
     const { theme } = useTheme();
     const st = useGymExerciseCardStyles();
     const setCount = record.sets.length;
-    const isComplete = record.completedAtMs !== undefined;
+    const hasSets = record.sets.length > 0;
+    const isComplete =
+        hasSets &&
+        record.sets.every((set) => set.completedAtMs !== undefined);
     const statusText = isComplete
         ? t('gymActiveSession.status.complete')
         : t('gymActiveSession.status.inProgress');
@@ -48,7 +51,7 @@ export const GymExerciseCard = ({
     const measureKey = [
         record.id,
         record.sets.length,
-        record.completedAtMs ?? '',
+        record.sets.map((set) => set.completedAtMs ?? '').join(','),
     ].join(':');
 
     const getSetDetails = (set: GymExerciseRecordSet): string => {
