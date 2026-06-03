@@ -60,7 +60,6 @@ export interface GymExerciseRecord {
     sourceGymPlanExerciseId?: UUID;
     sortIndex: number;
     startedAtMs?: number;
-    completedAtMs?: number;
     notes?: string;
     sets: GymExerciseRecordSet[];
     createdAtMs: number;

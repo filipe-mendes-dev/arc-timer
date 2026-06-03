@@ -201,7 +201,6 @@ export const gymExerciseRecordsTable = sqliteTable('gym_exercise_records', {
     ),
     sortIndex: integer('sort_index').notNull(),
     startedAtMs: integer('started_at_ms'),
-    completedAtMs: integer('completed_at_ms'),
     notes: text('notes'),
     createdAtMs: integer('created_at_ms').notNull(),
     updatedAtMs: integer('updated_at_ms').notNull(),

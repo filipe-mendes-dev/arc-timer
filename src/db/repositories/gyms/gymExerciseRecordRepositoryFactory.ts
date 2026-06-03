@@ -38,7 +38,7 @@ export interface UpdateGymExerciseRecordInput
         Partial<
             Pick<
                 GymExerciseRecordRow,
-                'completedAtMs' | 'notes' | 'sortIndex' | 'startedAtMs'
+                'notes' | 'sortIndex' | 'startedAtMs'
             >
         > {}
 
@@ -143,7 +143,6 @@ const assertRecordInput = (input: InsertGymExerciseRecordInput): void => {
     assertNonEmptyId(input.gymSessionId, 'Gym session ID');
     assertNonEmptyId(input.exerciseDefinitionId, 'Exercise definition ID');
     assertOptionalFiniteTimestamp(input.startedAtMs, 'startedAtMs');
-    assertOptionalFiniteTimestamp(input.completedAtMs, 'completedAtMs');
     assertFiniteTimestamp(input.createdAtMs, 'createdAtMs');
     assertFiniteTimestamp(input.updatedAtMs, 'updatedAtMs');
     assertIntegerAtLeast(input.sortIndex, 0, 'sortIndex');
@@ -196,7 +195,6 @@ const gymExerciseRecordFromRow = (
     sourceGymPlanExerciseId: row.sourceGymPlanExerciseId ?? undefined,
     sortIndex: row.sortIndex,
     startedAtMs: row.startedAtMs ?? undefined,
-    completedAtMs: row.completedAtMs ?? undefined,
     notes: row.notes ?? undefined,
     sets,
     createdAtMs: row.createdAtMs,
@@ -291,7 +289,6 @@ export const createGymExerciseRecordRepository = ({
 
             db.insert(gymExerciseRecordsTable)
                 .values({
-                    completedAtMs: input.completedAtMs ?? null,
                     createdAtMs: input.createdAtMs,
                     exerciseDefinitionId: input.exerciseDefinitionId,
                     gymSessionId: input.gymSessionId,
@@ -336,13 +333,11 @@ export const createGymExerciseRecordRepository = ({
         updateRecord: (input: UpdateGymExerciseRecordInput): void => {
             assertNonEmptyId(input.id, 'Gym exercise record ID');
             assertOptionalFiniteTimestamp(input.startedAtMs, 'startedAtMs');
-            assertOptionalFiniteTimestamp(input.completedAtMs, 'completedAtMs');
             assertFiniteTimestamp(input.updatedAtMs, 'updatedAtMs');
             assertOptionalIntegerAtLeast(input.sortIndex, 0, 'sortIndex');
 
             db.update(gymExerciseRecordsTable)
                 .set({
-                    completedAtMs: input.completedAtMs,
                     notes: input.notes,
                     sortIndex: input.sortIndex,
                     startedAtMs: input.startedAtMs,
