@@ -1,6 +1,7 @@
 import type { UUID } from './entities';
 
 export type GymSessionStatus = 'active' | 'completed' | 'discarded';
+export type GymPlanStatus = 'active' | 'archived' | 'draft';
 
 export interface GymPlanExercise {
     id: UUID;
@@ -34,7 +35,8 @@ export interface GymPlan {
     createdAtMs: number;
     updatedAtMs: number;
     isFavorite: boolean;
-    isArchived: boolean;
+    status: GymPlanStatus;
+    draftTargetGymPlanId?: UUID;
 }
 
 export interface GymExerciseRecordSet {
