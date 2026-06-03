@@ -1,13 +1,19 @@
 import React, { type ReactNode } from 'react';
-import { Platform, View } from 'react-native';
+import {
+    Platform,
+    View,
+    type StyleProp,
+    type ViewStyle,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createStyles } from '@src/theme/createStyles';
 
 type FooterBarProps = {
     children: ReactNode;
+    containerStyle?: StyleProp<ViewStyle>;
 };
 
-const PADDING_BOTTOM = 20;
+const PADDING_BOTTOM = 12;
 
 const useStyles = createStyles((theme) => ({
     safe: {
@@ -16,7 +22,7 @@ const useStyles = createStyles((theme) => ({
     row: {
         flexDirection: 'row',
         gap: 10,
-        paddingHorizontal: 14,
+        paddingHorizontal: theme.layout.footer.padding,
         paddingTop: 10,
 
         // base is 16 : 0 the added is literal bottom padding
@@ -27,12 +33,12 @@ const useStyles = createStyles((theme) => ({
     },
 }));
 
-export const FooterBar = ({ children }: FooterBarProps) => {
+export const FooterBar = ({ children, containerStyle }: FooterBarProps) => {
     const st = useStyles();
 
     return (
         <SafeAreaView edges={['bottom']} style={st.safe}>
-            <View style={st.row}>{children}</View>
+            <View style={[st.row, containerStyle]}>{children}</View>
         </SafeAreaView>
     );
 };
