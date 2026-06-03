@@ -134,9 +134,17 @@ export const ExerciseDefinitionFormModal = ({
                             ),
                         );
                         return;
+                    case 'WORKOUT_ONLY_RESTRICTED':
+                        setAvailabilityError(
+                            t(
+                                'exerciseDefinitions.validation.workoutOnlyRestricted',
+                            ),
+                        );
+                        return;
                     case 'DELETE_REFERENCED':
                     case 'DELETE_SYSTEM_FORBIDDEN':
                     case 'MERGE_GYM_ONLY_CONFLICT':
+                    case 'MERGE_WORKOUT_ONLY_CONFLICT':
                         setSaveError(
                             t('exerciseDefinitions.validation.saveFailed'),
                         );
