@@ -24,6 +24,37 @@ const formatWeight = (weightGrams: number): string => {
     return Number.isInteger(weightKg) ? `${weightKg}` : weightKg.toFixed(1);
 };
 
+const formatDistance = (distanceMeters: number): string => {
+    const distanceKm = distanceMeters / 1000;
+
+    if (Number.isInteger(distanceKm)) {
+        return `${distanceKm}`;
+    }
+
+    return distanceKm.toFixed(2);
+};
+
+const formatDurationMinutes = (durationSec: number): string => {
+    const durationMin = Math.round(durationSec / 60);
+
+    if (durationSec > 0 && durationMin < 1) {
+        return '1 min';
+    }
+
+    if (durationMin < 60) {
+        return `${durationMin} min`;
+    }
+
+    const hours = Math.floor(durationMin / 60);
+    const minutes = durationMin % 60;
+
+    if (minutes === 0) {
+        return `${hours} h`;
+    }
+
+    return `${hours} h ${minutes} min`;
+};
+
 export const GymExerciseCard = ({
     exerciseName,
     onRemove,
@@ -36,8 +67,7 @@ export const GymExerciseCard = ({
     const setCount = record.sets.length;
     const hasSets = record.sets.length > 0;
     const isComplete =
-        hasSets &&
-        record.sets.every((set) => set.completedAtMs !== undefined);
+        hasSets && record.sets.every((set) => set.completedAtMs !== undefined);
     const statusText = isComplete
         ? t('gymActiveSession.status.complete')
         : t('gymActiveSession.status.inProgress');
@@ -74,7 +104,7 @@ export const GymExerciseCard = ({
         if (set.durationSec !== undefined) {
             details.push(
                 t('gymExerciseData.setDetails.duration', {
-                    value: set.durationSec,
+                    value: formatDurationMinutes(set.durationSec),
                 }),
             );
         }
@@ -82,7 +112,7 @@ export const GymExerciseCard = ({
         if (set.distanceMeters !== undefined) {
             details.push(
                 t('gymExerciseData.setDetails.distance', {
-                    value: set.distanceMeters,
+                    value: formatDistance(set.distanceMeters),
                 }),
             );
         }
