@@ -149,6 +149,11 @@ const ICON_MAP = {
         name: 'close-outline',
         defaultSize: 22,
     },
+    add: {
+        lib: 'ion',
+        name: 'add',
+        defaultSize: 24,
+    },
     checkmarkCircle: {
         lib: 'ion',
         name: 'checkmark-circle',
