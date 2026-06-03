@@ -17,29 +17,31 @@ export const useGymExerciseCardStyles = createStyles((theme: AppTheme) =>
             gap: 6,
         },
         setsContainer: {
-            gap: 10,
+            gap: 8,
         },
         setRow: {
             flexDirection: 'row',
-            alignItems: 'flex-start',
+            alignItems: 'center',
             gap: 8,
         },
-        setIndexBubble: {
-            width: 22,
-            height: 22,
-            borderRadius: 11,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: theme.palette.accent.soft,
+        setStatusIcon: {
+            marginTop: 1,
         },
-        setIndexText: {
-            fontSize: 12,
-            fontWeight: '600',
-            color: theme.palette.accent.primary,
-        },
-        setTexts: {
+        setSummary: {
             flex: 1,
-            gap: 4,
+            minWidth: 0,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
+        },
+        setTitle: {
+            flexShrink: 0,
+            fontWeight: '600',
+            color: theme.palette.text.primary,
+        },
+        setDetails: {
+            flex: 1,
+            minWidth: 0,
         },
     }),
 );

@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { AppIcon } from '@src/components/ui/Icon/AppIcon';
+import { AppIcon, type IconId } from '@src/components/ui/Icon/AppIcon';
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import type {
@@ -91,6 +91,22 @@ export const GymExerciseCard = ({
         return details.join(' · ');
     };
 
+    const getSetStatusIconId = (set: GymExerciseRecordSet): IconId => {
+        if (set.completedAtMs !== undefined) {
+            return 'checkmarkCircle';
+        }
+
+        return 'radioButtonOff';
+    };
+
+    const getSetStatusIconColor = (set: GymExerciseRecordSet) => {
+        if (set.completedAtMs !== undefined) {
+            return theme.palette.accent.primary;
+        }
+
+        return theme.palette.text.muted;
+    };
+
     return (
         <MetaCard
             measureKey={measureKey}
@@ -146,25 +162,29 @@ export const GymExerciseCard = ({
                     <View style={st.setsContainer}>
                         {record.sets.map((set) => (
                             <View key={set.id} style={st.setRow}>
-                                <View style={st.setIndexBubble}>
-                                    <AppText
-                                        variant="caption"
-                                        style={st.setIndexText}
-                                    >
-                                        {set.setIndex + 1}
-                                    </AppText>
-                                </View>
+                                <AppIcon
+                                    id={getSetStatusIconId(set)}
+                                    size={18}
+                                    color={getSetStatusIconColor(set)}
+                                    style={st.setStatusIcon}
+                                />
 
-                                <View style={st.setTexts}>
-                                    <AppText variant="bodySmall" tone="primary">
+                                <View style={st.setSummary}>
+                                    <AppText
+                                        variant="bodySmall"
+                                        style={st.setTitle}
+                                        numberOfLines={1}
+                                    >
                                         {t('gymExerciseData.setWithIndex', {
                                             index: set.setIndex + 1,
                                         })}
+                                        :
                                     </AppText>
 
                                     <AppText
-                                        variant="caption"
+                                        variant="bodySmall"
                                         tone="muted"
+                                        style={st.setDetails}
                                         numberOfLines={1}
                                     >
                                         {getSetDetails(set)}
