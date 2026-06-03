@@ -20,7 +20,7 @@ import {
     getPositiveValue,
     getSetDetails,
     getWeightGrams,
-    initialTrackingFields,
+    inferTrackingFieldsFromSets,
 } from './GymExerciseDataScreen.helpers';
 import type { SetDraft, TrackingFields } from './GymExerciseDataScreen.types';
 
@@ -50,8 +50,11 @@ export const useGymExerciseDataScreen = () => {
     const addSet = useAddGymExerciseRecordSet();
     const updateSet = useUpdateGymExerciseRecordSet();
     const deleteSet = useDeleteGymExerciseRecordSet();
+    const { data: record } = useGymExerciseRecord(recordId);
+    const { data: sets = [] } = useGymExerciseRecordSets(recordId);
+    const { data: exerciseDefinitions = [] } = useGymExerciseDefinitions();
     const [trackingFields, setTrackingFields] =
-        useState<TrackingFields>(initialTrackingFields);
+        useState<TrackingFields>(() => inferTrackingFieldsFromSets(sets));
     const [isTrackingFieldsModalVisible, setTrackingFieldsModalVisible] =
         useState(false);
     const [editingDraft, setEditingDraft] = useState<SetDraft | null>(null);
@@ -69,9 +72,6 @@ export const useGymExerciseDataScreen = () => {
         selectedIds,
         toggleItem,
     } = useListSelection();
-    const { data: record } = useGymExerciseRecord(recordId);
-    const { data: sets = [] } = useGymExerciseRecordSets(recordId);
-    const { data: exerciseDefinitions = [] } = useGymExerciseDefinitions();
     const definition = exerciseDefinitions.find(
         (item) => item.id === record?.exerciseDefinitionId,
     );

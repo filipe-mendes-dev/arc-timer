@@ -14,9 +14,68 @@ export const initialTrackingFields: TrackingFields = {
     hasWeight: true,
 };
 
+export const inferTrackingFieldsFromSets = (
+    sets: GymExerciseRecordSet[],
+): TrackingFields => {
+    if (sets.length === 0) {
+        return initialTrackingFields;
+    }
+
+    const trackingFields = {
+        hasDistanceMeters: sets.some(
+            (set) => set.distanceMeters !== undefined,
+        ),
+        hasDurationSec: sets.some((set) => set.durationSec !== undefined),
+        hasReps: sets.some((set) => set.reps !== undefined),
+        hasWeight: sets.some((set) => set.weightGrams !== undefined),
+    };
+
+    if (
+        !trackingFields.hasDistanceMeters &&
+        !trackingFields.hasDurationSec &&
+        !trackingFields.hasReps &&
+        !trackingFields.hasWeight
+    ) {
+        return initialTrackingFields;
+    }
+
+    return trackingFields;
+};
+
 export const formatWeight = (weightGrams: number): string => {
     const weightKg = weightGrams / 1000;
     return Number.isInteger(weightKg) ? `${weightKg}` : weightKg.toFixed(1);
+};
+
+export const formatDistance = (distanceMeters: number): string => {
+    const distanceKm = distanceMeters / 1000;
+
+    if (Number.isInteger(distanceKm)) {
+        return `${distanceKm}`;
+    }
+
+    return distanceKm.toFixed(2);
+};
+
+export const formatDurationMinutes = (durationSec: number): string => {
+    const durationMin = Math.round(durationSec / 60);
+
+    if (durationSec > 0 && durationMin < 1) {
+        return '1 min';
+    }
+
+    if (durationMin < 60) {
+        return `${durationMin} min`;
+    }
+
+    const hours = Math.floor(durationMin / 60);
+    const minutes = durationMin % 60;
+
+    if (minutes === 0) {
+        return `${hours} h`;
+    }
+
+    return `${hours} h ${minutes} min`;
 };
 
 export const getWeightGrams = (weightKg: number): number | undefined => {
@@ -61,7 +120,7 @@ export const getSetDetails = (
     if (set.durationSec !== undefined) {
         details.push(
             t('gymExerciseData.setDetails.duration', {
-                value: set.durationSec,
+                value: formatDurationMinutes(set.durationSec),
             }),
         );
     }
@@ -69,7 +128,7 @@ export const getSetDetails = (
     if (set.distanceMeters !== undefined) {
         details.push(
             t('gymExerciseData.setDetails.distance', {
-                value: set.distanceMeters,
+                value: formatDistance(set.distanceMeters),
             }),
         );
     }
