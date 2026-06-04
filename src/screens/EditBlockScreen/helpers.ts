@@ -27,7 +27,7 @@ export const toPosInt = (s: string | number, fallback = 0): number => {
 // Ensure block has exactly N exercises
 export const ensureExerciseCount = (
     block: WorkoutBlock,
-    count: number
+    count: number,
 ): WorkoutBlock => {
     const next: WorkoutBlock = { ...block, exercises: [...block.exercises] };
 
@@ -35,7 +35,7 @@ export const ensureExerciseCount = (
         next.exercises.push({
             id: uid(),
             mode: 'time',
-            value: 20,
+            value: block.exercises[0]?.value ?? 20,
         });
     }
 
@@ -50,7 +50,7 @@ export const ensureExerciseCount = (
 // Called when user edits the "duration" stepper
 export const applyDurationToAll = (
     block: WorkoutBlock,
-    sec: number
+    sec: number,
 ): WorkoutBlock => {
     return {
         ...block,
@@ -86,8 +86,7 @@ export const validateBlock = (
 
     block.exercises.forEach((ex, ei) => {
         const hasDefinition = !!ex.exerciseDefinitionId;
-        const hasName =
-            ex.name !== undefined && ex.name.trim().length > 0;
+        const hasName = ex.name !== undefined && ex.name.trim().length > 0;
 
         if (
             options.shouldRequireExerciseNames === true &&
