@@ -4,6 +4,7 @@ import { File } from 'expo-file-system';
 import type {
     GymPlan,
     GymPlanExercise,
+    GymPlanExerciseTargetSet,
     GymPlanSection,
     GymPlanStatus,
 } from '../entities/gym.interfaces';
@@ -32,25 +33,41 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const isOptionalString = (value: unknown): value is string | undefined =>
     value === undefined || typeof value === 'string';
 
-const isOptionalNumber = (value: unknown): value is number | undefined =>
-    value === undefined || typeof value === 'number';
-
 const isGymPlanStatus = (value: unknown): value is GymPlanStatus =>
     value === 'active' || value === 'archived' || value === 'draft';
 
+const isGymPlanExerciseTargetSet = (
+    value: unknown,
+): value is GymPlanExerciseTargetSet => {
+    if (!isRecord(value)) return false;
+
+    return (
+        typeof value.id === 'string' &&
+        typeof value.setIndex === 'number' &&
+        (value.reps === undefined || typeof value.reps === 'number') &&
+        (value.weightGrams === undefined ||
+            typeof value.weightGrams === 'number') &&
+        (value.durationSec === undefined ||
+            typeof value.durationSec === 'number') &&
+        (value.distanceMeters === undefined ||
+            typeof value.distanceMeters === 'number') &&
+        typeof value.createdAtMs === 'number' &&
+        typeof value.updatedAtMs === 'number'
+    );
+};
+
 const isGymPlanExercise = (value: unknown): value is GymPlanExercise => {
     if (!isRecord(value)) return false;
+    const hasValidTargetSets =
+        value.targetSetDrafts === undefined ||
+        (Array.isArray(value.targetSetDrafts) &&
+            value.targetSetDrafts.every(isGymPlanExerciseTargetSet));
 
     return (
         typeof value.id === 'string' &&
         typeof value.exerciseDefinitionId === 'string' &&
         typeof value.sortIndex === 'number' &&
-        isOptionalNumber(value.targetSets) &&
-        isOptionalNumber(value.targetReps) &&
-        isOptionalNumber(value.targetWeightGrams) &&
-        isOptionalNumber(value.targetDurationSec) &&
-        isOptionalNumber(value.targetDistanceMeters) &&
-        isOptionalNumber(value.restSec) &&
+        hasValidTargetSets &&
         isOptionalString(value.notes) &&
         typeof value.createdAtMs === 'number' &&
         typeof value.updatedAtMs === 'number'

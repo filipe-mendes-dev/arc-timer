@@ -4,11 +4,12 @@ import { useTranslation } from 'react-i18next';
 
 import type { GymPlan } from '@src/core/entities/gym.interfaces';
 import {
+    useDiscardGymPlanDraft,
+    useDraftGymPlan,
     useGymPlans,
-    useStartImportedGymPlanDraft,
-    useStartNewGymPlanDraft,
     useToggleFavoriteGymPlan,
 } from '@src/data/gymPlans';
+import { useGymPlanBuilderStore } from '@src/state/stores/useGymPlanBuilderStore';
 
 import { importGymPlanDraftFromFile } from './GymPlansScreen.import';
 
@@ -18,7 +19,9 @@ interface UseGymPlansScreenResult {
     goToPlan: (gymPlanId: string) => void;
     handleImportFromFile: () => Promise<void>;
     handleNewPlan: () => void;
+    handleResumeDraft: () => void;
     hasSearch: boolean;
+    hasRecoverableDraft: boolean;
     importError: string;
     isImporting: boolean;
     isNewPlanModalVisible: boolean;
@@ -35,8 +38,13 @@ export const useGymPlansScreen = (): UseGymPlansScreenResult => {
     const { t } = useTranslation();
     const router = useRouter();
     const { data: gymPlans = [] } = useGymPlans();
-    const startNewDraft = useStartNewGymPlanDraft();
-    const startImportedDraft = useStartImportedGymPlanDraft();
+    const { data: recoverableDraft = null } = useDraftGymPlan();
+    const discardDraft = useDiscardGymPlanDraft();
+    const hydrateDraft = useGymPlanBuilderStore((state) => state.hydrateDraft);
+    const startImportedDraft = useGymPlanBuilderStore(
+        (state) => state.startImportedDraft,
+    );
+    const startNewDraft = useGymPlanBuilderStore((state) => state.startNewDraft);
     const toggleFavorite = useToggleFavoriteGymPlan();
     const [search, setSearch] = useState('');
     const [isNewPlanModalVisible, setNewPlanModalVisible] = useState(false);
@@ -69,15 +77,24 @@ export const useGymPlansScreen = (): UseGymPlansScreenResult => {
     );
 
     const handleNewPlan = useCallback(() => {
-        if (startNewDraft.isPending) return;
+        if (discardDraft.isPending) return;
 
-        startNewDraft.mutate(undefined, {
+        discardDraft.mutate(undefined, {
             onSuccess: () => {
+                startNewDraft();
                 closeNewPlanModal();
                 router.push('/gymPlans/edit');
             },
         });
-    }, [closeNewPlanModal, router, startNewDraft]);
+    }, [closeNewPlanModal, discardDraft, router, startNewDraft]);
+
+    const handleResumeDraft = useCallback(() => {
+        if (!recoverableDraft) return;
+
+        hydrateDraft(recoverableDraft, 'edit');
+        closeNewPlanModal();
+        router.push('/gymPlans/edit');
+    }, [closeNewPlanModal, hydrateDraft, recoverableDraft, router]);
 
     const handleImportFromFile = useCallback(async () => {
         if (isImporting) return;
@@ -85,7 +102,9 @@ export const useGymPlansScreen = (): UseGymPlansScreenResult => {
         setImporting(true);
 
         const result = await importGymPlanDraftFromFile({
-            startImportedDraft: startImportedDraft.mutateAsync,
+            startImportedDraft: async (gymPlan) => {
+                startImportedDraft(gymPlan);
+            },
             t,
         });
 
@@ -114,11 +133,13 @@ export const useGymPlansScreen = (): UseGymPlansScreenResult => {
         goToPlan,
         handleImportFromFile,
         handleNewPlan,
+        handleResumeDraft,
         hasSearch,
+        hasRecoverableDraft: recoverableDraft !== null,
         importError,
         isImporting,
         isNewPlanModalVisible,
-        isStartingDraft: startNewDraft.isPending,
+        isStartingDraft: discardDraft.isPending,
         openNewPlanModal,
         search,
         setImportError: setImportErrorState,

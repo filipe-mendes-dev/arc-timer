@@ -114,11 +114,13 @@ const GymPlansScreen = () => {
 
             <NewGymPlanModal
                 visible={screen.isNewPlanModalVisible}
+                hasRecoverableDraft={screen.hasRecoverableDraft}
                 isImporting={screen.isImporting}
                 isStartingDraft={screen.isStartingDraft}
                 onClose={screen.closeNewPlanModal}
                 onCreateNew={screen.handleNewPlan}
                 onImportFromFile={screen.handleImportFromFile}
+                onResumeDraft={screen.handleResumeDraft}
             />
 
             <ConfirmDialog

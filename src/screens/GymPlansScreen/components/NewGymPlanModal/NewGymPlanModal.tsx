@@ -9,20 +9,24 @@ import { AppText } from '@src/components/ui/Typography/AppText';
 import { useNewGymPlanModalStyles } from './NewGymPlanModal.styles';
 
 interface NewGymPlanModalProps {
+    hasRecoverableDraft: boolean;
     isImporting: boolean;
     isStartingDraft: boolean;
     visible: boolean;
     onClose: () => void;
     onCreateNew: () => void;
     onImportFromFile: () => Promise<void>;
+    onResumeDraft: () => void;
 }
 
 export const NewGymPlanModal = ({
+    hasRecoverableDraft,
     isImporting,
     isStartingDraft,
     onClose,
     onCreateNew,
     onImportFromFile,
+    onResumeDraft,
     visible,
 }: NewGymPlanModalProps) => {
     const { t } = useTranslation();
@@ -47,9 +51,17 @@ export const NewGymPlanModal = ({
                 </View>
 
                 <View style={st.buttonsContainer}>
+                    {hasRecoverableDraft && (
+                        <Button
+                            title={t('gymPlans.modal.resumeDraft')}
+                            variant="primary"
+                            onPress={onResumeDraft}
+                        />
+                    )}
+
                     <Button
                         title={t('gymPlans.modal.createNew')}
-                        variant="primary"
+                        variant={hasRecoverableDraft ? 'secondary' : 'primary'}
                         onPress={onCreateNew}
                         loading={isStartingDraft}
                     />
