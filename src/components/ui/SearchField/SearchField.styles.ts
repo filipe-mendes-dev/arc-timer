@@ -34,9 +34,11 @@ export const useSearchFieldStyles = createStyles((theme: AppTheme) =>
         },
 
         clearHitbox: {
-            padding: 4,
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 34,
+            height: 34,
             marginLeft: 4,
-            height: '100%',
         },
     }),
 );

@@ -1,0 +1,1 @@
+export { NewGymPlanModal } from './NewGymPlanModal';
