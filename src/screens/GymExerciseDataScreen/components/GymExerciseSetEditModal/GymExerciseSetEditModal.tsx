@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Modal } from '@src/components/modals/Modal';
@@ -10,6 +10,7 @@ import type {
     SetDraft,
     TrackingFields,
 } from '../../GymExerciseDataScreen.types';
+import { formatDurationMinutes } from '../../GymExerciseDataScreen.helpers';
 import { useStyles } from './GymExerciseSetEditModal.styles';
 
 interface GymExerciseSetEditModalProps {
@@ -39,7 +40,11 @@ export const GymExerciseSetEditModal = ({
             containerStyle={st.modalContainer}
             contentStyle={st.modalContent}
         >
-            <View style={st.modalBody}>
+            <ScrollView
+                contentContainerStyle={st.modalBody}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+            >
                 <View style={st.modalText}>
                     <AppText variant="title3">
                         {t('gymExerciseData.editSet.title')}
@@ -77,8 +82,10 @@ export const GymExerciseSetEditModal = ({
                                         weightKg: value,
                                     })
                                 }
+                                allowDecimal
+                                decimalPlaces={1}
                                 min={0}
-                                step={5}
+                                step={2.5}
                                 formatValue={(value) =>
                                     t('gymExerciseData.setDetails.weight', {
                                         value,
@@ -90,15 +97,25 @@ export const GymExerciseSetEditModal = ({
                         {trackingFields.hasDurationSec && (
                             <Stepper
                                 label={t('gymExerciseData.fields.durationSec')}
-                                value={draft.durationSec}
+                                value={Math.round(draft.durationSec / 60)}
                                 onChange={(value) =>
                                     onChangeDraft({
                                         ...draft,
-                                        durationSec: value,
+                                        durationSec: Math.round(value * 60),
                                     })
                                 }
                                 min={0}
                                 step={5}
+                                formatValue={(value) =>
+                                    t(
+                                        'gymExerciseData.setDetails.duration',
+                                        {
+                                            value: formatDurationMinutes(
+                                                value * 60,
+                                            ),
+                                        },
+                                    )
+                                }
                             />
                         )}
 
@@ -107,15 +124,24 @@ export const GymExerciseSetEditModal = ({
                                 label={t(
                                     'gymExerciseData.fields.distanceMeters',
                                 )}
-                                value={draft.distanceMeters}
+                                value={draft.distanceMeters / 1000}
                                 onChange={(value) =>
                                     onChangeDraft({
                                         ...draft,
-                                        distanceMeters: value,
+                                        distanceMeters: Math.round(
+                                            value * 1000,
+                                        ),
                                     })
                                 }
+                                allowDecimal
+                                decimalPlaces={2}
                                 min={0}
-                                step={100}
+                                step={0.5}
+                                formatValue={(value) =>
+                                    t('gymExerciseData.setDetails.distance', {
+                                        value,
+                                    })
+                                }
                             />
                         )}
                     </View>
@@ -137,7 +163,7 @@ export const GymExerciseSetEditModal = ({
                         flex
                     />
                 </View>
-            </View>
+            </ScrollView>
         </Modal>
     );
 };

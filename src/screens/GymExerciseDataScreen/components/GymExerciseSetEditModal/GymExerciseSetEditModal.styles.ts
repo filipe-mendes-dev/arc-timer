@@ -13,6 +13,7 @@ export const useStyles = createStyles((theme: AppTheme) =>
             borderRadius: theme.layout.card.borderRadius,
             borderWidth: theme.layout.card.borderWidth,
             borderColor: theme.palette.border.subtle,
+            maxHeight: '82%',
             padding: theme.layout.card.padding,
         },
         modalBody: {
