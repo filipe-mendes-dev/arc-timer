@@ -42,6 +42,72 @@ const getPreviousWeightKg = (
     return DEFAULT_WEIGHT_KG;
 };
 
+interface ClearTrackingFieldInput {
+    distanceMeters?: null;
+    durationSec?: null;
+    id: string;
+    reps?: null;
+    weightGrams?: null;
+}
+
+const getRemovedTrackingFields = (
+    current: TrackingFields,
+    draft: TrackingFields,
+): (keyof TrackingFields)[] => {
+    const removedFields: (keyof TrackingFields)[] = [];
+
+    if (current.hasReps && !draft.hasReps) {
+        removedFields.push('hasReps');
+    }
+
+    if (current.hasWeight && !draft.hasWeight) {
+        removedFields.push('hasWeight');
+    }
+
+    if (current.hasDurationSec && !draft.hasDurationSec) {
+        removedFields.push('hasDurationSec');
+    }
+
+    if (current.hasDistanceMeters && !draft.hasDistanceMeters) {
+        removedFields.push('hasDistanceMeters');
+    }
+
+    return removedFields;
+};
+
+const setHasTrackingFieldData = (
+    set: GymExerciseRecordSet,
+    field: keyof TrackingFields,
+): boolean => {
+    if (field === 'hasReps') {
+        return set.reps !== undefined;
+    }
+
+    if (field === 'hasWeight') {
+        return set.weightGrams !== undefined;
+    }
+
+    if (field === 'hasDurationSec') {
+        return set.durationSec !== undefined;
+    }
+
+    return set.distanceMeters !== undefined;
+};
+
+const getFieldsWithDataToRemove = (
+    sets: GymExerciseRecordSet[],
+    current: TrackingFields,
+    draft: TrackingFields | null,
+): (keyof TrackingFields)[] => {
+    if (!draft) {
+        return [];
+    }
+
+    return getRemovedTrackingFields(current, draft).filter((field) =>
+        sets.some((set) => setHasTrackingFieldData(set, field)),
+    );
+};
+
 export const useGymExerciseDataScreen = () => {
     const { t } = useTranslation();
     const router = useRouter();
@@ -55,6 +121,8 @@ export const useGymExerciseDataScreen = () => {
     const { data: exerciseDefinitions = [] } = useGymExerciseDefinitions();
     const [trackingFields, setTrackingFields] =
         useState<TrackingFields>(() => inferTrackingFieldsFromSets(sets));
+    const [draftTrackingFields, setDraftTrackingFields] =
+        useState<TrackingFields | null>(null);
     const [isTrackingFieldsModalVisible, setTrackingFieldsModalVisible] =
         useState(false);
     const [editingDraft, setEditingDraft] = useState<SetDraft | null>(null);
@@ -116,12 +184,72 @@ export const useGymExerciseDataScreen = () => {
         return '';
     };
 
-    const updateTrackingField = (field: keyof TrackingFields) => {
-        setTrackingFields((current) => ({
-            ...current,
-            [field]: !current[field],
-        }));
+    const updateDraftTrackingField = (field: keyof TrackingFields) => {
+        setDraftTrackingFields((current) => {
+            if (!current) return current;
+
+            return {
+                ...current,
+                [field]: !current[field],
+            };
+        });
     };
+
+    const openTrackingFieldsModal = () => {
+        setDraftTrackingFields(trackingFields);
+        setTrackingFieldsModalVisible(true);
+    };
+
+    const closeTrackingFieldsModal = () => {
+        setDraftTrackingFields(null);
+        setTrackingFieldsModalVisible(false);
+    };
+
+    const handleSaveTrackingFields = () => {
+        if (!draftTrackingFields) return;
+
+        const removedFields = getRemovedTrackingFields(
+            trackingFields,
+            draftTrackingFields,
+        );
+
+        for (const set of sets) {
+            const shouldUpdateSet = removedFields.some((field) =>
+                setHasTrackingFieldData(set, field),
+            );
+
+            if (!shouldUpdateSet) continue;
+
+            const clearInput: ClearTrackingFieldInput = { id: set.id };
+
+            if (removedFields.includes('hasDistanceMeters')) {
+                clearInput.distanceMeters = null;
+            }
+
+            if (removedFields.includes('hasDurationSec')) {
+                clearInput.durationSec = null;
+            }
+
+            if (removedFields.includes('hasReps')) {
+                clearInput.reps = null;
+            }
+
+            if (removedFields.includes('hasWeight')) {
+                clearInput.weightGrams = null;
+            }
+
+            updateSet.mutate(clearInput);
+        }
+
+        setTrackingFields(draftTrackingFields);
+        closeTrackingFieldsModal();
+    };
+
+    const fieldsWithDataToRemove = getFieldsWithDataToRemove(
+        sets,
+        trackingFields,
+        draftTrackingFields,
+    );
 
     const handleAddSet = () => {
         if (!record) return;
@@ -235,9 +363,10 @@ export const useGymExerciseDataScreen = () => {
 
     return {
         completedSetCount,
-        closeTrackingFieldsModal: () => setTrackingFieldsModalVisible(false),
+        closeTrackingFieldsModal,
         deleteConfirmMessage: getDeleteConfirmMessage(),
         deleteConfirmTitle: getDeleteConfirmTitle(),
+        draftTrackingFields,
         editingDraft,
         enterSelectMode,
         errorMessage: getErrorMessage(),
@@ -253,9 +382,11 @@ export const useGymExerciseDataScreen = () => {
         handleRequestDeleteSet,
         handleRequestSelectedDelete,
         handleSaveDraft,
+        handleSaveTrackingFields,
         handleSelectSet,
         handleToggleCompleteSet,
         hasSelection,
+        fieldsWithDataToRemove,
         isAddingSet: addSet.isPending,
         isDeletingSet: (set: GymExerciseRecordSet) =>
             deleteSet.isPending && deleteSet.variables === set.id,
@@ -265,7 +396,7 @@ export const useGymExerciseDataScreen = () => {
         isSelectMode,
         isSelected,
         isTrackingFieldsModalVisible,
-        openTrackingFieldsModal: () => setTrackingFieldsModalVisible(true),
+        openTrackingFieldsModal,
         pendingDeleteSets,
         record,
         selectAllSets: () => selectAll(sets.map((set) => set.id)),
@@ -274,7 +405,7 @@ export const useGymExerciseDataScreen = () => {
         sets,
         t,
         trackingFields,
-        updateTrackingField,
+        updateDraftTrackingField,
         getSetDetails: (set: GymExerciseRecordSet) => getSetDetails(set, t),
     };
 };

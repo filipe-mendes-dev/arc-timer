@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -32,6 +33,13 @@ export const GymExerciseSetEditModal = ({
 }: GymExerciseSetEditModalProps) => {
     const { t } = useTranslation();
     const st = useStyles();
+    const lastDraftRef = useRef<SetDraft | null>(null);
+
+    if (draft) {
+        lastDraftRef.current = draft;
+    }
+
+    const visibleDraft = draft ?? lastDraftRef.current;
 
     return (
         <Modal
@@ -55,15 +63,15 @@ export const GymExerciseSetEditModal = ({
                     </AppText>
                 </View>
 
-                {draft && (
+                {visibleDraft && (
                     <View style={st.defaultsControls}>
                         {trackingFields.hasReps && (
                             <Stepper
                                 label={t('gymExerciseData.fields.reps')}
-                                value={draft.reps}
+                                value={visibleDraft.reps}
                                 onChange={(value) =>
                                     onChangeDraft({
-                                        ...draft,
+                                        ...visibleDraft,
                                         reps: value,
                                     })
                                 }
@@ -75,10 +83,10 @@ export const GymExerciseSetEditModal = ({
                         {trackingFields.hasWeight && (
                             <Stepper
                                 label={t('gymExerciseData.fields.weightKg')}
-                                value={draft.weightKg}
+                                value={visibleDraft.weightKg}
                                 onChange={(value) =>
                                     onChangeDraft({
-                                        ...draft,
+                                        ...visibleDraft,
                                         weightKg: value,
                                     })
                                 }
@@ -97,10 +105,12 @@ export const GymExerciseSetEditModal = ({
                         {trackingFields.hasDurationSec && (
                             <Stepper
                                 label={t('gymExerciseData.fields.durationSec')}
-                                value={Math.round(draft.durationSec / 60)}
+                                value={Math.round(
+                                    visibleDraft.durationSec / 60,
+                                )}
                                 onChange={(value) =>
                                     onChangeDraft({
-                                        ...draft,
+                                        ...visibleDraft,
                                         durationSec: Math.round(value * 60),
                                     })
                                 }
@@ -124,10 +134,10 @@ export const GymExerciseSetEditModal = ({
                                 label={t(
                                     'gymExerciseData.fields.distanceMeters',
                                 )}
-                                value={draft.distanceMeters / 1000}
+                                value={visibleDraft.distanceMeters / 1000}
                                 onChange={(value) =>
                                     onChangeDraft({
-                                        ...draft,
+                                        ...visibleDraft,
                                         distanceMeters: Math.round(
                                             value * 1000,
                                         ),

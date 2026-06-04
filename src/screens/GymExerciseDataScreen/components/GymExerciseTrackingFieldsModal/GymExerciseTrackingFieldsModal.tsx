@@ -1,9 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Modal } from '@src/components/modals/Modal';
 import { Button } from '@src/components/ui/Button/Button';
+import { ErrorBanner } from '@src/components/ui/ErrorBanner/ErrorBanner';
 import GuardedPressable from '@src/components/ui/GuardedPressable/GuardedPressable';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { useTheme } from '@src/theme/ThemeProvider';
@@ -18,9 +20,12 @@ interface TrackingFieldToggleProps {
 }
 
 interface GymExerciseTrackingFieldsModalProps {
-    trackingFields: TrackingFields;
+    fieldsWithDataToRemove: readonly (keyof TrackingFields)[];
+    isSaving: boolean;
+    trackingFields: TrackingFields | null;
     visible: boolean;
     onClose: () => void;
+    onSave: () => void;
     onToggleField: (field: keyof TrackingFields) => void;
 }
 
@@ -31,10 +36,10 @@ const TrackingFieldToggle = ({
 }: TrackingFieldToggleProps) => {
     const { theme } = useTheme();
     const st = useStyles();
+    const accentColor = theme.palette.accent.primary;
+    const mutedColor = theme.palette.text.muted;
     const iconName = isSelected ? 'checkmark-circle' : 'ellipse-outline';
-    const iconColor = isSelected
-        ? theme.palette.accent.primary
-        : theme.palette.text.muted;
+    const iconColor = isSelected ? accentColor : mutedColor;
     const tone = isSelected ? 'primary' : 'muted';
 
     return (
@@ -52,13 +57,29 @@ const TrackingFieldToggle = ({
 };
 
 export const GymExerciseTrackingFieldsModal = ({
+    fieldsWithDataToRemove,
+    isSaving,
     trackingFields,
     visible,
     onClose,
+    onSave,
     onToggleField,
 }: GymExerciseTrackingFieldsModalProps) => {
     const { t } = useTranslation();
     const st = useStyles();
+    const [dismissalKey, setDismissalKey] = useState(0);
+    const hasFieldsWithDataToRemove = fieldsWithDataToRemove.length > 0;
+    const fieldNames = fieldsWithDataToRemove
+        .map((field) => t(`gymExerciseData.fieldsByKey.${field}`))
+        .join(', ');
+    const warningMessage = t('gymExerciseData.defaults.removeDataWarning', {
+        fields: fieldNames,
+    });
+    const saveLabel = t('common.actions.save');
+    const removeSaveLabel = t('gymExerciseData.defaults.removeDataAndSave');
+    const primaryButtonTitle = hasFieldsWithDataToRemove ? removeSaveLabel : saveLabel;
+
+    if (!trackingFields) return null;
 
     return (
         <Modal
@@ -82,33 +103,59 @@ export const GymExerciseTrackingFieldsModal = ({
                     <TrackingFieldToggle
                         label={t('gymExerciseData.fields.reps')}
                         isSelected={trackingFields.hasReps}
-                        onPress={() => onToggleField('hasReps')}
+                        onPress={() => {
+                            onToggleField('hasReps');
+                            setDismissalKey((prev) => prev + 1);
+                        }}
                     />
 
                     <TrackingFieldToggle
                         label={t('gymExerciseData.fields.weightKg')}
                         isSelected={trackingFields.hasWeight}
-                        onPress={() => onToggleField('hasWeight')}
+                        onPress={() => {
+                            onToggleField('hasWeight');
+                            setDismissalKey((prev) => prev + 1);
+                        }}
                     />
 
                     <TrackingFieldToggle
                         label={t('gymExerciseData.fields.durationSec')}
                         isSelected={trackingFields.hasDurationSec}
-                        onPress={() => onToggleField('hasDurationSec')}
+                        onPress={() => {
+                            onToggleField('hasDurationSec');
+                            setDismissalKey((prev) => prev + 1);
+                        }}
                     />
 
                     <TrackingFieldToggle
                         label={t('gymExerciseData.fields.distanceMeters')}
                         isSelected={trackingFields.hasDistanceMeters}
-                        onPress={() => onToggleField('hasDistanceMeters')}
+                        onPress={() => {
+                            onToggleField('hasDistanceMeters');
+                            setDismissalKey((prev) => prev + 1);
+                        }}
                     />
                 </View>
 
-                <Button
-                    title={t('common.actions.done')}
-                    variant="primary"
-                    onPress={onClose}
-                />
+                <View style={st.modalActions}>
+                    <ErrorBanner
+                        message={hasFieldsWithDataToRemove ? warningMessage : ''}
+                        isDismissible
+                        dismissalKey={dismissalKey}
+                    />
+                    <Button
+                        title={t('common.actions.cancel')}
+                        variant="secondary"
+                        onPress={onClose}
+                    />
+
+                    <Button
+                        title={primaryButtonTitle}
+                        variant="primary"
+                        loading={isSaving}
+                        onPress={onSave}
+                    />
+                </View>
             </View>
         </Modal>
     );

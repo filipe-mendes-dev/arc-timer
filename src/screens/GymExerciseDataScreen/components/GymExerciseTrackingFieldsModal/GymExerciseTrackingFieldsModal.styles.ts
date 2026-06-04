@@ -41,5 +41,8 @@ export const useStyles = createStyles((theme: AppTheme) =>
             borderColor: theme.palette.accent.primary,
             backgroundColor: theme.palette.accent.surface,
         },
+        modalActions: {
+            gap: 12,
+        },
     }),
 );
