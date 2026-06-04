@@ -74,7 +74,7 @@ export const useGymPlansScreen = (): UseGymPlansScreenResult => {
         startNewDraft.mutate(undefined, {
             onSuccess: () => {
                 closeNewPlanModal();
-                router.push('/gymPlans/builder');
+                router.push('/gymPlans/edit');
             },
         });
     }, [closeNewPlanModal, router, startNewDraft]);
@@ -94,7 +94,7 @@ export const useGymPlansScreen = (): UseGymPlansScreenResult => {
         }
 
         if (result.didImport) {
-            router.push('/gymPlans/builder');
+            router.push('/gymPlans/edit');
         }
 
         setImporting(false);

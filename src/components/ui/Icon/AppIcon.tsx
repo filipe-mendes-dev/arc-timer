@@ -134,6 +134,11 @@ const ICON_MAP = {
         name: 'create-outline',
         defaultSize: 18,
     },
+    note: {
+        lib: 'ion',
+        name: 'document-text-outline',
+        defaultSize: 18,
+    },
     star: {
         lib: 'ion',
         name: 'star',
