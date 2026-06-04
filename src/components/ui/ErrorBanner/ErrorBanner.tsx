@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useState } from 'react';
+import React, { forwardRef, useEffect, useRef, useState } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,6 +22,8 @@ interface DismissedBanner {
     message: string;
 }
 
+const COLLAPSE_DURATION_MS = 150;
+
 export const ErrorBanner = forwardRef<View, ErrorBannerProps>(({
     message,
     dismissalKey,
@@ -40,6 +42,7 @@ export const ErrorBanner = forwardRef<View, ErrorBannerProps>(({
         dismissedBanner.dismissalKey === dismissalKey;
     const isVisible = !!trimmedMessage && !isDismissed;
     const canDismiss = isDismissible || !!onClose;
+    const [shouldRender, setShouldRender] = useState(isVisible);
 
     const lastMessageRef = useRef('');
     if (trimmedMessage) {
@@ -55,8 +58,24 @@ export const ErrorBanner = forwardRef<View, ErrorBannerProps>(({
         onClose?.();
     };
 
+    useEffect(() => {
+        if (isVisible) {
+            setShouldRender(true);
+            return undefined;
+        }
+
+        const timeout = setTimeout(
+            () => setShouldRender(false),
+            COLLAPSE_DURATION_MS,
+        );
+
+        return () => clearTimeout(timeout);
+    }, [isVisible]);
+
+    if (!shouldRender) return null;
+
     return (
-        <CollapseFade visible={isVisible} duration={150}>
+        <CollapseFade visible={isVisible} duration={COLLAPSE_DURATION_MS}>
             <View
                 ref={ref}
                 style={[st.container, style]}
