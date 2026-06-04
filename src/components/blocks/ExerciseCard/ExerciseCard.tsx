@@ -77,7 +77,7 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
 
                 <View style={st.durationRow}>
                     <Stepper
-                        label={t('editBlock.fields.exerciseDurationSec')}
+                        label={t('editBlock.fields.durationSec')}
                         labelTone="primary"
                         value={exercise.value}
                         onChange={setDurationSec}
