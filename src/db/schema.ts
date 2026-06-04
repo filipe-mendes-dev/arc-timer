@@ -145,12 +145,6 @@ export const gymPlanExercisesTable = sqliteTable('gym_plan_exercises', {
         .notNull()
         .references(() => exerciseDefinitionsTable.id, { onDelete: 'restrict' }),
     sortIndex: integer('sort_index').notNull(),
-    targetSets: integer('target_sets'),
-    targetReps: integer('target_reps'),
-    targetWeightGrams: integer('target_weight_grams'),
-    targetDurationSec: integer('target_duration_sec'),
-    targetDistanceMeters: integer('target_distance_meters'),
-    restSec: integer('rest_sec'),
     notes: text('notes'),
     createdAtMs: integer('created_at_ms').notNull(),
     updatedAtMs: integer('updated_at_ms').notNull(),
@@ -160,6 +154,25 @@ export const gymPlanExercisesTable = sqliteTable('gym_plan_exercises', {
         table.sortIndex,
     ),
     index('gym_plan_exercises_definition_idx').on(table.exerciseDefinitionId),
+]);
+
+export const gymPlanExerciseTargetSetsTable = sqliteTable('gym_plan_exercise_target_sets', {
+    id: text('id').primaryKey(),
+    gymPlanExerciseId: text('gym_plan_exercise_id')
+        .notNull()
+        .references(() => gymPlanExercisesTable.id, { onDelete: 'cascade' }),
+    setIndex: integer('set_index').notNull(),
+    reps: integer('reps'),
+    weightGrams: integer('weight_grams'),
+    durationSec: integer('duration_sec'),
+    distanceMeters: integer('distance_meters'),
+    createdAtMs: integer('created_at_ms').notNull(),
+    updatedAtMs: integer('updated_at_ms').notNull(),
+}, (table) => [
+    uniqueIndex('gym_plan_exercise_target_sets_exercise_set_unique_idx').on(
+        table.gymPlanExerciseId,
+        table.setIndex,
+    ),
 ]);
 
 export const gymSessionsTable = sqliteTable('gym_sessions', {
