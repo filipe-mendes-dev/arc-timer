@@ -3,17 +3,24 @@ import type { UUID } from './entities';
 export type GymSessionStatus = 'active' | 'completed' | 'discarded';
 export type GymPlanStatus = 'active' | 'archived' | 'draft';
 
+export interface GymPlanExerciseTargetSet {
+    id: UUID;
+    setIndex: number;
+    reps?: number;
+    weightGrams?: number;
+    durationSec?: number;
+    distanceMeters?: number;
+    createdAtMs: number;
+    updatedAtMs: number;
+}
+
 export interface GymPlanExercise {
     id: UUID;
     exerciseDefinitionId: UUID;
+    name?: string;
     sortIndex: number;
-    targetSets?: number;
-    targetReps?: number;
-    targetWeightGrams?: number;
-    targetDurationSec?: number;
-    targetDistanceMeters?: number;
-    restSec?: number;
     notes?: string;
+    targetSetDrafts?: GymPlanExerciseTargetSet[];
     createdAtMs: number;
     updatedAtMs: number;
 }
