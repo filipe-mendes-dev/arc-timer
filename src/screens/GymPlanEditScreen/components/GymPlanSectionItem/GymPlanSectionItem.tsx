@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -8,30 +8,32 @@ import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { WiggleView } from '@src/components/ui/WiggleView';
 import type { GymPlanSection } from '@src/core/entities/gym.interfaces';
-import { getGymPlanExerciseTargetSets } from '@src/core/gyms/gymPlanTargetSets';
 import { useTheme } from '@src/theme/ThemeProvider';
 
+import {
+    type GymPlanSectionItemCopyScope,
+    getDisplayName,
+    getExerciseCountLabel,
+    getExerciseFallbackLabel,
+    getExercisePlannedSetCount,
+    getPlannedSetCount,
+    getPlannedSetCountLabel,
+    getSectionFallbackLabel,
+} from './GymPlanSectionItem.helpers';
 import { useGymPlanSectionItemStyles } from './GymPlanSectionItem.styles';
 
 interface GymPlanSectionItemProps {
+    copyScope?: GymPlanSectionItemCopyScope;
     definitionNameById: ReadonlyMap<string, string>;
     index: number;
     isWiggling?: boolean;
-    onPress: (sectionId: string) => void;
-    onRemove: (sectionId: string) => void;
+    onPress?: (sectionId: string) => void;
+    onRemove?: (sectionId: string) => void;
     section: GymPlanSection;
 }
 
-const getDisplayName = (
-    name: string | undefined,
-    fallbackName: string,
-): string => {
-    if (name && name.length > 0) return name;
-
-    return fallbackName;
-};
-
 export const GymPlanSectionItem = ({
+    copyScope = 'builder',
     definitionNameById,
     index,
     isWiggling = false,
@@ -45,44 +47,26 @@ export const GymPlanSectionItem = ({
     const hasExercises = section.exercises.length > 0;
 
     const plannedSetCount = useMemo(
-        () =>
-            section.exercises.reduce(
-                (total, exercise) =>
-                    total + getGymPlanExerciseTargetSets(exercise).length,
-                0,
-            ),
-        [section.exercises],
+        () => getPlannedSetCount(section),
+        [section],
     );
 
     const metaParts = useMemo(
         () => [
-            t('gymPlanBuilder.exerciseCount', {
-                count: section.exercises.length,
-            }),
-            t('gymPlanBuilder.plannedSetCount', {
-                count: plannedSetCount,
-            }),
+            getExerciseCountLabel(section.exercises.length, copyScope, t),
+            getPlannedSetCountLabel(plannedSetCount, copyScope, t),
         ],
-        [plannedSetCount, section.exercises.length, t],
+        [copyScope, plannedSetCount, section.exercises.length, t],
     );
 
     const trimmedTitle = section.title?.trim();
-    const fallbackSectionLabel = t('gymPlanBuilder.sectionFallback', {
-        index: index + 1,
-    });
+    const fallbackSectionLabel = getSectionFallbackLabel(index, copyScope, t);
     const sectionLabel = getDisplayName(trimmedTitle, fallbackSectionLabel);
 
-    const actionStrip = {
-        icon: (
-            <Ionicons
-                name="trash-outline"
-                size={18}
-                color={theme.palette.metaCard.actionStrip.icon}
-            />
-        ),
-        backgroundColor: theme.palette.metaCard.actionStrip.background,
-        onPress: () => onRemove(section.id),
-    };
+    const handlePress = useCallback(() => {
+        if (onPress) onPress(section.id);
+        return;
+    }, [onPress, section.id]);
 
     const measureKey = [
         section.id,
@@ -110,12 +94,25 @@ export const GymPlanSectionItem = ({
                     color: theme.palette.metaCard.topLeftContent.text,
                     borderColor: theme.palette.metaCard.topLeftContent.border,
                 }}
-                actionStrip={actionStrip}
+                actionStrip={
+                    onRemove && {
+                        icon: (
+                            <Ionicons
+                                name="trash-outline"
+                                size={18}
+                                color={theme.palette.metaCard.actionStrip.icon}
+                            />
+                        ),
+                        backgroundColor:
+                            theme.palette.metaCard.actionStrip.background,
+                        onPress: () => onRemove(section.id),
+                    }
+                }
                 expandable={hasExercises}
                 initiallyExpanded={hasExercises}
                 withBottomFade={false}
                 minHeight={0}
-                onPress={() => onPress(section.id)}
+                onPress={handlePress}
                 summaryContent={
                     <View style={st.body}>
                         <View style={st.sectionInfoRow}>
@@ -140,26 +137,25 @@ export const GymPlanSectionItem = ({
                                             definitionNameById.get(
                                                 exercise.exerciseDefinitionId,
                                             ) ??
-                                            t(
-                                                'gymPlanBuilder.exerciseFallback',
-                                                {
-                                                    index: exerciseIndex + 1,
-                                                },
+                                            getExerciseFallbackLabel(
+                                                exerciseIndex,
+                                                copyScope,
+                                                t,
                                             );
                                         const exerciseName = getDisplayName(
                                             exercise.name,
                                             fallbackName,
                                         );
                                         const exercisePlannedSetCount =
-                                            getGymPlanExerciseTargetSets(
+                                            getExercisePlannedSetCount(
                                                 exercise,
-                                            ).length;
-                                        const secondaryContent = t(
-                                            'gymPlanBuilder.plannedSetCount',
-                                            {
-                                                count: exercisePlannedSetCount,
-                                            },
-                                        );
+                                            );
+                                        const secondaryContent =
+                                            getPlannedSetCountLabel(
+                                                exercisePlannedSetCount,
+                                                copyScope,
+                                                t,
+                                            );
 
                                         return (
                                             <IndexedListItem
