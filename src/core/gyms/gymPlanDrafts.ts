@@ -37,7 +37,6 @@ export const createGymPlanPlaceholderExercise = (
     const exercise: GymPlanExercise = {
         id: uid(),
         exerciseDefinitionId: '',
-        name: `Exercise ${index}`,
         sortIndex: index - 1,
         createdAtMs: nowMs,
         updatedAtMs: nowMs,
@@ -75,7 +74,7 @@ export const createEmptyGymPlanDraft = (): GymPlan => {
         id: uid(),
         name: '',
         description: undefined,
-        sections: [createGymPlanSectionWithPlaceholders()],
+        sections: [],
         createdAtMs: nowMs,
         updatedAtMs: nowMs,
         isFavorite: false,
