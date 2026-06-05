@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import type { WorkoutBlock } from '@src/core/entities/entities';
+import { IndexedListItem } from '@src/components/ui/IndexedListItem';
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { WiggleView } from '@src/components/ui/WiggleView';
@@ -148,45 +149,29 @@ export const WorkoutBlockItem = ({
                 collapsibleContent={
                     <View style={st.body}>
                         <View style={st.exercisesContainer}>
-                            {exercises.map((ex, i) => (
-                                <View key={ex.id} style={st.exerciseRow}>
-                                    <View style={st.exerciseIndexBubble}>
-                                        <AppText
-                                            variant="caption"
-                                            style={st.exerciseIndexText}
-                                        >
-                                            {i + 1}
-                                        </AppText>
-                                    </View>
+                            {exercises.map((ex, i) => {
+                                const mainContent =
+                                    ex.name ??
+                                    t(
+                                        'workoutBlockItem.labels.exerciseWithIndex',
+                                        {
+                                            index: i + 1,
+                                        },
+                                    );
+                                const secondaryContent = formatExerciseMeta(
+                                    ex.mode,
+                                    ex.value,
+                                );
 
-                                    <View style={st.exerciseTexts}>
-                                        <AppText
-                                            variant="bodySmall"
-                                            tone="primary"
-                                            numberOfLines={1}
-                                        >
-                                            {ex.name ??
-                                                t(
-                                                    'workoutBlockItem.labels.exerciseWithIndex',
-                                                    {
-                                                        index: i + 1,
-                                                    }
-                                                )}
-                                        </AppText>
-
-                                        <AppText
-                                            variant="caption"
-                                            tone="muted"
-                                            numberOfLines={1}
-                                        >
-                                            {formatExerciseMeta(
-                                                ex.mode,
-                                                ex.value
-                                            )}
-                                        </AppText>
-                                    </View>
-                                </View>
-                            ))}
+                                return (
+                                    <IndexedListItem
+                                        key={ex.id}
+                                        index={i}
+                                        mainContent={mainContent}
+                                        secondaryContent={secondaryContent}
+                                    />
+                                );
+                            })}
                         </View>
                     </View>
                 }
