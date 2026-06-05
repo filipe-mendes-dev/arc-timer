@@ -8,7 +8,7 @@ import {
     cloneGymPlanAsDraft,
     cloneImportedGymPlanAsDraft,
     createEmptyGymPlanDraft,
-    createGymPlanSectionWithPlaceholders,
+    createEmptyGymPlanSection,
 } from '@src/core/gyms/gymPlanDrafts';
 
 export type GymPlanBuilderMode = 'create' | 'edit' | 'import';
@@ -60,7 +60,7 @@ export const useGymPlanBuilderStore = create<GymPlanBuilderState>()((set) => ({
                     ...state.draft,
                     sections: normalizeGymPlanSections([
                         ...state.draft.sections,
-                        createGymPlanSectionWithPlaceholders(),
+                        createEmptyGymPlanSection(),
                     ]),
                 },
                 isDirty: true,
