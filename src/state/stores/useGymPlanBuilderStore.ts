@@ -1,10 +1,14 @@
 import { create } from 'zustand';
 
-import type { GymPlan } from '@src/core/entities/gym.interfaces';
+import type {
+    GymPlan,
+    GymPlanSection,
+} from '@src/core/entities/gym.interfaces';
 import {
     cloneGymPlanAsDraft,
     cloneImportedGymPlanAsDraft,
     createEmptyGymPlanDraft,
+    createGymPlanSectionWithPlaceholders,
 } from '@src/core/gyms/gymPlanDrafts';
 
 export type GymPlanBuilderMode = 'create' | 'edit' | 'import';
@@ -13,9 +17,11 @@ interface GymPlanBuilderState {
     draft: GymPlan | null;
     isDirty: boolean;
     mode: GymPlanBuilderMode | null;
+    addSection: () => void;
     checkpointDraft: () => void;
     clearDraft: () => void;
     hydrateDraft: (draft: GymPlan, mode: GymPlanBuilderMode) => void;
+    removeSection: (sectionId: string) => void;
     setDraft: (
         draft:
             | GymPlan
@@ -25,12 +31,41 @@ interface GymPlanBuilderState {
     startEditDraft: (gymPlan: GymPlan) => void;
     startImportedDraft: (gymPlan: GymPlan) => void;
     startNewDraft: () => void;
+    updateDraft: (patch: Partial<GymPlan>) => void;
+    updateSections: (sections: readonly GymPlanSection[]) => void;
 }
+
+const normalizeGymPlanSections = (
+    sections: readonly GymPlanSection[],
+): GymPlanSection[] =>
+    sections.map((section, sectionIndex) => ({
+        ...section,
+        sortIndex: sectionIndex,
+        exercises: section.exercises.map((exercise, exerciseIndex) => ({
+            ...exercise,
+            sortIndex: exerciseIndex,
+        })),
+    }));
 
 export const useGymPlanBuilderStore = create<GymPlanBuilderState>()((set) => ({
     draft: null,
     isDirty: false,
     mode: null,
+    addSection: () =>
+        set((state) => {
+            if (!state.draft) return {};
+
+            return {
+                draft: {
+                    ...state.draft,
+                    sections: normalizeGymPlanSections([
+                        ...state.draft.sections,
+                        createGymPlanSectionWithPlaceholders(),
+                    ]),
+                },
+                isDirty: true,
+            };
+        }),
     checkpointDraft: () => set({ isDirty: false }),
     clearDraft: () =>
         set({
@@ -43,6 +78,22 @@ export const useGymPlanBuilderStore = create<GymPlanBuilderState>()((set) => ({
             draft,
             isDirty: false,
             mode,
+        }),
+    removeSection: (sectionId) =>
+        set((state) => {
+            if (!state.draft) return {};
+
+            return {
+                draft: {
+                    ...state.draft,
+                    sections: normalizeGymPlanSections(
+                        state.draft.sections.filter(
+                            (section) => section.id !== sectionId,
+                        ),
+                    ),
+                },
+                isDirty: true,
+            };
         }),
     setDraft: (draft) =>
         set((state) => ({
@@ -69,5 +120,29 @@ export const useGymPlanBuilderStore = create<GymPlanBuilderState>()((set) => ({
             draft: createEmptyGymPlanDraft(),
             isDirty: true,
             mode: 'create',
+        }),
+    updateDraft: (patch) =>
+        set((state) => {
+            if (!state.draft) return {};
+
+            return {
+                draft: {
+                    ...state.draft,
+                    ...patch,
+                },
+                isDirty: true,
+            };
+        }),
+    updateSections: (sections) =>
+        set((state) => {
+            if (!state.draft) return {};
+
+            return {
+                draft: {
+                    ...state.draft,
+                    sections: normalizeGymPlanSections(sections),
+                },
+                isDirty: true,
+            };
         }),
 }));
