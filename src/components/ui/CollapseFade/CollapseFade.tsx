@@ -12,6 +12,7 @@ import { st } from './CollapseFade.styles';
 interface CollapseFadeProps {
     visible: boolean;
     children: React.ReactNode;
+    animateOnMount?: boolean;
     duration?: number;
     contentStyle?: StyleProp<ViewStyle>;
 }
@@ -19,11 +20,12 @@ interface CollapseFadeProps {
 export const CollapseFade = ({
     visible,
     children,
+    animateOnMount = false,
     duration = 200,
     contentStyle,
 }: CollapseFadeProps) => {
     const height = useSharedValue(0);
-    const opacity = useSharedValue(visible ? 1 : 0);
+    const opacity = useSharedValue(visible && !animateOnMount ? 1 : 0);
 
     // Refs avoid the setState → re-render → useEffect chain; inside a Modal
     // layout fires repeatedly during the open animation, which restarts
@@ -41,7 +43,9 @@ export const CollapseFade = ({
         contentHeightRef.current = measured;
 
         if (visibleRef.current) {
-            height.value = withTiming(measured, { duration: durationRef.current });
+            height.value = withTiming(measured, {
+                duration: durationRef.current,
+            });
             opacity.value = withTiming(1, { duration: durationRef.current });
         }
     };
