@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useRef, useState } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,6 +11,7 @@ import GuardedPressable from '../GuardedPressable/GuardedPressable';
 
 interface ErrorBannerProps {
     message: string;
+    collapseContentStyle?: StyleProp<ViewStyle>;
     dismissalKey?: string | number;
     isDismissible?: boolean;
     onClose?: () => void;
@@ -24,90 +25,80 @@ interface DismissedBanner {
 
 const COLLAPSE_DURATION_MS = 150;
 
-export const ErrorBanner = forwardRef<View, ErrorBannerProps>(({
-    message,
-    dismissalKey,
-    isDismissible = false,
-    onClose,
-    style,
-}, ref) => {
-    const { theme } = useTheme();
-    const st = useStyles();
-    const [dismissedBanner, setDismissedBanner] =
-        useState<DismissedBanner | null>(null);
-
-    const trimmedMessage = message.trim();
-    const isDismissed =
-        dismissedBanner?.message === trimmedMessage &&
-        dismissedBanner.dismissalKey === dismissalKey;
-    const isVisible = !!trimmedMessage && !isDismissed;
-    const canDismiss = isDismissible || !!onClose;
-    const [shouldRender, setShouldRender] = useState(isVisible);
-
-    const lastMessageRef = useRef('');
-    if (trimmedMessage) {
-        lastMessageRef.current = trimmedMessage;
-    }
-    const renderedMessage = lastMessageRef.current;
-
-    const handleClose = () => {
-        setDismissedBanner({
+export const ErrorBanner = forwardRef<View, ErrorBannerProps>(
+    (
+        {
+            message,
+            collapseContentStyle,
             dismissalKey,
-            message: trimmedMessage,
-        });
-        onClose?.();
-    };
+            isDismissible = false,
+            onClose,
+            style,
+        },
+        ref,
+    ) => {
+        const { theme } = useTheme();
+        const st = useStyles();
+        const [dismissedBanner, setDismissedBanner] =
+            useState<DismissedBanner | null>(null);
 
-    useEffect(() => {
-        if (isVisible) {
-            setShouldRender(true);
-            return undefined;
+        const trimmedMessage = message.trim();
+        const isDismissed =
+            dismissedBanner?.message === trimmedMessage &&
+            dismissedBanner.dismissalKey === dismissalKey;
+        const isVisible = !!trimmedMessage && !isDismissed;
+        const canDismiss = isDismissible || !!onClose;
+
+        const lastMessageRef = useRef('');
+        if (trimmedMessage) {
+            lastMessageRef.current = trimmedMessage;
         }
+        const renderedMessage = lastMessageRef.current;
 
-        const timeout = setTimeout(
-            () => setShouldRender(false),
-            COLLAPSE_DURATION_MS,
-        );
+        const handleClose = () => {
+            setDismissedBanner({
+                dismissalKey,
+                message: trimmedMessage,
+            });
+            onClose?.();
+        };
 
-        return () => clearTimeout(timeout);
-    }, [isVisible]);
-
-    if (!shouldRender) return null;
-
-    return (
-        <CollapseFade visible={isVisible} duration={COLLAPSE_DURATION_MS}>
-            <View
-                ref={ref}
-                style={[st.container, style]}
+        return (
+            <CollapseFade
+                visible={isVisible}
+                duration={COLLAPSE_DURATION_MS}
+                contentStyle={collapseContentStyle}
             >
-                <Ionicons
-                    name="alert-circle"
-                    size={18}
-                    color={theme.palette.icon.error}
-                />
+                <View ref={ref} style={[st.container, style]}>
+                    <Ionicons
+                        name="alert-circle"
+                        size={18}
+                        color={theme.palette.icon.error}
+                    />
 
-                <View style={st.textContainer}>
-                    <AppText variant="bodySmall" style={st.messageText}>
-                        {renderedMessage}
-                    </AppText>
+                    <View style={st.textContainer}>
+                        <AppText variant="bodySmall" style={st.messageText}>
+                            {renderedMessage}
+                        </AppText>
+                    </View>
+
+                    {canDismiss && (
+                        <GuardedPressable
+                            onPress={handleClose}
+                            hitSlop={12}
+                            style={st.closeButton}
+                        >
+                            <Ionicons
+                                name="close"
+                                size={18}
+                                color={theme.palette.text.muted}
+                            />
+                        </GuardedPressable>
+                    )}
                 </View>
-
-                {canDismiss && (
-                    <GuardedPressable
-                        onPress={handleClose}
-                        hitSlop={12}
-                        style={st.closeButton}
-                    >
-                        <Ionicons
-                            name="close"
-                            size={18}
-                            color={theme.palette.text.muted}
-                        />
-                    </GuardedPressable>
-                )}
-            </View>
-        </CollapseFade>
-    );
-});
+            </CollapseFade>
+        );
+    },
+);
 
 ErrorBanner.displayName = 'ErrorBanner';
