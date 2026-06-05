@@ -48,23 +48,25 @@ const GymPlanEditScreen = () => {
                 topBarOptions={screen.topBarOptions}
                 gap={theme.layout.mainContainer.gap}
             >
-                <TextField
-                    label={t('gymPlanBuilder.fields.name')}
-                    value={screen.draft.name}
-                    onChangeText={screen.updateName}
-                    placeholder={t('gymPlanBuilder.fields.namePlaceholder')}
-                    errorText={screen.nameErrorMessage}
-                />
-                {screen.isNotesVisible && (
-                    <TextAreaField
-                        label={t('gymPlanBuilder.fields.notes')}
-                        value={screen.draft.description ?? ''}
-                        onChangeText={screen.updateDescription}
-                        placeholder={t(
-                            'gymPlanBuilder.fields.descriptionPlaceholder',
-                        )}
+                <View>
+                    <TextField
+                        label={t('gymPlanBuilder.fields.name')}
+                        value={screen.draft.name}
+                        onChangeText={screen.updateName}
+                        placeholder={t('gymPlanBuilder.fields.namePlaceholder')}
+                        errorText={screen.nameErrorMessage}
                     />
-                )}
+                    {screen.isNotesVisible && (
+                        <TextAreaField
+                            label={t('gymPlanBuilder.fields.notes')}
+                            value={screen.draft.description ?? ''}
+                            onChangeText={screen.updateDescription}
+                            placeholder={t(
+                                'gymPlanBuilder.fields.descriptionPlaceholder',
+                            )}
+                        />
+                    )}
+                </View>
 
                 <ScreenSection
                     title={t('gymPlanBuilder.sections.plan')}

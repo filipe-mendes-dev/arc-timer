@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import type { GymPlanSection } from '@src/core/entities/gym.interfaces';
+import { getGymPlanExerciseTargetSets } from '@src/core/gyms/gymPlanTargetSets';
 import { useTheme } from '@src/theme/ThemeProvider';
 
 import { useGymPlanSectionItemStyles } from './GymPlanSectionItem.styles';
@@ -50,7 +51,8 @@ export const GymPlanSectionItem = ({
     const plannedSetCount = useMemo(
         () =>
             section.exercises.reduce(
-                (total, exercise) => total + (exercise.targetSets ?? 0),
+                (total, exercise) =>
+                    total + getGymPlanExerciseTargetSets(exercise).length,
                 0,
             ),
         [section.exercises],
@@ -195,6 +197,10 @@ export const GymPlanSectionItem = ({
                                 if (exercise.name) {
                                     exerciseName = exercise.name;
                                 }
+                                const exercisePlannedSetCount =
+                                    getGymPlanExerciseTargetSets(
+                                        exercise,
+                                    ).length;
 
                                 return (
                                     <View
@@ -227,9 +233,7 @@ export const GymPlanSectionItem = ({
                                                 {t(
                                                     'gymPlanBuilder.plannedSetCount',
                                                     {
-                                                        count:
-                                                            exercise.targetSets ??
-                                                            0,
+                                                        count: exercisePlannedSetCount,
                                                     },
                                                 )}
                                             </AppText>
