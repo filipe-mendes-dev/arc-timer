@@ -141,7 +141,11 @@ export const MetaCard: FC<MetaCardProps> = ({
     return (
         <GuardedPressable
             onPress={onPress}
-            style={[st.cardContainer, containerStyle]}
+            style={({ pressed }) => [
+                st.cardContainer,
+                containerStyle,
+                pressed && onPress && st.pressed,
+            ]}
         >
             {/* Top header */}
             <View style={st.cardHeader}>

@@ -26,7 +26,7 @@ export const useStyles = createStyles(
             },
 
             pressed: {
-                opacity: 0.9,
+                opacity: 0.8,
             },
 
             textBlock: {

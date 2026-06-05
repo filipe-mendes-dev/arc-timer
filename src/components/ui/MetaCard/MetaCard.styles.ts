@@ -187,5 +187,6 @@ export const useMetaCardStyles = createStyles(
                     props.selectionOutlineColor ?? theme.palette.accent.primary,
                 zIndex: 20,
             },
+            pressed: { opacity: 0.8 },
         }),
 );
