@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
+import { IndexedListItem } from '@src/components/ui/IndexedListItem';
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { WiggleView } from '@src/components/ui/WiggleView';
@@ -21,6 +22,15 @@ interface GymPlanSectionItemProps {
     section: GymPlanSection;
 }
 
+const getDisplayName = (
+    name: string | undefined,
+    fallbackName: string,
+): string => {
+    if (name && name.length > 0) return name;
+
+    return fallbackName;
+};
+
 export const GymPlanSectionItem = ({
     definitionNameById,
     index,
@@ -32,6 +42,7 @@ export const GymPlanSectionItem = ({
     const { t } = useTranslation();
     const { theme } = useTheme();
     const st = useGymPlanSectionItemStyles();
+    const hasExercises = section.exercises.length > 0;
 
     const plannedSetCount = useMemo(
         () =>
@@ -56,12 +67,10 @@ export const GymPlanSectionItem = ({
     );
 
     const trimmedTitle = section.title?.trim();
-    let sectionLabel = t('gymPlanBuilder.sectionFallback', {
+    const fallbackSectionLabel = t('gymPlanBuilder.sectionFallback', {
         index: index + 1,
     });
-    if (trimmedTitle && trimmedTitle.length > 0) {
-        sectionLabel = trimmedTitle;
-    }
+    const sectionLabel = getDisplayName(trimmedTitle, fallbackSectionLabel);
 
     const actionStrip = {
         icon: (
@@ -85,6 +94,7 @@ export const GymPlanSectionItem = ({
     return (
         <WiggleView index={index} isWiggling={isWiggling}>
             <MetaCard
+                key={hasExercises ? 'withExercises' : 'empty'}
                 measureKey={measureKey}
                 topLeftContent={{
                     text: sectionLabel,
@@ -101,8 +111,8 @@ export const GymPlanSectionItem = ({
                     borderColor: theme.palette.metaCard.topLeftContent.border,
                 }}
                 actionStrip={actionStrip}
-                expandable
-                initiallyExpanded
+                expandable={hasExercises}
+                initiallyExpanded={hasExercises}
                 withBottomFade={false}
                 minHeight={0}
                 onPress={() => onPress(section.id)}
@@ -121,65 +131,51 @@ export const GymPlanSectionItem = ({
                     </View>
                 }
                 collapsibleContent={
-                    <View style={st.body}>
-                        <View style={st.exercisesContainer}>
-                            {section.exercises.map((exercise, exerciseIndex) => {
-                                let exerciseName =
-                                    definitionNameById.get(
-                                        exercise.exerciseDefinitionId,
-                                    ) ??
-                                    t('gymPlanBuilder.exerciseFallback', {
-                                        index: exerciseIndex + 1,
-                                    });
-                                if (exercise.name) {
-                                    exerciseName = exercise.name;
-                                }
-                                const exercisePlannedSetCount =
-                                    getGymPlanExerciseTargetSets(
-                                        exercise,
-                                    ).length;
+                    hasExercises ? (
+                        <View style={st.body}>
+                            <View style={st.exercisesContainer}>
+                                {section.exercises.map(
+                                    (exercise, exerciseIndex) => {
+                                        const fallbackName =
+                                            definitionNameById.get(
+                                                exercise.exerciseDefinitionId,
+                                            ) ??
+                                            t(
+                                                'gymPlanBuilder.exerciseFallback',
+                                                {
+                                                    index: exerciseIndex + 1,
+                                                },
+                                            );
+                                        const exerciseName = getDisplayName(
+                                            exercise.name,
+                                            fallbackName,
+                                        );
+                                        const exercisePlannedSetCount =
+                                            getGymPlanExerciseTargetSets(
+                                                exercise,
+                                            ).length;
+                                        const secondaryContent = t(
+                                            'gymPlanBuilder.plannedSetCount',
+                                            {
+                                                count: exercisePlannedSetCount,
+                                            },
+                                        );
 
-                                return (
-                                    <View
-                                        key={exercise.id}
-                                        style={st.exerciseRow}
-                                    >
-                                        <View style={st.exerciseIndexBubble}>
-                                            <AppText
-                                                variant="caption"
-                                                style={st.exerciseIndexText}
-                                            >
-                                                {exerciseIndex + 1}
-                                            </AppText>
-                                        </View>
-
-                                        <View style={st.exerciseTexts}>
-                                            <AppText
-                                                variant="bodySmall"
-                                                tone="primary"
-                                                numberOfLines={1}
-                                            >
-                                                {exerciseName}
-                                            </AppText>
-
-                                            <AppText
-                                                variant="caption"
-                                                tone="muted"
-                                                numberOfLines={1}
-                                            >
-                                                {t(
-                                                    'gymPlanBuilder.plannedSetCount',
-                                                    {
-                                                        count: exercisePlannedSetCount,
-                                                    },
-                                                )}
-                                            </AppText>
-                                        </View>
-                                    </View>
-                                );
-                            })}
+                                        return (
+                                            <IndexedListItem
+                                                key={exercise.id}
+                                                index={exerciseIndex}
+                                                mainContent={exerciseName}
+                                                secondaryContent={
+                                                    secondaryContent
+                                                }
+                                            />
+                                        );
+                                    },
+                                )}
+                            </View>
                         </View>
-                    </View>
+                    ) : undefined
                 }
             />
         </WiggleView>
