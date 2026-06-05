@@ -1,20 +1,11 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, {
-    cancelAnimation,
-    Easing,
-    useAnimatedStyle,
-    useSharedValue,
-    withDelay,
-    withRepeat,
-    withSequence,
-    withTiming,
-} from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { AppText } from '@src/components/ui/Typography/AppText';
+import { WiggleView } from '@src/components/ui/WiggleView';
 import type { GymPlanSection } from '@src/core/entities/gym.interfaces';
 import { getGymPlanExerciseTargetSets } from '@src/core/gyms/gymPlanTargetSets';
 import { useTheme } from '@src/theme/ThemeProvider';
@@ -30,11 +21,6 @@ interface GymPlanSectionItemProps {
     section: GymPlanSection;
 }
 
-const SHAKE_DISTANCE = 1;
-const SHAKE_STEP_MS = 300;
-const PAUSE_BETWEEN_SHAKES_MS = 500;
-const INITIAL_DELAY_STAGGER_MS = 90;
-
 export const GymPlanSectionItem = ({
     definitionNameById,
     index,
@@ -46,7 +32,6 @@ export const GymPlanSectionItem = ({
     const { t } = useTranslation();
     const { theme } = useTheme();
     const st = useGymPlanSectionItemStyles();
-    const wiggleValue = useSharedValue<number>(0);
 
     const plannedSetCount = useMemo(
         () =>
@@ -69,54 +54,6 @@ export const GymPlanSectionItem = ({
         ],
         [plannedSetCount, section.exercises.length, t],
     );
-
-    const wiggleAnimatedStyle = useAnimatedStyle(() => ({
-        transform: [{ translateX: wiggleValue.value }],
-    }));
-
-    useEffect(() => {
-        if (!isWiggling) {
-            cancelAnimation(wiggleValue);
-            wiggleValue.value = 0;
-            return;
-        }
-
-        const initialDelayMs = index * INITIAL_DELAY_STAGGER_MS;
-        const easing = Easing.inOut(Easing.quad);
-
-        wiggleValue.value = withDelay(
-            initialDelayMs,
-            withRepeat(
-                withSequence(
-                    withTiming(SHAKE_DISTANCE, {
-                        duration: SHAKE_STEP_MS,
-                        easing,
-                    }),
-                    withTiming(-SHAKE_DISTANCE, {
-                        duration: SHAKE_STEP_MS,
-                        easing,
-                    }),
-                    withTiming(SHAKE_DISTANCE, {
-                        duration: SHAKE_STEP_MS,
-                        easing,
-                    }),
-                    withTiming(0, {
-                        duration: SHAKE_STEP_MS,
-                        easing,
-                    }),
-                    withDelay(
-                        PAUSE_BETWEEN_SHAKES_MS,
-                        withTiming(0, {
-                            duration: 0,
-                            easing,
-                        }),
-                    ),
-                ),
-                -1,
-            ),
-        );
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [index, isWiggling]);
 
     const trimmedTitle = section.title?.trim();
     let sectionLabel = t('gymPlanBuilder.sectionFallback', {
@@ -146,7 +83,7 @@ export const GymPlanSectionItem = ({
     ].join(':');
 
     return (
-        <Animated.View style={isWiggling ? wiggleAnimatedStyle : undefined}>
+        <WiggleView index={index} isWiggling={isWiggling}>
             <MetaCard
                 measureKey={measureKey}
                 topLeftContent={{
@@ -245,6 +182,6 @@ export const GymPlanSectionItem = ({
                     </View>
                 }
             />
-        </Animated.View>
+        </WiggleView>
     );
 };
