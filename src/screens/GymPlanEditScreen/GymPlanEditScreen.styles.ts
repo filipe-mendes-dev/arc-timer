@@ -13,7 +13,7 @@ export const useStyles = createStyles((theme: AppTheme) =>
             gap: 12,
         },
         errorBanner: {
-            marginTop: 8,
+            paddingTop: theme.layout.listItem.gap,
         },
         notesContent: {
             paddingTop: theme.layout.mainContainer.gap,

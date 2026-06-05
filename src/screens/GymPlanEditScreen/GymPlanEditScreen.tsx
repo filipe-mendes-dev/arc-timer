@@ -77,16 +77,18 @@ const GymPlanEditScreen = () => {
                     title={t('gymPlanBuilder.sections.plan')}
                     gap={theme.layout.listItem.gap}
                 >
-                    <AppText variant="caption" tone="secondary">
-                        {t('gymPlanBuilder.hints.tapSectionToEdit')}
-                    </AppText>
+                    <View>
+                        <AppText variant="caption" tone="secondary">
+                            {t('gymPlanBuilder.hints.tapSectionToEdit')}
+                        </AppText>
 
-                    <ErrorBanner
-                        message={screen.errorMessage}
-                        isDismissible
-                        dismissalKey={screen.validationDismissalKey}
-                        style={st.errorBanner}
-                    />
+                        <ErrorBanner
+                            message={screen.errorMessage}
+                            isDismissible
+                            dismissalKey={screen.validationDismissalKey}
+                            collapseContentStyle={st.errorBanner}
+                        />
+                    </View>
 
                     {screen.draft.sections.map((section, sectionIndex) => (
                         <GymPlanSectionItem
