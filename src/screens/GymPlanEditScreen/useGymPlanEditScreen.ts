@@ -6,8 +6,7 @@ import type { TopBarOption } from '@src/components/navigation/TopBar/TopBar.inte
 import type { MainContainerHandle } from '@src/components/layout/MainContainer/MainContainer';
 import type { GymPlan } from '@src/core/entities/gym.interfaces';
 import {
-    createGymPlanPlaceholderExercise,
-    createGymPlanSectionWithPlaceholders,
+    createEmptyGymPlanSection,
     isPlaceholderGymPlanExercise,
     stripPlaceholderGymPlanExercises,
 } from '@src/core/gyms/gymPlanDrafts';
@@ -41,13 +40,16 @@ interface UseGymPlanEditScreenResult {
     mainContainerRef: React.RefObject<MainContainerHandle | null>;
     nameErrorMessage?: string;
     openSection: (sectionId: string) => void;
+    planNameInput: string;
+    planTitle: string;
     removeSectionId: string | null;
     saveDraft: () => void;
+    commitPlanNameInput: () => void;
     setLeaveConfirmVisible: (isVisible: boolean) => void;
     setRemoveSectionId: (sectionId: string | null) => void;
     topBarOptions: readonly TopBarOption[];
     updateDescription: (description: string) => void;
-    updateName: (name: string) => void;
+    updatePlanNameInput: (name: string) => void;
     validationDismissalKey: number;
 }
 
@@ -59,20 +61,16 @@ export const useGymPlanEditScreen = (): UseGymPlanEditScreenResult => {
     const commitDraft = useCommitGymPlanDraft();
     const discardDraft = useDiscardGymPlanDraft();
     const { data: allExerciseDefinitions = [] } = useGymExerciseDefinitions();
-    const addSectionToDraft = useGymPlanBuilderStore(
-        (state) => state.addSection,
-    );
     const draft = useGymPlanBuilderStore((state) => state.draft);
     const clearDraft = useGymPlanBuilderStore((state) => state.clearDraft);
     const hydrateDraft = useGymPlanBuilderStore((state) => state.hydrateDraft);
     const removeSectionFromDraft = useGymPlanBuilderStore(
         (state) => state.removeSection,
     );
+    const setDraft = useGymPlanBuilderStore((state) => state.setDraft);
     const updateDraft = useGymPlanBuilderStore((state) => state.updateDraft);
-    const updateSections = useGymPlanBuilderStore(
-        (state) => state.updateSections,
-    );
     const [isNotesVisible, setNotesVisible] = useState(false);
+    const [planNameInput, setPlanNameInput] = useState('');
     const [removeSectionId, setRemoveSectionId] = useState<string | null>(null);
     const [isLeaveConfirmVisible, setLeaveConfirmVisible] = useState(false);
     const [errors, setErrors] = useState<ValidationError[]>([]);
@@ -99,40 +97,16 @@ export const useGymPlanEditScreen = (): UseGymPlanEditScreenResult => {
 
     useEffect(() => {
         if (!draft) {
+            setPlanNameInput('');
             setNotesVisible(false);
             return;
         }
 
+        setPlanNameInput(draft.name);
         if ((draft.description?.trim().length ?? 0) > 0) {
             setNotesVisible(true);
         }
     }, [draft]);
-
-    useEffect(() => {
-        if (!draft) return;
-
-        const shouldCreateSection = draft.sections.length === 0;
-        if (shouldCreateSection) {
-            updateSections([createGymPlanSectionWithPlaceholders()]);
-            return;
-        }
-
-        const hasEmptySection = draft.sections.some(
-            (section) => section.exercises.length === 0,
-        );
-        if (!hasEmptySection) return;
-
-        updateSections(
-            draft.sections.map((section) => {
-                if (section.exercises.length > 0) return section;
-
-                return {
-                    ...section,
-                    exercises: [createGymPlanPlaceholderExercise(1)],
-                };
-            }),
-        );
-    }, [draft, updateSections]);
 
     const requestLeave = useCallback((): boolean => {
         if (!draft) return false;
@@ -171,15 +145,38 @@ export const useGymPlanEditScreen = (): UseGymPlanEditScreenResult => {
         [updateDraft],
     );
 
-    const addSection = useCallback(() => {
-        addSectionToDraft();
-        setErrors((prev) => prev.filter((error) => error.field !== 'sections'));
-    }, [addSectionToDraft]);
+    const commitPlanNameInput = useCallback(() => {
+        updateDraftAndClearErrors({ name: planNameInput.trim() });
+    }, [planNameInput, updateDraftAndClearErrors]);
 
-    const validate = (): ValidationError[] => {
+    const addSection = useCallback(() => {
+        const section = createEmptyGymPlanSection();
+        setDraft((currentDraft) => {
+            if (!currentDraft) return currentDraft;
+
+            return {
+                ...currentDraft,
+                sections: [
+                    ...currentDraft.sections,
+                    {
+                        ...section,
+                        sortIndex: currentDraft.sections.length,
+                    },
+                ],
+            };
+        });
+        router.push({
+            pathname: '/gymPlans/edit-section',
+            params: { sectionId: section.id },
+        });
+        setErrors((prev) => prev.filter((error) => error.field !== 'sections'));
+    }, [router, setDraft]);
+
+    const validate = (nameOverride?: string): ValidationError[] => {
         const nextErrors: ValidationError[] = [];
 
-        if (!draft || draft.name.trim().length === 0) {
+        const name = nameOverride ?? draft?.name ?? '';
+        if (!draft || name.trim().length === 0) {
             nextErrors.push({
                 field: 'name',
                 message: t('gymPlanBuilder.validation.nameRequired'),
@@ -223,12 +220,19 @@ export const useGymPlanEditScreen = (): UseGymPlanEditScreenResult => {
     };
 
     const saveDraft = () => {
-        const validationErrors = validate();
+        const nextName = planNameInput.trim();
+        updateDraftAndClearErrors({ name: nextName });
+        const validationErrors = validate(nextName);
         setValidationDismissalKey((prev) => prev + 1);
-        if (validationErrors.length > 0) return;
         if (!draft) return;
+        if (validationErrors.length > 0) return;
 
-        upsertDraft.mutate(stripPlaceholderGymPlanExercises(draft), {
+        upsertDraft.mutate(stripPlaceholderGymPlanExercises(
+            {
+                ...draft,
+                name: nextName,
+            },
+        ), {
             onSuccess: () => {
                 commitDraft.mutate(undefined, {
                     onSuccess: (savedPlan) => {
@@ -295,10 +299,16 @@ export const useGymPlanEditScreen = (): UseGymPlanEditScreenResult => {
             ? t('gymPlanBuilder.validation.saveFailed')
             : '';
     const errorMessage = mutationErrorMessage || sectionErrorMessage;
+    const trimmedPlanName = draft?.name.trim() ?? '';
+    let planTitle = t('gymPlanBuilder.title');
+    if (trimmedPlanName.length > 0) {
+        planTitle = trimmedPlanName;
+    }
 
     return {
         addSection,
         cancelLeave: () => setLeaveConfirmVisible(false),
+        commitPlanNameInput,
         confirmDiscardAndLeave,
         confirmRemoveSection,
         definitionNameById,
@@ -311,6 +321,8 @@ export const useGymPlanEditScreen = (): UseGymPlanEditScreenResult => {
         mainContainerRef,
         nameErrorMessage,
         openSection,
+        planNameInput,
+        planTitle,
         removeSectionId,
         saveDraft,
         setLeaveConfirmVisible,
@@ -318,7 +330,7 @@ export const useGymPlanEditScreen = (): UseGymPlanEditScreenResult => {
         topBarOptions,
         updateDescription: (description) =>
             updateDraftAndClearErrors({ description }),
-        updateName: (name) => updateDraftAndClearErrors({ name }),
+        updatePlanNameInput: setPlanNameInput,
         validationDismissalKey,
     };
 };

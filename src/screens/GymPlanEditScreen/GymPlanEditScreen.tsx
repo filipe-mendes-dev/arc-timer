@@ -16,6 +16,7 @@ import { useTheme } from '@src/theme/ThemeProvider';
 import { useStyles } from './GymPlanEditScreen.styles';
 import { GymPlanSectionItem } from './components/GymPlanSectionItem';
 import { useGymPlanEditScreen } from './useGymPlanEditScreen';
+import { CollapseFade } from 'src/components/ui/CollapseFade/CollapseFade';
 
 const GymPlanEditScreen = () => {
     const { t } = useTranslation();
@@ -44,19 +45,23 @@ const GymPlanEditScreen = () => {
         <>
             <MainContainer
                 ref={screen.mainContainerRef}
-                title={t('gymPlanBuilder.title')}
+                title={screen.planTitle}
                 topBarOptions={screen.topBarOptions}
                 gap={theme.layout.mainContainer.gap}
             >
                 <View>
                     <TextField
                         label={t('gymPlanBuilder.fields.name')}
-                        value={screen.draft.name}
-                        onChangeText={screen.updateName}
+                        value={screen.planNameInput}
+                        onChangeText={screen.updatePlanNameInput}
+                        onBlur={screen.commitPlanNameInput}
                         placeholder={t('gymPlanBuilder.fields.namePlaceholder')}
                         errorText={screen.nameErrorMessage}
                     />
-                    {screen.isNotesVisible && (
+                    <CollapseFade
+                        visible={screen.isNotesVisible}
+                        contentStyle={st.notesContent}
+                    >
                         <TextAreaField
                             label={t('gymPlanBuilder.fields.notes')}
                             value={screen.draft.description ?? ''}
@@ -65,7 +70,7 @@ const GymPlanEditScreen = () => {
                                 'gymPlanBuilder.fields.descriptionPlaceholder',
                             )}
                         />
-                    )}
+                    </CollapseFade>
                 </View>
 
                 <ScreenSection

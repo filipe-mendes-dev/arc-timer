@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { createStyles } from '@src/theme/createStyles';
 import type { AppTheme } from '@src/theme/theme';
 
-export const useStyles = createStyles((_theme: AppTheme) =>
+export const useStyles = createStyles((theme: AppTheme) =>
     StyleSheet.create({
         center: {
             flex: 1,
@@ -14,6 +14,9 @@ export const useStyles = createStyles((_theme: AppTheme) =>
         },
         errorBanner: {
             marginTop: 8,
+        },
+        notesContent: {
+            paddingTop: theme.layout.mainContainer.gap,
         },
     }),
 );
