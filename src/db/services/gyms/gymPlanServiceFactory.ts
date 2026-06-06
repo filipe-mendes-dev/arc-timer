@@ -69,12 +69,9 @@ interface PersistableGymPlanRows {
     }>;
 }
 
-const assertNonEmptyText = (value: string, errorMessage: string): void => {
+const assertNonEmptyText = (value: string): void => {
     if (value.trim().length === 0) {
-        throw createGymError({
-            ...gymErrors.invalidGymPlan,
-            message: errorMessage,
-        });
+        throw createGymError(gymErrors.invalidGymPlan);
     }
 };
 
@@ -96,28 +93,22 @@ const assertGymPlanCanBePersisted = (
     gymPlan: GymPlan,
     exerciseDefinitionService: ExerciseDefinitionService,
 ): void => {
-    assertNonEmptyText(gymPlan.id, 'Gym plan ID cannot be blank');
+    assertNonEmptyText(gymPlan.id);
     if (gymPlan.status !== 'draft') {
-        assertNonEmptyText(gymPlan.name ?? '', 'Gym plan name cannot be blank');
+        assertNonEmptyText(gymPlan.name ?? '');
     }
 
     gymPlan.sections.forEach((section) => {
-        assertNonEmptyText(section.id, 'Gym plan section ID cannot be blank');
+        assertNonEmptyText(section.id);
 
         section.exercises.forEach((exercise) => {
-            assertNonEmptyText(
-                exercise.id,
-                'Gym plan exercise ID cannot be blank',
-            );
+            assertNonEmptyText(exercise.id);
             assertExerciseDefinitionCanBeUsed(
                 exercise.exerciseDefinitionId,
                 exerciseDefinitionService,
             );
             (exercise.targetSetDrafts ?? []).forEach((targetSet) => {
-                assertNonEmptyText(
-                    targetSet.id,
-                    'Gym plan exercise target set ID cannot be blank',
-                );
+                assertNonEmptyText(targetSet.id);
             });
         });
     });
@@ -138,18 +129,12 @@ const assertGymPlanCanBeCommitted = (
     assertGymPlanCanBePersisted(gymPlan, exerciseDefinitionService);
 
     if (gymPlan.sections.length === 0) {
-        throw createGymError({
-            ...gymErrors.invalidGymPlan,
-            message: 'Gym plan must include at least one section',
-        });
+        throw createGymError(gymErrors.invalidGymPlan);
     }
 
     gymPlan.sections.forEach((section) => {
         if (section.exercises.length === 0) {
-            throw createGymError({
-                ...gymErrors.invalidGymPlan,
-                message: 'Gym plan sections must include at least one exercise',
-            });
+            throw createGymError(gymErrors.invalidGymPlan);
         }
     });
 };
