@@ -7,7 +7,7 @@ import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import type { ActionStripProps } from '@src/components/ui/MetaCard/MetaCard.interfaces';
 import { AppText } from '@src/components/ui/Typography/AppText';
-import type { GymPlan } from '@src/core/entities/gym.interfaces';
+import type { GymPlan } from '@src/core/entities/gymPlan.interfaces';
 import { useTheme } from '@src/theme/ThemeProvider';
 
 import { useGymPlanItemStyles } from './GymPlanItem.styles';

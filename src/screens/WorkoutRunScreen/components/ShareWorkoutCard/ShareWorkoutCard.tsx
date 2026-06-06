@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { View } from 'react-native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 
-import type { Workout } from '@src/core/entities/entities';
+import type { Workout } from '@src/core/entities/workout.interfaces';
 import { formatWorkoutDuration } from '@core/workouts/summarizeWorkout';
 
 import { AppText } from '@src/components/ui/Typography/AppText';

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
-import type { WorkoutBlock } from '@src/core/entities/entities';
+import type { WorkoutBlock } from '@src/core/entities/workout.interfaces';
 import { uid } from '@src/core/id';
 import { useWorkoutDraftStore } from '@src/state/stores/useWorkoutDraftStore';
 import { useUpsertWorkout, useWorkout } from '@src/data/workouts';

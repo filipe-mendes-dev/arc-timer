@@ -16,7 +16,7 @@ import { AppText } from '@src/components/ui/Typography/AppText';
 import type {
     GymExerciseRecordSet,
     GymSession,
-} from '@src/core/entities/gym.interfaces';
+} from '@src/core/entities/gymSession.interfaces';
 import { formatCompletedGymDuration } from '@src/core/gyms/formatGymDuration';
 import {
     useGymPlan,

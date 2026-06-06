@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import type {
     ExerciseDefinition,
     ExerciseDefinitionAvailability,
-} from '@src/core/entities/entities';
+} from '@src/core/entities/exerciseDefinition.interfaces';
 import { Modal } from '@src/components/modals/Modal';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { Button } from '@src/components/ui/Button/Button';

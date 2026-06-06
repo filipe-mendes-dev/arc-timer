@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
 
-import type { GymExerciseRecordSet } from '@src/core/entities/gym.interfaces';
+import type { GymExerciseRecordSet } from '@src/core/entities/gymSession.interfaces';
 
 import type { SetDraft, TrackingFields } from './GymExerciseDataScreen.types';
 

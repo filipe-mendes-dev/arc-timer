@@ -1,7 +1,7 @@
 import * as DocumentPicker from 'expo-document-picker';
 import { File } from 'expo-file-system';
 
-import type { Workout } from '../entities/entities';
+import type { Workout } from '../entities/workout.interfaces';
 import {
     ARC_WORKOUT_EXTENSION,
     ARC_WORKOUT_KIND,

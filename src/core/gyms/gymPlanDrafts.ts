@@ -3,7 +3,7 @@ import type {
     GymPlanExercise,
     GymPlanExerciseTargetSet,
     GymPlanSection,
-} from '@src/core/entities/gym.interfaces';
+} from '@src/core/entities/gymPlan.interfaces';
 import { uid } from '@src/core/id';
 
 import {

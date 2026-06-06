@@ -1,7 +1,7 @@
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 
-import type { GymPlan } from '@src/core/entities/gym.interfaces';
+import type { GymPlan } from '@src/core/entities/gymPlan.interfaces';
 import { ARC_GYM_PLAN_MIME, type ExportedGymPlanFileV1 } from './exportTypes';
 
 export type ExportGymPlanResult =

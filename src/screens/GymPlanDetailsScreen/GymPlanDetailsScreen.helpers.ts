@@ -1,4 +1,4 @@
-import type { GymPlan } from '@src/core/entities/gym.interfaces';
+import type { GymPlan } from '@src/core/entities/gymPlan.interfaces';
 import { getPlannedSetCount } from '@src/screens/GymPlanEditScreen/components/GymPlanSectionItem/GymPlanSectionItem.helpers';
 
 export const getExerciseCount = (gymPlan: GymPlan): number =>

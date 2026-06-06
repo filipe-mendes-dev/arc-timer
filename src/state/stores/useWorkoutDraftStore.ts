@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 
-import type { Workout, WorkoutBlock } from '@src/core/entities/entities';
+import type { Workout, WorkoutBlock } from '@src/core/entities/workout.interfaces';
 import { uid } from '@src/core/id';
 import i18next from '@src/i18n';
 

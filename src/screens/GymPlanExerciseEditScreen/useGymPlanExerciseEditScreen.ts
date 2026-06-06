@@ -10,7 +10,7 @@ import type {
 import type {
     GymPlanExercise,
     GymPlanExerciseTargetSet,
-} from '@src/core/entities/gym.interfaces';
+} from '@src/core/entities/gymPlan.interfaces';
 import {
     getGymPlanExerciseTargetSets,
 } from '@src/core/gyms/gymPlanTargetSets';

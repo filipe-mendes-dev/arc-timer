@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import GuardedPressable from '@src/components/ui/GuardedPressable/GuardedPressable';
 import { AppText } from '@src/components/ui/Typography/AppText';
-import type { GymPlanExerciseTargetSet } from '@src/core/entities/gym.interfaces';
+import type { GymPlanExerciseTargetSet } from '@src/core/entities/gymPlan.interfaces';
 import { useTheme } from '@src/theme/ThemeProvider';
 import type { AppTheme } from '@src/theme/theme';
 

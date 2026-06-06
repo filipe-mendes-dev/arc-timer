@@ -1,4 +1,4 @@
-import type { GymPlan } from '../entities/gym.interfaces';
+import type { GymPlan } from '../entities/gymPlan.interfaces';
 
 export const ARC_GYM_PLAN_KIND = 'arc-timer/gym-plan' as const;
 export const ARC_GYM_PLAN_EXTENSION = '.arcgp' as const;

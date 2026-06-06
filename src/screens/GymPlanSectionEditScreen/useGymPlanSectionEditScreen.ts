@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import type {
     GymPlanExercise,
     GymPlanSection,
-} from '@src/core/entities/gym.interfaces';
+} from '@src/core/entities/gymPlan.interfaces';
 import {
     createEmptyGymPlanSection,
     stripPlaceholderGymPlanExercises,

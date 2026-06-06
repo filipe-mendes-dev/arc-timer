@@ -1,4 +1,4 @@
-import type { Workout } from '../entities/entities';
+import type { Workout } from '../entities/workout.interfaces';
 
 export const ARC_WORKOUT_KIND = 'arc-timer/workout' as const;
 export const ARC_WORKOUT_EXTENSION = '.arcw' as const;

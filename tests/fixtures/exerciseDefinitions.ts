@@ -1,4 +1,4 @@
-import type { ExerciseDefinition } from '@src/core/entities/entities';
+import type { ExerciseDefinition } from '@src/core/entities/exerciseDefinition.interfaces';
 import { normalizeExerciseName } from '@src/core/exercises/normalizeExerciseName';
 
 export interface ExerciseDefinitionFixtureArgs {

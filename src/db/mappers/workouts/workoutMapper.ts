@@ -1,4 +1,4 @@
-import type { Workout, WorkoutBlock } from '@src/core/entities/entities';
+import type { Workout, WorkoutBlock } from '@src/core/entities/workout.interfaces';
 import { uid } from '@src/core/id';
 
 import type {

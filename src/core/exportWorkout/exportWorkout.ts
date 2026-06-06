@@ -1,7 +1,7 @@
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 
-import type { Workout } from '@src/core/entities/entities';
+import type { Workout } from '@src/core/entities/workout.interfaces';
 import type { ExportedWorkoutFileV1 } from './exportTypes';
 
 export const ARC_WORKOUT_MIME = 'application/vnd.arctimer.workout+json';

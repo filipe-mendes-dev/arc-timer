@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 import type {
     GymPlanExercise,
     GymPlanSection,
-} from '@src/core/entities/gym.interfaces';
+} from '@src/core/entities/gymPlan.interfaces';
 import { getGymPlanExerciseTargetSets } from '@src/core/gyms/gymPlanTargetSets';
 
 export type GymPlanSectionItemCopyScope = 'builder' | 'details';

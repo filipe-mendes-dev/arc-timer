@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import GuardedPressable from '@src/components/ui/GuardedPressable/GuardedPressable';
 import { AppText } from '@src/components/ui/Typography/AppText';
-import type { GymExerciseRecordSet } from '@src/core/entities/gym.interfaces';
+import type { GymExerciseRecordSet } from '@src/core/entities/gymSession.interfaces';
 import { useTheme } from '@src/theme/ThemeProvider';
 
 import { useStyles } from './GymExerciseSetLine.styles';

@@ -7,7 +7,7 @@ import type {
     GymPlanExerciseTargetSet,
     GymPlanSection,
     GymPlanStatus,
-} from '../entities/gym.interfaces';
+} from '../entities/gymPlan.interfaces';
 import {
     ARC_GYM_PLAN_EXTENSION,
     ARC_GYM_PLAN_KIND,

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import type { GymExerciseRecord } from '@src/core/entities/gym.interfaces';
+import type { GymExerciseRecord } from '@src/core/entities/gymSession.interfaces';
 import {
     useActiveGymSession,
     useDeleteGymExerciseRecord,

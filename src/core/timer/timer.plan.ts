@@ -1,4 +1,4 @@
-import type { Workout, WorkoutBlock } from '../entities/entities';
+import type { Workout, WorkoutBlock } from '../entities/workout.interfaces';
 import {
     clampInt,
     exDisplayName,

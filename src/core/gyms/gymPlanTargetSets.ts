@@ -1,7 +1,7 @@
 import type {
     GymPlanExercise,
     GymPlanExerciseTargetSet,
-} from '@src/core/entities/gym.interfaces';
+} from '@src/core/entities/gymPlan.interfaces';
 import { uid } from '@src/core/id';
 
 const DEFAULT_TARGET_WEIGHT_KG = 5;

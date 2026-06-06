@@ -1,7 +1,7 @@
 import type {
     ExerciseDefinitionAvailability,
     ExerciseDefinitionSource,
-} from '@src/core/entities/entities';
+} from '@src/core/entities/exerciseDefinition.interfaces';
 
 import { normalizeExerciseName } from './normalizeExerciseName';
 

@@ -4,7 +4,7 @@ import type {
     Workout,
     WorkoutBlock,
     WorkoutExercise,
-} from '@src/core/entities/entities';
+} from '@src/core/entities/workout.interfaces';
 import { uid } from '@core/id';
 
 import {

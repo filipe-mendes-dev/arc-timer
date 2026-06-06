@@ -1,4 +1,4 @@
-import type { Workout } from '@src/core/entities/entities';
+import type { Workout } from '@src/core/entities/workout.interfaces';
 import type { WorkoutSession } from '@src/core/entities/workoutSession.interfaces';
 import { uid } from '@src/core/id';
 

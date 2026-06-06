@@ -7,7 +7,7 @@ import { IndexedListItem } from '@src/components/ui/IndexedListItem';
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { WiggleView } from '@src/components/ui/WiggleView';
-import type { GymPlanSection } from '@src/core/entities/gym.interfaces';
+import type { GymPlanSection } from '@src/core/entities/gymPlan.interfaces';
 import { useTheme } from '@src/theme/ThemeProvider';
 
 import {

@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import type { GymPlan } from '@src/core/entities/gym.interfaces';
+import type { GymPlan } from '@src/core/entities/gymPlan.interfaces';
 import {
     useDiscardGymPlanDraft,
     useDraftGymPlan,

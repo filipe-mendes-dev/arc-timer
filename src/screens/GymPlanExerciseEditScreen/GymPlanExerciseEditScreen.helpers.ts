@@ -6,7 +6,7 @@ import type {
     GymPlan,
     GymPlanExercise,
     GymPlanExerciseTargetSet,
-} from '@src/core/entities/gym.interfaces';
+} from '@src/core/entities/gymPlan.interfaces';
 import {
     createGymPlanTargetSet,
     getDefaultGymPlanTargetWeightKg,

@@ -6,7 +6,7 @@ import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { WiggleView } from '@src/components/ui/WiggleView';
-import type { GymPlanExercise } from '@src/core/entities/gym.interfaces';
+import type { GymPlanExercise } from '@src/core/entities/gymPlan.interfaces';
 import { getGymPlanExerciseTargetSets } from '@src/core/gyms/gymPlanTargetSets';
 import { getSetDetails } from '@src/screens/GymExerciseDataScreen/GymExerciseDataScreen.helpers';
 import { useTheme } from '@src/theme/ThemeProvider';

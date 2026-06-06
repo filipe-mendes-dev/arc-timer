@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import type { GymExerciseRecordSet } from '@src/core/entities/gym.interfaces';
+import type { GymExerciseRecordSet } from '@src/core/entities/gymSession.interfaces';
 import {
     useAddGymExerciseRecordSet,
     useDeleteGymExerciseRecordSet,

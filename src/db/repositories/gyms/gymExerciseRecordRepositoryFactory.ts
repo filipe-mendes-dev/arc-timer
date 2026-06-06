@@ -3,7 +3,7 @@ import { asc, desc, eq } from 'drizzle-orm';
 import type {
     GymExerciseRecord,
     GymExerciseRecordSet,
-} from '@src/core/entities/gym.interfaces';
+} from '@src/core/entities/gymSession.interfaces';
 
 import {
     gymExerciseRecordsTable,

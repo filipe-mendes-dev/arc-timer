@@ -1,4 +1,4 @@
-import type { WorkoutBlock } from '@src/core/entities/entities';
+import type { WorkoutBlock } from '@src/core/entities/workout.interfaces';
 import { uid } from '@core/id';
 
 export type BlockValidationTargetId = 'setup' | `exercise:${string}`;

@@ -7,7 +7,7 @@ import { AppText } from '@src/components/ui/Typography/AppText';
 import type {
     GymExerciseRecord,
     GymExerciseRecordSet,
-} from '@src/core/entities/gym.interfaces';
+} from '@src/core/entities/gymSession.interfaces';
 import { useTheme } from '@src/theme/ThemeProvider';
 
 import { useGymExerciseCardStyles } from './GymExerciseCard.styles';

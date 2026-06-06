@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
 
-import type { GymPlan } from '@src/core/entities/gym.interfaces';
+import type { GymPlan } from '@src/core/entities/gymPlan.interfaces';
 import { importGymPlanFromFile } from '@src/core/importGymPlan/importGymPlan';
 
 interface ImportErrorTranslationMap {

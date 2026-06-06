@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react';
 
-import type { WorkoutExercise } from '@src/core/entities/entities';
+import type { WorkoutExercise } from '@src/core/entities/workout.interfaces';
 import type { TextFieldSuggestionItem } from '@src/components/ui/TextField/TextField.interfaces';
 import { useExerciseDefinitionSuggestions } from '@src/data/exerciseDefinitions';
 

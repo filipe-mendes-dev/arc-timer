@@ -3,7 +3,7 @@ import type {
     WorkoutExercise,
     Workout,
     WorkoutBlock,
-} from '@src/core/entities/entities';
+} from '@src/core/entities/workout.interfaces';
 import type {
     WorkoutSession,
     WorkoutSessionStats,

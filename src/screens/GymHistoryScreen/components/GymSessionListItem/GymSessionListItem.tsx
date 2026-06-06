@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { AppText } from '@src/components/ui/Typography/AppText';
-import type { GymSession } from '@src/core/entities/gym.interfaces';
+import type { GymSession } from '@src/core/entities/gymSession.interfaces';
 import { formatCompletedGymDuration } from '@src/core/gyms/formatGymDuration';
 import { useTheme } from '@src/theme/ThemeProvider';
 

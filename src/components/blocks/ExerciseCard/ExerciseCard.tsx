@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
-import type { WorkoutExercise } from '@src/core/entities/entities';
+import type { WorkoutExercise } from '@src/core/entities/workout.interfaces';
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { TextField } from '@src/components/ui/TextField/TextField';
 import { Stepper } from '@src/components/ui/Stepper/Stepper';

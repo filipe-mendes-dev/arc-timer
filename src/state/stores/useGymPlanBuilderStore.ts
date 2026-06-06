@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import type {
     GymPlan,
     GymPlanSection,
-} from '@src/core/entities/gym.interfaces';
+} from '@src/core/entities/gymPlan.interfaces';
 import {
     cloneGymPlanAsDraft,
     cloneImportedGymPlanAsDraft,

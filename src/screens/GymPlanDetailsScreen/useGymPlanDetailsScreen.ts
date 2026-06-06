@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import type { TopBarOption } from '@src/components/navigation/TopBar/TopBar.interfaces';
-import type { GymPlan } from '@src/core/entities/gym.interfaces';
+import type { GymPlan } from '@src/core/entities/gymPlan.interfaces';
 import { exportGymPlanToFile } from '@src/core/exportGymPlan/exportGymPlan';
 import {
     useArchiveGymPlan,
