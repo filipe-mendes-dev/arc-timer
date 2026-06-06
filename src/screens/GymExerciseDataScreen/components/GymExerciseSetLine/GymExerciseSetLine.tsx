@@ -45,7 +45,9 @@ const GymExerciseSetLine = ({
     const secondaryColor = theme.palette.text.secondary;
     const selectionIconId = isSelected ? 'checkmarkCircle' : 'radioButtonOff';
     const selectionIconColor = isSelected ? accentColor : secondaryColor;
-    const completeIconName = isCompleted ? 'checkmark-circle' : 'checkmark-circle-outline';
+    const completeIconName = isCompleted
+        ? 'checkmark-circle'
+        : 'checkmark-circle-outline';
     const completeIconColor = isCompleted ? accentColor : mutedColor;
 
     return (
@@ -67,6 +69,7 @@ const GymExerciseSetLine = ({
 
                     onEdit(set);
                 }}
+                disabled={isCompleted}
                 style={st.setLineMain}
             >
                 {isSelectMode && (
