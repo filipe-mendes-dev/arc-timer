@@ -10,8 +10,8 @@ import {
     createEmptyGymPlanSection,
     stripPlaceholderGymPlanExercises,
 } from '@src/core/gyms/gymPlanDrafts';
+import { useGymExerciseDefinitions } from '@src/data/exerciseDefinitions';
 import { useUpsertDraftGymPlan } from '@src/data/gymPlans';
-import { useGymExerciseDefinitions } from '@src/data/gymSessions';
 import { useGymPlanBuilderStore } from '@src/state/stores/useGymPlanBuilderStore';
 
 interface UseGymPlanSectionEditScreenResult {

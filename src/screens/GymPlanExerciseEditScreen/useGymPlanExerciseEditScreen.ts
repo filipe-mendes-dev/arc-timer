@@ -15,9 +15,11 @@ import {
     getGymPlanExerciseTargetSets,
 } from '@src/core/gyms/gymPlanTargetSets';
 import { stripPlaceholderGymPlanExercises } from '@src/core/gyms/gymPlanDrafts';
-import { useFindOrCreateGymExerciseDefinitionByName } from '@src/data/exerciseDefinitions';
+import {
+    useFindOrCreateGymExerciseDefinitionByName,
+    useGymExerciseDefinitions,
+} from '@src/data/exerciseDefinitions';
 import { useUpsertDraftGymPlan } from '@src/data/gymPlans';
-import { useGymExerciseDefinitions } from '@src/data/gymSessions';
 import { useListSelection } from '@src/hooks/useListSelection';
 import { useGymPlanBuilderStore } from '@src/state/stores/useGymPlanBuilderStore';
 import { useTheme } from '@src/theme/ThemeProvider';

@@ -16,7 +16,7 @@ import {
     useDraftGymPlan,
     useUpsertDraftGymPlan,
 } from '@src/data/gymPlans';
-import { useGymExerciseDefinitions } from '@src/data/gymSessions';
+import { useGymExerciseDefinitions } from '@src/data/exerciseDefinitions';
 import { useSystemBackHandler } from '@src/hooks/navigation/useSystemBackHandler';
 import { useGymPlanBuilderStore } from '@src/state/stores/useGymPlanBuilderStore';
 
@@ -102,7 +102,7 @@ export const useGymPlanEditScreen = (): UseGymPlanEditScreenResult => {
             return;
         }
 
-        setPlanNameInput(draft.name);
+        setPlanNameInput(draft.name ?? '');
         if ((draft.description?.trim().length ?? 0) > 0) {
             setNotesVisible(true);
         }
@@ -299,7 +299,7 @@ export const useGymPlanEditScreen = (): UseGymPlanEditScreenResult => {
             ? t('gymPlanBuilder.validation.saveFailed')
             : '';
     const errorMessage = mutationErrorMessage || sectionErrorMessage;
-    const trimmedPlanName = draft?.name.trim() ?? '';
+    const trimmedPlanName = draft?.name?.trim() ?? '';
     let planTitle = t('gymPlanBuilder.title');
     if (trimmedPlanName.length > 0) {
         planTitle = trimmedPlanName;

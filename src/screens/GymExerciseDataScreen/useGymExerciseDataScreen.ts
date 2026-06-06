@@ -3,12 +3,11 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import type { GymExerciseRecordSet } from '@src/core/entities/gymSession.interfaces';
+import { useGymExerciseDefinitions } from '@src/data/exerciseDefinitions';
 import {
     useAddGymExerciseRecordSet,
     useDeleteGymExerciseRecordSet,
-    useGymExerciseDefinitions,
-    useGymExerciseRecord,
-    useGymExerciseRecordSets,
+    useActiveGymSession,
     useUpdateGymExerciseRecordSet,
 } from '@src/data/gymSessions';
 import { useListSelection } from '@src/hooks/useListSelection';
@@ -116,8 +115,11 @@ export const useGymExerciseDataScreen = () => {
     const addSet = useAddGymExerciseRecordSet();
     const updateSet = useUpdateGymExerciseRecordSet();
     const deleteSet = useDeleteGymExerciseRecordSet();
-    const { data: record } = useGymExerciseRecord(recordId);
-    const { data: sets = [] } = useGymExerciseRecordSets(recordId);
+    const { data: activeSession } = useActiveGymSession();
+    const record = activeSession?.exerciseRecords.find(
+        (item) => item.id === recordId,
+    );
+    const sets = record?.sets ?? [];
     const { data: exerciseDefinitions = [] } = useGymExerciseDefinitions();
     const [trackingFields, setTrackingFields] =
         useState<TrackingFields>(() => inferTrackingFieldsFromSets(sets));

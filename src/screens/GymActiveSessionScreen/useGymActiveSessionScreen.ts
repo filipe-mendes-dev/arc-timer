@@ -3,12 +3,12 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import type { GymExerciseRecord } from '@src/core/entities/gymSession.interfaces';
+import { useGymExerciseDefinitions } from '@src/data/exerciseDefinitions';
 import {
     useActiveGymSession,
     useDeleteGymExerciseRecord,
     useDiscardGymSession,
     useFinishGymSession,
-    useGymExerciseDefinitions,
 } from '@src/data/gymSessions';
 import {
     formatElapsedDuration,

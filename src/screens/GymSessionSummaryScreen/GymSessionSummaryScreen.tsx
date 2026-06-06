@@ -18,14 +18,12 @@ import type {
     GymSession,
 } from '@src/core/entities/gymSession.interfaces';
 import { formatCompletedGymDuration } from '@src/core/gyms/formatGymDuration';
-import {
-    useGymPlan,
-    useStartGymSessionFromPlan,
-} from '@src/data/gymPlans';
+import { useGymExerciseDefinitions } from '@src/data/exerciseDefinitions';
+import { useGymPlan } from '@src/data/gymPlans';
 import {
     useDeleteGymSession,
-    useGymExerciseDefinitions,
     useGymSession,
+    useStartGymSessionFromPlan,
     useStartGymSessionFromSessionSnapshot,
 } from '@src/data/gymSessions';
 import { useTheme } from '@src/theme/ThemeProvider';
