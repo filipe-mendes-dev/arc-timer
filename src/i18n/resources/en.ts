@@ -7,6 +7,7 @@ export const en: I18nResource = {
             cancel: 'Cancel',
             remove: 'Remove',
             edit: 'Edit',
+            save: 'Save',
             start: 'Start',
             share: 'Share',
             done: 'Done',
@@ -40,6 +41,7 @@ export const en: I18nResource = {
     drawer: {
         home: 'Home',
         workouts: 'Workouts',
+        gym: 'Gym',
         exercises: 'Exercises',
         history: 'History',
         settings: 'Settings',
@@ -61,6 +63,416 @@ export const en: I18nResource = {
         startImmediately: 'Start immediately',
         recentWorkouts: 'Recent Workouts',
         noSessionsYet: 'No sessions yet.',
+    },
+    gym: {
+        title: 'Gym',
+        heading: 'Gym session',
+        subtitle: 'Track strength work outside timed workouts.',
+        currentSession: 'Current session',
+        sessionStats: 'Session stats',
+        actions: {
+            startNewSession: 'Quick session',
+            startNewSessionSubtitle: 'Start from an empty gym log',
+            resumeSession: 'Resume session',
+            finishSession: 'Finish session',
+            history: 'Session history',
+            historySubtitle: 'Review completed gym sessions',
+            plans: 'Gym plans',
+            plansSubtitle: 'Build reusable strength templates',
+            sessionInProgress: 'Session in progress',
+            sessionInProgressSubtitle: 'Finish it before starting another',
+        },
+        finishSessionModal: {
+            title: 'Finish session?',
+            message:
+                'Complete this session to save it to history, or discard it without keeping progress.',
+            complete: 'Complete',
+            discard: 'Discard',
+        },
+        status: {
+            active: 'An active gym session is already running.',
+            none: 'No active gym session.',
+        },
+        errors: {
+            activeSessionExists: 'An active gym session already exists.',
+            startFailed: 'Could not start a gym session. Try again.',
+        },
+    },
+    gymPlans: {
+        title: 'Gym Plans',
+        searchPlaceholder: 'Search gym plans',
+        emptyTitle: 'No Gym Plans Yet',
+        emptyDescription: 'Create a reusable plan for your gym sessions.',
+        searchEmptyTitle: 'No Plans Found',
+        searchEmptyDescription: 'Try a different plan name.',
+        actions: {
+            createPlan: '+ Create Plan',
+            new: '+ New',
+        },
+        modal: {
+            title: 'New Gym Plan',
+            subtitle: 'Choose how you want to start:',
+            createNew: 'Create New',
+            importFromFile: 'Import From File',
+            resumeDraft: 'Resume Draft',
+            cancel: 'Cancel',
+        },
+        import: {
+            errors: {
+                invalidExtension:
+                    'That file is not an ARC Timer gym plan (.arcgymplan).',
+                invalidKind:
+                    'That file is not an ARC Timer gym plan export.',
+                invalidShape:
+                    'That file looks like an ARC Timer export, but it is missing data.',
+                parseFailed: 'The file is corrupted or not valid JSON.',
+                readFailed: 'Could not read the selected file.',
+                unexpected: 'Import failed due to an unexpected error.',
+            },
+        },
+        confirmRemove: {
+            title: 'Delete Gym Plan?',
+            message: 'This gym plan will be permanently deleted.',
+            confirm: 'Delete',
+        },
+        confirmRemoveBulk: {
+            title_one: 'Delete {{count}} Gym Plan?',
+            title_other: 'Delete {{count}} Gym Plans?',
+            message_one: 'This selected gym plan will be permanently deleted.',
+            message_other:
+                'The {{count}} selected gym plans will be permanently deleted.',
+        },
+        card: {
+            label: 'Plan',
+            sections_one: '{{count}} section',
+            sections_other: '{{count}} sections',
+            exercises_one: '{{count}} exercise',
+            exercises_other: '{{count}} exercises',
+        },
+    },
+    gymPlanDetails: {
+        title: 'Gym plan',
+        notFound: 'Gym plan not found',
+        overview: 'Overview',
+        cardTitle: 'Plan overview',
+        sections: 'Sections',
+        sectionFallback: 'Section {{index}}',
+        exerciseCount_one: '{{count}} exercise',
+        exerciseCount_other: '{{count}} exercises',
+        exerciseFallback: 'Exercise',
+        noTargets: 'No targets',
+        favorite: 'Favorite',
+        hint: 'You can run this gym plan now or edit it before your next session.',
+        exportGymPlan: 'Share gym plan',
+        metrics: {
+            sections: 'Sections',
+            exercises: 'Exercises',
+            targetSets: 'Target sets',
+        },
+        actions: {
+            start: 'Start plan',
+            edit: 'Edit',
+            favorite: 'Favorite',
+            unfavorite: 'Unfavorite',
+            archive: 'Archive',
+            restore: 'Restore',
+            delete: 'Delete',
+        },
+        targets: {
+            sets_one: '{{count}} set',
+            sets_other: '{{count}} sets',
+            reps_one: '{{count}} rep',
+            reps_other: '{{count}} reps',
+            weightKg: '{{value}} kg',
+            durationSec: '{{value}} sec',
+        },
+        deleteConfirm: {
+            title: 'Delete gym plan?',
+            message: 'This gym plan will be permanently deleted.',
+            confirm: 'Delete',
+        },
+        export: {
+            sharingUnavailable: 'Sharing is not available on this device.',
+            writeFailed: 'Could not prepare this gym plan for sharing.',
+            failed: 'Could not share this gym plan. Try again.',
+        },
+        errors: {
+            actionFailed: 'Could not complete this action. Try again.',
+        },
+    },
+    gymPlanBuilder: {
+        title: 'New Plan',
+        draftMissing: 'No draft plan found.',
+        sectionFallback: 'Section {{index}}',
+        exerciseFallback: 'Exercise',
+        exerciseCount_one: '{{count}} exercise',
+        exerciseCount_other: '{{count}} exercises',
+        plannedSetCount_one: '{{count}} planned set',
+        plannedSetCount_other: '{{count}} planned sets',
+        noTargets: 'No targets',
+        sections: {
+            details: 'Details',
+            plan: 'Gym plan',
+        },
+        hints: {
+            tapSectionToEdit: 'Tap a section to edit its details.',
+        },
+        fields: {
+            name: 'Plan name',
+            namePlaceholder: 'e.g., Push day',
+            description: 'Description',
+            descriptionPlaceholder: 'Optional notes for this plan',
+            sectionTitle: 'Section title',
+            targetWeightKg: 'Weight kg',
+            notes: 'Notes',
+        },
+        actions: {
+            addSection: 'Add section',
+            addExercise: 'Add exercise',
+            addNote: 'Add note',
+            removeNote: 'Remove note',
+            removeSection: 'Remove section',
+            save: 'Save',
+            saveSection: 'Save',
+        },
+        exercisePicker: {
+            title: 'Add exercise',
+            searchPlaceholder: 'Search gym exercises',
+        },
+        exerciseCard: {
+            label: 'Planned exercise',
+        },
+        targetFields: {
+            description:
+                'Choose which targets appear on each planned exercise. Reps and weight are enabled by default.',
+            removeDataAndSave: 'Remove targets and save',
+            removeDataWarning:
+                'Saving will remove existing targets for: {{fields}}.',
+            title: 'Tracking fields',
+        },
+        sectionEditor: {
+            exercises: 'Exercise List',
+            notFound: 'Plan section not found.',
+            tapExerciseToEdit: 'Tap an exercise to edit.',
+            title: 'Section details',
+        },
+        targets: {
+            sets_one: '{{count}} set',
+            sets_other: '{{count}} sets',
+            reps_one: '{{count}} rep',
+            reps_other: '{{count}} reps',
+            weightKg: '{{value}} kg',
+        },
+        validation: {
+            nameRequired: 'Plan name is required.',
+            sectionRequired: 'Add at least one section.',
+            sectionExerciseRequired:
+                'Section {{index}} needs at least one exercise.',
+            placeholderExerciseRequired:
+                'Choose an exercise for every item in section {{index}}.',
+            saveFailed: 'Could not save this draft. Try again.',
+        },
+        discardConfirm: {
+            title: 'Discard draft?',
+            message: 'This draft plan will be deleted.',
+            confirm: 'Discard',
+        },
+        removeSectionConfirm: {
+            title: 'Remove section?',
+            message: 'This section and its exercises will be removed.',
+        },
+        removeExerciseConfirm: {
+            title: 'Remove exercise?',
+            message: 'This exercise will be removed from the plan.',
+        },
+    },
+    gymPlanExerciseEdit: {
+        title: 'Planned exercise',
+        notFound: 'Planned exercise not found.',
+        exerciseName: 'Exercise name',
+        exerciseNamePlaceholder: 'e.g., Leg Press',
+        newExerciseTitle: 'New Exercise',
+        exerciseFallback: 'Exercise',
+        targets: 'Set targets',
+        notes: 'Notes',
+        hint: 'Changes are saved to the draft plan automatically.',
+        errors: {
+            nameRequired: 'Exercise name is required.',
+            saveFailed: 'Could not save this exercise. Try again.',
+        },
+    },
+    gymActiveSession: {
+        title: 'Gym session',
+        duration: 'Duration',
+        startedAt: 'Started',
+        sets: 'Sets',
+        exercises: 'Exercises',
+        emptyTitle: 'No active gym session',
+        emptyDescription: 'Start a gym session before tracking exercises.',
+        noExercisesTitle: 'No exercises yet',
+        noExercisesDescription:
+            'Add exercises here as you move through the session.',
+        status: {
+            complete: 'Complete',
+            inProgress: 'In progress',
+            live: 'Live',
+        },
+        actions: {
+            addExercise: 'Add exercise',
+            backToGym: 'Back to Gym',
+            discard: 'Discard',
+            end: 'End',
+            finish: 'Finish',
+            removeExercise: 'Remove',
+        },
+        finishConfirm: {
+            title: 'Finish session?',
+            message: 'This will save the gym session to your history.',
+        },
+        discardConfirm: {
+            title: 'Discard session?',
+            message:
+                'This gym session will be closed without keeping progress.',
+        },
+        removeExerciseConfirm: {
+            title: 'Remove exercise?',
+            message:
+                'This exercise and all of its sets will be removed from the session.',
+        },
+        addExerciseModal: {
+            create: 'Create',
+            name: 'Name',
+            namePlaceholder: 'e.g., Bench press',
+            nameRequired: 'Exercise name is required.',
+            subtitle: 'Use a saved exercise or type a new one.',
+            title: 'Add exercise',
+        },
+        errors: {
+            addExerciseFailed: 'Could not add this exercise. Try again.',
+            discardFailed: 'Could not discard this gym session. Try again.',
+            finishFailed: 'Could not finish this gym session. Try again.',
+            removeExerciseFailed: 'Could not remove this exercise. Try again.',
+        },
+    },
+    gymHistory: {
+        title: 'Gym history',
+        searchPlaceholder: 'Search gym sessions',
+        emptyTitle: 'No gym sessions yet',
+        emptyDescription: 'Complete a gym session and it will appear here.',
+        searchEmptyTitle: 'No gym sessions found',
+        searchEmptyDescription: 'Try a different date.',
+        sessionTitle: 'Gym session',
+        confirmRemoveBulk: {
+            title_one: 'Delete {{count}} gym session?',
+            title_other: 'Delete {{count}} gym sessions?',
+            message_one:
+                'This will permanently delete the selected gym session.',
+            message_other:
+                'This will permanently delete the {{count}} selected gym sessions.',
+        },
+    },
+    gymSessionSummary: {
+        title: 'Gym session',
+        notFound: 'Gym session not found',
+        endedAt: 'Ended {{time}}',
+        completedSets: 'Done sets',
+        exercises: 'Exercises',
+        noExercises: 'No exercises in this session',
+        notes: 'Notes',
+        actions: {
+            delete: 'Delete',
+            openGymPlan: 'Go to gym plan',
+            runAgain: 'Run again',
+        },
+        hints: {
+            noSourceGymPlan:
+                'The original plan is unavailable. Run again will replay this session structure.',
+        },
+        errors: {
+            runAgainFailed: 'Could not start this gym session again.',
+        },
+        status: {
+            incomplete: 'Not finished',
+        },
+        deleteConfirm: {
+            title: 'Delete gym session',
+            message: 'This gym session will be permanently deleted.',
+            confirm: 'Delete',
+        },
+    },
+    gymExerciseData: {
+        title: 'Exercise Data',
+        exerciseSets: 'Exercise Sets',
+        overview: 'Overview',
+        exercise: 'Exercise',
+        exerciseFallback: 'Exercise',
+        sets: 'Sets',
+        setWithIndex: 'Set {{index}}',
+        newSet: 'New set',
+        noSetsTitle: 'No sets yet',
+        noSetsDescription:
+            'Add working data once a set has reps, weight, time, or distance.',
+        notFoundTitle: 'Exercise not found',
+        notFoundDescription: 'This exercise is not in the active gym session.',
+        actions: {
+            addSet: 'Add set',
+            backToSession: 'Back to session',
+            completeSet: 'Done',
+            deleteSet: 'Delete',
+            options: 'More',
+            saveSet: 'Save set',
+            trackingFields: 'Tracking fields',
+        },
+        fields: {
+            distanceMeters: 'Distance',
+            durationSec: 'Duration',
+            reps: 'Reps',
+            weightKg: 'Weight',
+        },
+        fieldsByKey: {
+            hasDistanceMeters: 'Distance',
+            hasDurationSec: 'Duration',
+            hasReps: 'Reps',
+            hasWeight: 'Weight',
+        },
+        defaults: {
+            description:
+                'Choose what this exercise tracks. Reps and weight are enabled by default.',
+            removeDataAndSave: 'Remove data and save',
+            removeDataWarning:
+                'Saving will remove existing values for: {{fields}}.',
+            title: 'Tracking fields',
+        },
+        editSet: {
+            description: 'Update the values tracked for this set.',
+            title: 'Edit set',
+        },
+        status: {
+            complete: 'Complete',
+            inProgress: 'In progress',
+        },
+        deleteConfirm: {
+            message: 'This set will be permanently deleted.',
+            title: 'Delete set',
+        },
+        deleteConfirmBulk: {
+            message: '{{count}} sets will be permanently deleted.',
+            title: 'Delete {{count}} sets',
+        },
+        setDetails: {
+            distance: '{{value}} km',
+            duration: '{{value}}',
+            empty: 'No set data',
+            reps_one: '{{count}} rep',
+            reps_other: '{{count}} reps',
+            rpe: 'RPE {{value}}',
+            weight: '{{value}} kg',
+        },
+        errors: {
+            addSetFailed: 'Could not save this set. Try again.',
+            deleteSetFailed: 'Could not delete this set. Try again.',
+            updateSetFailed: 'Could not update this set. Try again.',
+        },
     },
     history: {
         title: 'History',
@@ -157,7 +569,8 @@ export const en: I18nResource = {
             nameRequired: 'Workout name is required.',
             addBlock: 'Add at least one block.',
             exerciseNamesRequired: 'Exercises must have defined names.',
-            saveFailed: 'Could not save workout. Check the details and try again.',
+            saveFailed:
+                'Could not save workout. Check the details and try again.',
         },
         removeBlock: {
             title: 'Remove block',
@@ -181,6 +594,7 @@ export const en: I18nResource = {
         },
         fields: {
             blockTitle: 'Block name',
+            durationSec: 'Duration',
             exerciseDurationSec: 'Default duration',
             restBetweenExercisesSec: 'Between exercises',
             setsInBlock: 'Sets',
@@ -336,7 +750,10 @@ export const en: I18nResource = {
             duplicateName: 'An exercise with this name already exists.',
             gymOnlyRestricted:
                 'This exercise is used in a workout and cannot be set to gym only.',
-            saveFailed: 'Could not save exercise. Check the details and try again.',
+            workoutOnlyRestricted:
+                'This exercise is used in a gym plan and cannot be set to workout only.',
+            saveFailed:
+                'Could not save exercise. Check the details and try again.',
         },
     },
     workoutSummary: {
