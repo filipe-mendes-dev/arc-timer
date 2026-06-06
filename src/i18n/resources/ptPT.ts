@@ -615,6 +615,8 @@ export const ptPT: I18nResource = {
             exerciseNamesRequired: 'Exercícios devem ter nomes definidos.',
             saveFailed:
                 'Não foi possível guardar o treino. Verifica os detalhes e tenta novamente.',
+            unnamedExercises:
+                'Os exercícios precisam de nomes definidos antes de guardar.',
         },
         removeBlock: {
             title: 'Remover bloco',
@@ -795,8 +797,16 @@ export const ptPT: I18nResource = {
         validation: {
             nameRequired: 'O nome do exercício é obrigatório.',
             duplicateName: 'Já existe um exercício com este nome.',
+            deleteReferenced:
+                'Este exercício ainda está a ser usado e não pode ser apagado.',
+            deleteSystemForbidden:
+                'Os exercícios do sistema não podem ser apagados.',
             gymOnlyRestricted:
                 'Este exercício está a ser usado num treino e não pode ser definido apenas para ginásio.',
+            mergeGymOnlyConflict:
+                'Um exercício de treino não pode ser unido a um exercício apenas de ginásio.',
+            mergeWorkoutOnlyConflict:
+                'Um exercício de ginásio não pode ser unido a um exercício apenas de treino.',
             workoutOnlyRestricted:
                 'Este exercício está a ser usado num plano de ginásio e não pode ser definido apenas para treino.',
             saveFailed:

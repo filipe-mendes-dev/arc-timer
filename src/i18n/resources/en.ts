@@ -592,6 +592,8 @@ export const en: I18nResource = {
             exerciseNamesRequired: 'Exercises must have defined names.',
             saveFailed:
                 'Could not save workout. Check the details and try again.',
+            unnamedExercises:
+                'Exercises must have defined names before saving.',
         },
         removeBlock: {
             title: 'Remove block',
@@ -769,8 +771,15 @@ export const en: I18nResource = {
         validation: {
             nameRequired: 'Exercise name is required.',
             duplicateName: 'An exercise with this name already exists.',
+            deleteReferenced:
+                'This exercise is still used and cannot be deleted.',
+            deleteSystemForbidden: 'System exercises cannot be deleted.',
             gymOnlyRestricted:
                 'This exercise is used in a workout and cannot be set to gym only.',
+            mergeGymOnlyConflict:
+                'A workout exercise cannot be merged into a gym-only exercise.',
+            mergeWorkoutOnlyConflict:
+                'A gym exercise cannot be merged into a workout-only exercise.',
             workoutOnlyRestricted:
                 'This exercise is used in a gym plan and cannot be set to workout only.',
             saveFailed:

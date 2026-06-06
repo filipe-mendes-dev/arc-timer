@@ -564,6 +564,7 @@ export interface I18nResource {
             addBlock: string;
             exerciseNamesRequired: string;
             saveFailed: string;
+            unnamedExercises: string;
         };
         removeBlock: {
             title: string;
@@ -736,7 +737,11 @@ export interface I18nResource {
         validation: {
             nameRequired: string;
             duplicateName: string;
+            deleteReferenced: string;
+            deleteSystemForbidden: string;
             gymOnlyRestricted: string;
+            mergeGymOnlyConflict: string;
+            mergeWorkoutOnlyConflict: string;
             workoutOnlyRestricted: string;
             saveFailed: string;
         };
