@@ -2,40 +2,31 @@ import { useMemo, useState } from 'react';
 import { FlatList, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 import { MainContainer } from '@src/components/layout/MainContainer/MainContainer';
 import { ListEmptyState } from '@src/components/layout/ListEmptyState';
 import ConfirmDialog from '@src/components/modals/ConfirmDialog/ConfirmDialog';
 import { SearchField } from '@src/components/ui/SearchField/SearchField';
-import { useGymPlanListItems } from '@src/data/gymPlans';
-import { useGymSessions } from '@src/data/gymSessions';
+import { useGymSessionListItems } from '@src/data/gymSessions';
+import type { GymSessionListItem as GymSessionListItemEntity } from '@src/core/entities/gymSession.interfaces';
 
-import GymSessionListItem from './components/GymSessionListItem/GymSessionListItem';
+import { GymSessionListItem } from './components/GymSessionListItem/GymSessionListItem';
 import { useStyles } from './GymHistoryScreen.styles';
 import { useGymHistorySelection } from './useGymHistorySelection';
 
+const getSessionTitle = (
+    session: GymSessionListItemEntity,
+    t: TFunction,
+): string => session.sourceGymPlanName ?? t('gymHistory.sessionTitle');
+
 const GymHistoryScreen = () => {
-    const { i18n, t } = useTranslation();
+    const { t } = useTranslation();
     const router = useRouter();
     const st = useStyles();
     const selection = useGymHistorySelection();
-    const { data: gymPlans = [] } = useGymPlanListItems(true);
-    const { data: sessions = [] } = useGymSessions();
+    const { data: sessions = [] } = useGymSessionListItems();
     const [search, setSearch] = useState('');
-    const locale = i18n.resolvedLanguage ?? i18n.language;
-
-    const gymPlanNameById = useMemo(
-        () => new Map(gymPlans.map((gymPlan) => [gymPlan.id, gymPlan.name])),
-        [gymPlans],
-    );
-
-    const getSessionTitle = (sourceGymPlanId?: string): string => {
-        if (!sourceGymPlanId) return t('gymHistory.sessionTitle');
-
-        return (
-            gymPlanNameById.get(sourceGymPlanId) ?? t('gymHistory.sessionTitle')
-        );
-    };
 
     const data = useMemo(() => {
         const searchTerm = search.trim().toLowerCase();
@@ -43,17 +34,11 @@ const GymHistoryScreen = () => {
         if (!searchTerm) return sessions;
 
         return sessions.filter((session) => {
-            const startedAtLabel = new Date(
-                session.startedAtMs,
-            ).toLocaleDateString(locale, {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric',
-            });
+            const searchText = getSessionTitle(session, t);
 
-            return startedAtLabel.toLowerCase().includes(searchTerm);
+            return searchText.toLowerCase().includes(searchTerm);
         });
-    }, [locale, search, sessions]);
+    }, [search, sessions, t]);
     const hasSearch = search.trim().length > 0;
 
     let emptyTitle = t('gymHistory.emptyTitle');
@@ -94,7 +79,6 @@ const GymHistoryScreen = () => {
                         isSelectMode={selection.isSelectMode}
                         isSelected={selection.isSelected(item.id)}
                         session={item}
-                        title={getSessionTitle(item.sourceGymPlanId)}
                         onSelect={() => selection.toggleItem(item.id)}
                         onPress={() => router.push(`/gymHistory/${item.id}`)}
                     />

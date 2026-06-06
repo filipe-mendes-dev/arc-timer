@@ -42,5 +42,7 @@ export interface GymSessionListItem {
     endedAtMs?: number;
     status: GymSessionStatus;
     sourceGymPlanId?: UUID;
+    sourceGymPlanName?: string;
     exerciseRecordCount: number;
+    setCount: number;
 }

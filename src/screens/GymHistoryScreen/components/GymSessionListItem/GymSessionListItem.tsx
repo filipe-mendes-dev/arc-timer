@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { AppText } from '@src/components/ui/Typography/AppText';
-import type { GymSession } from '@src/core/entities/gymSession.interfaces';
+import type { GymSessionListItem as GymSessionListItemEntity } from '@src/core/entities/gymSession.interfaces';
 import { formatCompletedGymDuration } from '@src/core/gyms/formatGymDuration';
 import { useTheme } from '@src/theme/ThemeProvider';
 
@@ -16,25 +16,20 @@ interface GymSessionListItemProps {
     isSelectMode?: boolean;
     onPress: () => void;
     onSelect?: () => void;
-    session: GymSession;
-    title: string;
+    session: GymSessionListItemEntity;
 }
 
-const GymSessionListItem = ({
+export const GymSessionListItem = ({
     isSelected = false,
     isSelectMode = false,
     onPress,
     onSelect,
     session,
-    title,
 }: GymSessionListItemProps) => {
     const { t } = useTranslation();
     const { theme } = useTheme();
     const st = useStyles();
-    const setCount = session.exerciseRecords.reduce(
-        (total, record) => total + record.sets.length,
-        0,
-    );
+    const title = session.sourceGymPlanName ?? t('gymHistory.sessionTitle');
     const durationText = useMemo(
         () =>
             formatCompletedGymDuration(session.startedAtMs, session.endedAtMs),
@@ -65,10 +60,10 @@ const GymSessionListItem = ({
                             numberOfLines={1}
                         >
                             {t('common.units.exercise', {
-                                count: session.exerciseRecords.length,
+                                count: session.exerciseRecordCount,
                             })}
                             {' · '}
-                            {t('common.units.set', { count: setCount })}
+                            {t('common.units.set', { count: session.setCount })}
                         </AppText>
                     </View>
 
@@ -92,5 +87,3 @@ const GymSessionListItem = ({
         />
     );
 };
-
-export default GymSessionListItem;
