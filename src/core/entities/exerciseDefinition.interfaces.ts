@@ -13,11 +13,3 @@ export interface ExerciseDefinition {
     createdAtMs: number;
     updatedAtMs: number;
 }
-
-export interface ExerciseDefinitionListItem {
-    id: UUID;
-    name: string;
-    normalizedName: string;
-    source: ExerciseDefinitionSource;
-    availability: ExerciseDefinitionAvailability;
-}
