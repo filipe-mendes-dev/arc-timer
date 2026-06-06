@@ -119,7 +119,6 @@ export const createExerciseDefinitionRepository = ({
         if (existing && existing.id !== existingId) {
             throw createExerciseDefinitionError(
                 exerciseDefinitionErrors.duplicateName,
-                `Exercise definition already exists for normalized name "${normalizedName}"`,
             );
         }
     };
