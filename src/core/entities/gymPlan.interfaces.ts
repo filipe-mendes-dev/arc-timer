@@ -33,21 +33,14 @@ export interface GymPlanSection {
     updatedAtMs: number;
 }
 
-export interface GymPlan {
-    id: UUID;
-    name: string;
-    description?: string;
+export interface GymPlan extends GymPlanListItem {
     sections: GymPlanSection[];
-    createdAtMs: number;
-    updatedAtMs: number;
-    isFavorite: boolean;
-    status: GymPlanStatus;
     draftTargetGymPlanId?: UUID;
 }
 
 export interface GymPlanListItem {
     id: UUID;
-    name: string;
+    name?: string;
     description?: string;
     createdAtMs: number;
     updatedAtMs: number;

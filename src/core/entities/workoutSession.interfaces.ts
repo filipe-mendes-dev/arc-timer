@@ -19,18 +19,8 @@ export interface WorkoutSessionStats {
     prepSecByBlock?: number[];
 }
 
-export interface WorkoutSession {
-    id: UUID;
-
-    startedAtMs: number;
-    endedAtMs: number;
-
+export interface WorkoutSession extends WorkoutSessionListItem {
     workoutSnapshot: Workout;
-    activeWorkoutId?: UUID;
-    workoutVersionId: UUID;
-
-    totalDurationSec?: number;
-
     stats?: WorkoutSessionStats;
 }
 

@@ -32,12 +32,8 @@ export interface WorkoutBlock {
     exercises: WorkoutExercise[];
 }
 
-export interface Workout {
-    id: UUID;
-    name: string;
+export interface Workout extends WorkoutListItem {
     blocks: WorkoutBlock[];
-    updatedAtMs: number;
-    isFavorite?: boolean;
 }
 
 export interface WorkoutListItem {

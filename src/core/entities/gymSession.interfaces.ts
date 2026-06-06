@@ -29,12 +29,7 @@ export interface GymExerciseRecord {
     updatedAtMs: number;
 }
 
-export interface GymSession {
-    id: UUID;
-    startedAtMs: number;
-    endedAtMs?: number;
-    status: GymSessionStatus;
-    sourceGymPlanId?: UUID;
+export interface GymSession extends GymSessionListItem {
     notes?: string;
     exerciseRecords: GymExerciseRecord[];
     createdAtMs: number;
