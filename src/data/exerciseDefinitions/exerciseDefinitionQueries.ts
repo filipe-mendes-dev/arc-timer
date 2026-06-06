@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import type { ExerciseDefinition } from '@src/core/entities/entities';
+import type { ExerciseDefinition } from '@src/core/entities/exerciseDefinition.interfaces';
 import { dbServices } from '@src/db/dbServices';
 import type { ExerciseDefinitionListParams } from '@src/db/services/exerciseDefinitions/exerciseDefinitionServiceFactory';
 
@@ -22,6 +22,15 @@ export const useExerciseDefinitions = (
             options.enabled === false
                 ? []
                 : dbServices.exerciseDefinitionService.list(params),
+    });
+
+export const useGymExerciseDefinitions = (name?: string) =>
+    useExerciseDefinitions({
+        filters: {
+            availability: 'gym',
+            name,
+        },
+        scope: 'all',
     });
 
 export const useExerciseDefinition = (id?: string) =>

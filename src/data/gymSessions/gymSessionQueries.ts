@@ -1,24 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { dbServices } from '@src/db/dbServices';
-import type { ExerciseDefinition } from '@src/core/entities/entities';
-import type {
-    GymExerciseRecord,
-    GymExerciseRecordSet,
-} from '@src/core/entities/gym.interfaces';
 
 import { gymSessionKeys } from './gymSessionKeys';
-
-const getGymExerciseRecord = (id?: string): GymExerciseRecord | null => {
-    if (!id) return null;
-
-    const activeSession = dbServices.gymSessionService.getActiveGymSession();
-
-    return (
-        activeSession?.exerciseRecords.find((record) => record.id === id) ??
-        null
-    );
-};
 
 export const useActiveGymSession = () =>
     useQuery({
@@ -27,40 +11,21 @@ export const useActiveGymSession = () =>
         initialData: () => dbServices.gymSessionService.getActiveGymSession(),
     });
 
-export const useGymExerciseRecord = (id?: string) =>
+export const useGymSessionListItems = () =>
     useQuery({
-        queryKey: gymSessionKeys.exerciseRecord(id),
-        queryFn: () => getGymExerciseRecord(id),
-        enabled: !!id,
-        initialData: () => getGymExerciseRecord(id),
-    });
-
-export const useGymExerciseRecordSets = (recordId?: string) =>
-    useQuery({
-        queryKey: gymSessionKeys.exerciseRecordSets(recordId),
-        queryFn: () => getGymExerciseRecord(recordId)?.sets ?? [],
-        enabled: !!recordId,
-        initialData: (): GymExerciseRecordSet[] =>
-            getGymExerciseRecord(recordId)?.sets ?? [],
-    });
-
-export const useGymExerciseDefinitions = (name?: string) =>
-    useQuery({
-        queryKey: gymSessionKeys.availableExerciseDefinitions(name),
+        queryKey: gymSessionKeys.listItems(),
         queryFn: () =>
-            dbServices.exerciseDefinitionService.list({
-                filters: {
-                    availability: 'gym',
-                    name,
-                },
-                scope: 'all',
-            }),
-        initialData: (): ExerciseDefinition[] =>
-            dbServices.exerciseDefinitionService.list({
-                filters: {
-                    availability: 'gym',
-                    name,
-                },
-                scope: 'all',
-            }),
+            dbServices.gymSessionService.listGymSessionItems({ limit: 100 }),
+        initialData: () =>
+            dbServices.gymSessionService.listGymSessionItems({ limit: 100 }),
+    });
+
+export const useGymSession = (id?: string) =>
+    useQuery({
+        queryKey: gymSessionKeys.detail(id),
+        queryFn: () =>
+            id ? dbServices.gymSessionService.getGymSessionById(id) : null,
+        enabled: !!id,
+        initialData: () =>
+            id ? dbServices.gymSessionService.getGymSessionById(id) : null,
     });

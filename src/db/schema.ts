@@ -180,7 +180,7 @@ export const gymSessionsTable = sqliteTable('gym_sessions', {
     startedAtMs: integer('started_at_ms').notNull(),
     endedAtMs: integer('ended_at_ms'),
     status: text('status', {
-        enum: ['active', 'completed', 'discarded'],
+        enum: ['active', 'completed'],
     }).notNull(),
     sourceGymPlanId: text('source_gym_plan_id').references(
         () => gymPlansTable.id,

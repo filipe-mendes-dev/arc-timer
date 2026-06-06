@@ -2,7 +2,8 @@ import type {
     GymExerciseRecord,
     GymExerciseRecordSet,
     GymSession,
-} from '@src/core/entities/gym.interfaces';
+    GymSessionListItem,
+} from '@src/core/entities/gymSession.interfaces';
 import { uid } from '@src/core/id';
 
 import { createGymError, gymErrors } from '../../repositories/gyms/gymErrors';
@@ -11,9 +12,11 @@ import type {
     PersistedGymExerciseRecord,
     PersistedGymExerciseRecordSet,
 } from '../../repositories/gyms/gymExerciseRecordRepositoryFactory';
+import type { GymPlanRepository } from '../../repositories/gyms/gymPlanRepositoryFactory';
 import type {
     GymSessionRepository,
     GymSessionRow,
+    InsertGymSessionAggregateInput,
 } from '../../repositories/gyms/gymSessionRepositoryFactory';
 import { systemClock, type Clock } from '../../repositories/repositoryClock';
 import type { ExerciseDefinitionService } from '../exerciseDefinitions/exerciseDefinitionServiceFactory';
@@ -27,21 +30,23 @@ export interface StartEmptyGymSessionInput {
     startedAtMs?: number;
 }
 
+export interface StartGymSessionFromPlanInput {
+    gymPlanId: string;
+    notes?: string;
+    startedAtMs?: number;
+}
+
+export interface StartGymSessionFromSessionSnapshotInput {
+    sessionId: string;
+    startedAtMs?: number;
+}
+
 export interface AddExerciseRecordToSessionInput {
     exerciseDefinitionId: string;
     notes?: string;
     sessionId: string;
     startedAtMs?: number;
 }
-
-export interface UpdateExerciseRecordInput {
-    completedAtMs?: number;
-    id: string;
-    notes?: string;
-    sortIndex?: number;
-    startedAtMs?: number;
-}
-
 export interface AddSetToExerciseRecordInput {
     completedAtMs?: number;
     distanceMeters?: number;
@@ -55,43 +60,46 @@ export interface AddSetToExerciseRecordInput {
 }
 
 export interface UpdateExerciseRecordSetInput {
-    completedAtMs?: number;
-    distanceMeters?: number;
-    durationSec?: number;
+    completedAtMs?: number | null;
+    distanceMeters?: number | null;
+    durationSec?: number | null;
     id: string;
     isWarmup?: boolean;
     notes?: string;
-    reps?: number;
+    reps?: number | null;
     rpeTenths?: number;
     setIndex?: number;
-    weightGrams?: number;
+    weightGrams?: number | null;
 }
 
 export interface FinishGymSessionInput {
     endedAtMs?: number;
     notes?: string;
-    sessionId?: string;
 }
 
 export interface GymSessionService {
     getActiveGymSession: () => GymSession | null;
     getGymSessionById: (id: string) => GymSession | null;
-    listGymSessions: (input?: ListGymSessionsInput) => GymSession[];
+    listGymSessionItems: (input?: ListGymSessionsInput) => GymSessionListItem[];
     startEmptyGymSession: (input?: StartEmptyGymSessionInput) => GymSession;
+    startGymSessionFromPlan: (
+        input: StartGymSessionFromPlanInput,
+    ) => GymSession;
+    startGymSessionFromSessionSnapshot: (
+        input: StartGymSessionFromSessionSnapshotInput,
+    ) => GymSession;
     addExerciseRecordToSession: (
         input: AddExerciseRecordToSessionInput,
     ) => GymExerciseRecord;
     addSetToExerciseRecord: (
         input: AddSetToExerciseRecordInput,
     ) => GymExerciseRecordSet;
-    updateExerciseRecord: (
-        input: UpdateExerciseRecordInput,
-    ) => GymExerciseRecord;
     updateExerciseRecordSet: (
         input: UpdateExerciseRecordSetInput,
     ) => GymExerciseRecordSet;
     finishGymSession: (input?: FinishGymSessionInput) => GymSession;
-    discardGymSession: (id: string) => GymSession;
+    discardGymSession: (id: string) => void;
+    deleteGymSession: (id: string) => void;
     deleteExerciseRecord: (id: string) => void;
     deleteExerciseRecordSet: (id: string) => void;
 }
@@ -100,6 +108,7 @@ export interface CreateGymSessionServiceArgs {
     clock?: Clock;
     exerciseDefinitionService: ExerciseDefinitionService;
     gymExerciseRecordRepository: GymExerciseRecordRepository;
+    gymPlanRepository: GymPlanRepository;
     gymSessionRepository: GymSessionRepository;
 }
 
@@ -130,7 +139,6 @@ const gymExerciseRecordFromPersisted = (
     sourceGymPlanExerciseId: record.sourceGymPlanExerciseId,
     sortIndex: record.sortIndex,
     startedAtMs: record.startedAtMs,
-    completedAtMs: record.completedAtMs,
     notes: record.notes,
     sets: record.sets.map(gymExerciseRecordSetFromPersisted),
     createdAtMs: record.createdAtMs,
@@ -146,6 +154,8 @@ const gymSessionFromRow = (
     endedAtMs: row.endedAtMs ?? undefined,
     status: row.status,
     sourceGymPlanId: row.sourceGymPlanId ?? undefined,
+    exerciseRecordCount: records.length,
+    setCount: records.reduce((total, record) => total + record.sets.length, 0),
     notes: row.notes ?? undefined,
     exerciseRecords: records.map(gymExerciseRecordFromPersisted),
     createdAtMs: row.createdAtMs,
@@ -167,6 +177,7 @@ export const createGymSessionService = ({
     clock = systemClock,
     exerciseDefinitionService,
     gymExerciseRecordRepository,
+    gymPlanRepository,
     gymSessionRepository,
 }: CreateGymSessionServiceArgs): GymSessionService => {
     const hydrateSessionRow = (row: GymSessionRow): GymSession =>
@@ -235,7 +246,8 @@ export const createGymSessionService = ({
     const assertExerciseDefinitionCanBeUsed = (
         exerciseDefinitionId: string,
     ): void => {
-        const definition = exerciseDefinitionService.getById(exerciseDefinitionId);
+        const definition =
+            exerciseDefinitionService.getById(exerciseDefinitionId);
         if (!definition) {
             throw createGymError(gymErrors.exerciseDefinitionNotFound);
         }
@@ -256,19 +268,6 @@ export const createGymSessionService = ({
         }
     };
 
-    const assertRecordTimeRange = (
-        startedAtMs: number | undefined,
-        completedAtMs: number | undefined,
-    ): void => {
-        if (
-            startedAtMs !== undefined &&
-            completedAtMs !== undefined &&
-            completedAtMs < startedAtMs
-        ) {
-            throw createGymError(gymErrors.invalidGymExerciseRecordTimeRange);
-        }
-    };
-
     const service: GymSessionService = {
         getActiveGymSession: (): GymSession | null => {
             const session = gymSessionRepository.getActive();
@@ -280,12 +279,10 @@ export const createGymSessionService = ({
             return session ? hydrateSessionRow(session) : null;
         },
 
-        listGymSessions: ({
+        listGymSessionItems: ({
             limit = DEFAULT_RECENT_SESSION_LIMIT,
-        }: ListGymSessionsInput = {}): GymSession[] =>
-            gymSessionRepository
-                .getRecent(limit)
-                .map((session) => hydrateSessionRow(session)),
+        }: ListGymSessionsInput = {}): GymSessionListItem[] =>
+            gymSessionRepository.getRecentListItems(limit),
 
         startEmptyGymSession: (
             input: StartEmptyGymSessionInput = {},
@@ -309,6 +306,148 @@ export const createGymSessionService = ({
             return hydrateSessionRow(getSessionOrThrow(id));
         },
 
+        startGymSessionFromPlan: ({
+            gymPlanId,
+            notes,
+            startedAtMs,
+        }: StartGymSessionFromPlanInput): GymSession => {
+            if (gymSessionRepository.hasActive()) {
+                throw createGymError(gymErrors.activeSessionExists);
+            }
+
+            const gymPlan = gymPlanRepository.getById(gymPlanId);
+            if (!gymPlan) {
+                throw createGymError(gymErrors.gymPlanNotFound);
+            }
+
+            if (gymPlan.status === 'archived') {
+                throw createGymError(gymErrors.gymPlanArchived);
+            }
+
+            if (gymPlan.status === 'draft') {
+                throw createGymError(gymErrors.invalidGymPlan);
+            }
+
+            const planExercises = gymPlan.sections.flatMap(
+                (section) => section.exercises,
+            );
+            planExercises.forEach((exercise) => {
+                assertExerciseDefinitionCanBeUsed(
+                    exercise.exerciseDefinitionId,
+                );
+            });
+
+            const nowMs = clock.now();
+            const sessionId = uid();
+            const resolvedStartedAtMs = startedAtMs ?? nowMs;
+            const exerciseRecords: InsertGymSessionAggregateInput['exerciseRecords'] =
+                [];
+            const exerciseRecordSets: InsertGymSessionAggregateInput['exerciseRecordSets'] =
+                [];
+
+            planExercises.forEach((exercise, index) => {
+                const recordId = uid();
+                exerciseRecords.push({
+                    id: recordId,
+                    gymSessionId: sessionId,
+                    exerciseDefinitionId: exercise.exerciseDefinitionId,
+                    sourceGymPlanExerciseId: exercise.id,
+                    sortIndex: index,
+                    notes: exercise.notes,
+                    createdAtMs: nowMs,
+                    updatedAtMs: nowMs,
+                });
+
+                (exercise.targetSetDrafts ?? []).forEach(
+                    (targetSet, setIndex) => {
+                        exerciseRecordSets.push({
+                            id: uid(),
+                            gymExerciseRecordId: recordId,
+                            setIndex,
+                            reps: targetSet.reps,
+                            weightGrams: targetSet.weightGrams,
+                            durationSec: targetSet.durationSec,
+                            distanceMeters: targetSet.distanceMeters,
+                            isWarmup: false,
+                            createdAtMs: nowMs,
+                            updatedAtMs: nowMs,
+                        });
+                    },
+                );
+            });
+
+            gymSessionRepository.insertWithExerciseRecords({
+                session: {
+                    id: sessionId,
+                    startedAtMs: resolvedStartedAtMs,
+                    status: 'active',
+                    sourceGymPlanId: gymPlan.id,
+                    notes,
+                    createdAtMs: nowMs,
+                    updatedAtMs: nowMs,
+                },
+                exerciseRecords,
+                exerciseRecordSets,
+            });
+
+            return hydrateSessionRow(getSessionOrThrow(sessionId));
+        },
+
+        startGymSessionFromSessionSnapshot: ({
+            sessionId,
+            startedAtMs,
+        }: StartGymSessionFromSessionSnapshotInput): GymSession => {
+            if (gymSessionRepository.hasActive()) {
+                throw createGymError(gymErrors.activeSessionExists);
+            }
+
+            const sourceSession = getSessionOrThrow(sessionId);
+            const sourceRecords = gymExerciseRecordRepository.getBySessionId(
+                sourceSession.id,
+            );
+            sourceRecords.forEach((record) => {
+                assertExerciseDefinitionCanBeUsed(record.exerciseDefinitionId);
+            });
+
+            const nowMs = clock.now();
+            const newSessionId = uid();
+            const resolvedStartedAtMs = startedAtMs ?? nowMs;
+            const sourceGymPlan =
+                sourceSession.sourceGymPlanId !== null
+                    ? gymPlanRepository.getById(sourceSession.sourceGymPlanId)
+                    : null;
+            const sourceGymPlanId =
+                sourceGymPlan?.status === 'active'
+                    ? sourceGymPlan.id
+                    : undefined;
+
+            gymSessionRepository.insertWithExerciseRecords({
+                session: {
+                    id: newSessionId,
+                    startedAtMs: resolvedStartedAtMs,
+                    status: 'active',
+                    sourceGymPlanId,
+                    notes: sourceSession.notes ?? undefined,
+                    createdAtMs: nowMs,
+                    updatedAtMs: nowMs,
+                },
+                exerciseRecords: sourceRecords.map((record, index) => ({
+                    id: uid(),
+                    gymSessionId: newSessionId,
+                    exerciseDefinitionId: record.exerciseDefinitionId,
+                    sourceGymPlanExerciseId: record.sourceGymPlanExerciseId,
+                    sortIndex: index,
+                    startedAtMs: undefined,
+                    notes: record.notes,
+                    createdAtMs: nowMs,
+                    updatedAtMs: nowMs,
+                })),
+                exerciseRecordSets: [],
+            });
+
+            return hydrateSessionRow(getSessionOrThrow(newSessionId));
+        },
+
         addExerciseRecordToSession: ({
             exerciseDefinitionId,
             notes,
@@ -324,10 +463,9 @@ export const createGymSessionService = ({
                 id,
                 gymSessionId: session.id,
                 exerciseDefinitionId,
-                sortIndex:
-                    gymExerciseRecordRepository.getNextRecordSortIndex(
-                        session.id,
-                    ),
+                sortIndex: gymExerciseRecordRepository.getNextRecordSortIndex(
+                    session.id,
+                ),
                 startedAtMs,
                 notes,
                 createdAtMs: nowMs,
@@ -390,36 +528,6 @@ export const createGymSessionService = ({
             return gymExerciseRecordSetFromPersisted(set);
         },
 
-        updateExerciseRecord: ({
-            completedAtMs,
-            id,
-            notes,
-            sortIndex,
-            startedAtMs,
-        }: UpdateExerciseRecordInput): GymExerciseRecord => {
-            const existing = getRecordInActiveSessionOrThrow(id);
-            assertRecordTimeRange(
-                startedAtMs ?? existing.startedAtMs,
-                completedAtMs ?? existing.completedAtMs,
-            );
-
-            gymExerciseRecordRepository.updateRecord({
-                id,
-                completedAtMs,
-                notes,
-                sortIndex,
-                startedAtMs,
-                updatedAtMs: clock.now(),
-            });
-
-            const updated = gymExerciseRecordRepository.getById(id);
-            if (!updated) {
-                throw createGymError(gymErrors.exerciseRecordNotFound);
-            }
-
-            return gymExerciseRecordFromPersisted(updated);
-        },
-
         updateExerciseRecordSet: ({
             completedAtMs,
             distanceMeters,
@@ -432,13 +540,7 @@ export const createGymSessionService = ({
             setIndex,
             weightGrams,
         }: UpdateExerciseRecordSetInput): GymExerciseRecordSet => {
-            const existing = getSetInActiveSessionOrThrow(id);
-            assertSetIsMeaningful({
-                distanceMeters: distanceMeters ?? existing.distanceMeters,
-                durationSec: durationSec ?? existing.durationSec,
-                reps: reps ?? existing.reps,
-                weightGrams: weightGrams ?? existing.weightGrams,
-            });
+            getSetInActiveSessionOrThrow(id);
 
             gymExerciseRecordRepository.updateSet({
                 id,
@@ -462,10 +564,8 @@ export const createGymSessionService = ({
             return gymExerciseRecordSetFromPersisted(updated);
         },
 
-        finishGymSession: (
-            input: FinishGymSessionInput = {},
-        ): GymSession => {
-            const session = getActiveSessionOrThrow(input.sessionId);
+        finishGymSession: (input: FinishGymSessionInput = {}): GymSession => {
+            const session = getActiveSessionOrThrow();
             const endedAtMs = input.endedAtMs ?? clock.now();
             if (endedAtMs < session.startedAtMs) {
                 throw createGymError(gymErrors.invalidGymSessionTimeRange);
@@ -482,21 +582,26 @@ export const createGymSessionService = ({
             return hydrateSessionRow(getSessionOrThrow(session.id));
         },
 
-        discardGymSession: (id: string): GymSession => {
+        discardGymSession: (id: string): void => {
             const session = getActiveSessionOrThrow(id);
-            const nowMs = clock.now();
-            if (nowMs < session.startedAtMs) {
-                throw createGymError(gymErrors.invalidGymSessionTimeRange);
+            const exerciseDefinitionIds = gymExerciseRecordRepository
+                .getBySessionId(session.id)
+                .map((record) => record.exerciseDefinitionId);
+
+            gymSessionRepository.delete(session.id);
+            exerciseDefinitionService.deleteUnreferencedUserExerciseDefinitions(
+                exerciseDefinitionIds,
+            );
+        },
+
+        deleteGymSession: (id: string): void => {
+            const session = getSessionOrThrow(id);
+
+            if (session.status === 'active') {
+                throw createGymError(gymErrors.activeSessionCannotBeDeleted);
             }
 
-            gymSessionRepository.update({
-                id: session.id,
-                status: 'discarded',
-                endedAtMs: nowMs,
-                updatedAtMs: nowMs,
-            });
-
-            return hydrateSessionRow(getSessionOrThrow(session.id));
+            gymSessionRepository.delete(id);
         },
 
         deleteExerciseRecord: (id: string): void => {

@@ -2,12 +2,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { dbServices } from '@src/db/dbServices';
 import type {
-    AddExerciseRecordToSessionInput,
     AddSetToExerciseRecordInput,
-    UpdateExerciseRecordInput,
+    StartGymSessionFromPlanInput,
+    StartGymSessionFromSessionSnapshotInput,
     UpdateExerciseRecordSetInput,
 } from '@src/db/services/gyms/gymSessionServiceFactory';
 
+import { gymPlanKeys } from '../gymPlans/gymPlanKeys';
 import { gymSessionKeys } from './gymSessionKeys';
 
 export interface AddGymExerciseRecordByNameInput {
@@ -37,6 +38,37 @@ export const useStartGymSession = () => {
     });
 };
 
+export const useStartGymSessionFromPlan = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (input: StartGymSessionFromPlanInput) =>
+            dbServices.gymSessionService.startGymSessionFromPlan(input),
+        onSuccess: async () => {
+            await Promise.all([
+                invalidateGymSessionQueries(queryClient),
+                queryClient.invalidateQueries({
+                    queryKey: gymPlanKeys.all,
+                }),
+            ]);
+        },
+    });
+};
+
+export const useStartGymSessionFromSessionSnapshot = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (input: StartGymSessionFromSessionSnapshotInput) =>
+            dbServices.gymSessionService.startGymSessionFromSessionSnapshot(
+                input,
+            ),
+        onSuccess: async () => {
+            await invalidateGymSessionQueries(queryClient);
+        },
+    });
+};
+
 export const useFinishGymSession = () => {
     const queryClient = useQueryClient();
 
@@ -60,25 +92,18 @@ export const useDiscardGymSession = () => {
     });
 };
 
-export const useAddGymExerciseRecord = () => {
+export const useDeleteGymSession = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (input: AddExerciseRecordToSessionInput) =>
-            dbServices.gymSessionService.addExerciseRecordToSession(input),
-        onSuccess: async () => {
-            await invalidateGymSessionQueries(queryClient);
+        mutationFn: async (id: string) => {
+            dbServices.gymSessionService.deleteGymSession(id);
+            return id;
         },
-    });
-};
-
-export const useUpdateGymExerciseRecord = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async (input: UpdateExerciseRecordInput) =>
-            dbServices.gymSessionService.updateExerciseRecord(input),
-        onSuccess: async () => {
+        onSuccess: async (id) => {
+            queryClient.removeQueries({
+                queryKey: gymSessionKeys.detail(id),
+            });
             await invalidateGymSessionQueries(queryClient);
         },
     });

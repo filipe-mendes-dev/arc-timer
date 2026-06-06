@@ -5,11 +5,13 @@ import type {
     ExerciseDefinition,
     ExerciseDefinitionAvailability,
     ExerciseDefinitionSource,
-} from '@src/core/entities/entities';
+} from '@src/core/entities/exerciseDefinition.interfaces';
 import { normalizeExerciseName } from '@src/core/exercises/normalizeExerciseName';
 
 import {
     exerciseDefinitionsTable,
+    gymExerciseRecordsTable,
+    gymPlanExercisesTable,
     workoutExercisesTable,
 } from '../../schema';
 import {
@@ -71,8 +73,14 @@ export interface ExerciseDefinitionRepository {
     getAll: () => ExerciseDefinition[];
     getById: (id: string) => ExerciseDefinition | null;
     getByNormalizedName: (normalizedName: string) => ExerciseDefinition | null;
+    hasGymSessionExerciseReferences: (id: string) => boolean;
+    hasGymPlanExerciseReferences: (id: string) => boolean;
     hasWorkoutExerciseReferences: (id: string) => boolean;
     list: (params?: ExerciseDefinitionListParams) => ExerciseDefinition[];
+    replaceGymPlanExerciseDefinitionReferences: (input: {
+        sourceId: string;
+        targetId: string;
+    }) => void;
     replaceWorkoutExerciseDefinitionReferences: (input: {
         sourceId: string;
         targetId: string;
@@ -178,6 +186,28 @@ export const createExerciseDefinitionRepository = ({
             return row ? exerciseDefinitionFromRow(row) : null;
         },
 
+        hasGymSessionExerciseReferences: (id: string): boolean => {
+            const reference = db
+                .select({ id: gymExerciseRecordsTable.id })
+                .from(gymExerciseRecordsTable)
+                .where(eq(gymExerciseRecordsTable.exerciseDefinitionId, id))
+                .limit(1)
+                .get();
+
+            return reference !== undefined;
+        },
+
+        hasGymPlanExerciseReferences: (id: string): boolean => {
+            const reference = db
+                .select({ id: gymPlanExercisesTable.id })
+                .from(gymPlanExercisesTable)
+                .where(eq(gymPlanExercisesTable.exerciseDefinitionId, id))
+                .limit(1)
+                .get();
+
+            return reference !== undefined;
+        },
+
         hasWorkoutExerciseReferences: (id: string): boolean => {
             const reference = db
                 .select({ id: workoutExercisesTable.id })
@@ -209,6 +239,17 @@ export const createExerciseDefinitionRepository = ({
                                   .where(
                                       eq(
                                           workoutExercisesTable.exerciseDefinitionId,
+                                          exerciseDefinitionsTable.id,
+                                      ),
+                                  ),
+                          ),
+                          exists(
+                              db
+                                  .select({ id: gymPlanExercisesTable.id })
+                                  .from(gymPlanExercisesTable)
+                                  .where(
+                                      eq(
+                                          gymPlanExercisesTable.exerciseDefinitionId,
                                           exerciseDefinitionsTable.id,
                                       ),
                                   ),
@@ -251,6 +292,16 @@ export const createExerciseDefinitionRepository = ({
                 limit === undefined ? query.all() : query.limit(limit).all();
 
             return rows.map(exerciseDefinitionFromRow);
+        },
+
+        replaceGymPlanExerciseDefinitionReferences: ({
+            sourceId,
+            targetId,
+        }): void => {
+            db.update(gymPlanExercisesTable)
+                .set({ exerciseDefinitionId: targetId })
+                .where(eq(gymPlanExercisesTable.exerciseDefinitionId, sourceId))
+                .run();
         },
 
         replaceWorkoutExerciseDefinitionReferences: ({

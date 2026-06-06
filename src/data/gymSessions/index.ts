@@ -1,21 +1,21 @@
 export { gymSessionKeys } from './gymSessionKeys';
 export {
-    useAddGymExerciseRecord,
     useAddGymExerciseRecordByName,
     useAddGymExerciseRecordSet,
     useDeleteGymExerciseRecord,
     useDeleteGymExerciseRecordSet,
+    useDeleteGymSession,
     useDiscardGymSession,
     useFinishGymSession,
     useStartGymSession,
-    useUpdateGymExerciseRecord,
+    useStartGymSessionFromPlan,
+    useStartGymSessionFromSessionSnapshot,
     useUpdateGymExerciseRecordSet,
 } from './gymSessionMutations';
 export {
     useActiveGymSession,
-    useGymExerciseDefinitions,
-    useGymExerciseRecord,
-    useGymExerciseRecordSets,
+    useGymSession,
+    useGymSessionListItems,
 } from './gymSessionQueries';
 export {
     createGymError,
