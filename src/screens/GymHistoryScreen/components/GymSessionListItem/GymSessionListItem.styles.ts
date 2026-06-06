@@ -17,7 +17,7 @@ export const useStyles = createStyles((theme: AppTheme) =>
         left: {
             flex: 1,
             minWidth: 0,
-            gap: 4,
+            gap: 6,
         },
         title: {
             color: theme.palette.text.primary,

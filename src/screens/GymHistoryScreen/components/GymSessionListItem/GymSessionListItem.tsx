@@ -12,13 +12,19 @@ import { useTheme } from '@src/theme/ThemeProvider';
 import { useStyles } from './GymSessionListItem.styles';
 
 interface GymSessionListItemProps {
+    isSelected?: boolean;
+    isSelectMode?: boolean;
     onPress: () => void;
+    onSelect?: () => void;
     session: GymSession;
     title: string;
 }
 
 const GymSessionListItem = ({
+    isSelected = false,
+    isSelectMode = false,
     onPress,
+    onSelect,
     session,
     title,
 }: GymSessionListItemProps) => {
@@ -37,8 +43,10 @@ const GymSessionListItem = ({
 
     return (
         <MetaCard
-            onPress={onPress}
+            onPress={isSelectMode ? onSelect : onPress}
             containerStyle={st.card}
+            showSelectionOutline={isSelected}
+            isPressedFeedbackDisabled={isSelectMode}
             date={new Date(session.startedAtMs).toISOString()}
             summaryContent={
                 <View style={st.row}>
