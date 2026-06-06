@@ -1,4 +1,5 @@
-import type { Workout } from './entities';
+import type { UUID } from './common.interfaces';
+import type { Workout } from './workout.interfaces';
 
 export interface WorkoutSessionStats {
     completedSets: number;
@@ -19,16 +20,26 @@ export interface WorkoutSessionStats {
 }
 
 export interface WorkoutSession {
-    id: string;
+    id: UUID;
 
     startedAtMs: number;
     endedAtMs: number;
 
     workoutSnapshot: Workout;
-    activeWorkoutId?: string;
-    workoutVersionId: string;
+    activeWorkoutId?: UUID;
+    workoutVersionId: UUID;
 
     totalDurationSec?: number;
 
     stats?: WorkoutSessionStats;
+}
+
+export interface WorkoutSessionListItem {
+    id: UUID;
+    startedAtMs: number;
+    endedAtMs: number;
+    workoutName: string;
+    activeWorkoutId?: UUID;
+    workoutVersionId: UUID;
+    totalDurationSec?: number;
 }

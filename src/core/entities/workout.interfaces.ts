@@ -1,4 +1,4 @@
-export type UUID = string;
+import type { UUID } from './common.interfaces';
 
 /**
  * - 'time' → value is seconds
@@ -6,56 +6,29 @@ export type UUID = string;
  */
 export type ExerciseMode = 'time' | 'reps';
 
-export type ExerciseDefinitionSource = 'system' | 'user';
-
-export type ExerciseDefinitionAvailability = 'both' | 'workout' | 'gym';
-
-export interface ExerciseDefinition {
-    id: UUID;
-    name: string;
-    normalizedName: string;
-    source: ExerciseDefinitionSource;
-    availability: ExerciseDefinitionAvailability;
-    createdAtMs: number;
-    updatedAtMs: number;
-}
-
-/**
- * Option 1:
- *   mode: 'time'
- *   value: <seconds>
- *
- * Option 2:
- *   mode: 'reps'
- *   value: <reps>
- *   tempo?: '3-1-3' | '2-0-2' | string
- */
 export interface WorkoutExercise {
     id: UUID;
     name?: string;
     exerciseDefinitionId?: UUID;
-
-    mode: ExerciseMode;
+    value: number;
 
     /**
      * When mode === 'time' → value is duration in seconds.
      * When mode === 'reps' → value is number of reps.
      */
-    value: number;
-
+    mode: ExerciseMode;
     /**
      * Optional tempo / cadence for reps (ignored for time mode).
      */
     tempo?: string;
 }
+
 export interface WorkoutBlock {
     id: UUID;
     title?: string;
-
     sets: number;
     restBetweenSetsSec: number;
     restBetweenExercisesSec: number;
-
     exercises: WorkoutExercise[];
 }
 
@@ -65,4 +38,13 @@ export interface Workout {
     blocks: WorkoutBlock[];
     updatedAtMs: number;
     isFavorite?: boolean;
+}
+
+export interface WorkoutListItem {
+    id: UUID;
+    name: string;
+    updatedAtMs: number;
+    isFavorite: boolean;
+    blockCount: number;
+    exerciseCount: number;
 }
