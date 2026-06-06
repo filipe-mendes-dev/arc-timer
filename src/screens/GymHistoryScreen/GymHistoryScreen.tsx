@@ -7,7 +7,7 @@ import { MainContainer } from '@src/components/layout/MainContainer/MainContaine
 import { ListEmptyState } from '@src/components/layout/ListEmptyState';
 import ConfirmDialog from '@src/components/modals/ConfirmDialog/ConfirmDialog';
 import { SearchField } from '@src/components/ui/SearchField/SearchField';
-import { useGymPlans } from '@src/data/gymPlans';
+import { useGymPlanListItems } from '@src/data/gymPlans';
 import { useGymSessions } from '@src/data/gymSessions';
 
 import GymSessionListItem from './components/GymSessionListItem/GymSessionListItem';
@@ -19,7 +19,7 @@ const GymHistoryScreen = () => {
     const router = useRouter();
     const st = useStyles();
     const selection = useGymHistorySelection();
-    const { data: gymPlans = [] } = useGymPlans(true);
+    const { data: gymPlans = [] } = useGymPlanListItems(true);
     const { data: sessions = [] } = useGymSessions();
     const [search, setSearch] = useState('');
     const locale = i18n.resolvedLanguage ?? i18n.language;
