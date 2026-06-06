@@ -4,6 +4,10 @@ import {
     type GymExerciseRecordRepository,
 } from './repositories/gyms/gymExerciseRecordRepositoryFactory';
 import {
+    createGymPlanRepository,
+    type GymPlanRepository,
+} from './repositories/gyms/gymPlanRepositoryFactory';
+import {
     createGymSessionRepository,
     type GymSessionRepository,
 } from './repositories/gyms/gymSessionRepositoryFactory';
@@ -26,6 +30,10 @@ import {
     createGymSessionService,
     type GymSessionService,
 } from './services/gyms/gymSessionServiceFactory';
+import {
+    createGymPlanService,
+    type GymPlanService,
+} from './services/gyms/gymPlanServiceFactory';
 import type { ExerciseDefinitionService } from './services/exerciseDefinitions/exerciseDefinitionServiceFactory';
 import type { WorkoutRepository } from './repositories/workouts/workoutRepositoryFactory';
 import type { WorkoutSessionRepository } from './repositories/workoutSessions/workoutSessionRepositoryFactory';
@@ -38,6 +46,8 @@ export interface CreateDbServicesArgs {
 export interface DbServices {
     exerciseDefinitionService: ExerciseDefinitionService;
     gymExerciseRecordRepository: GymExerciseRecordRepository;
+    gymPlanRepository: GymPlanRepository;
+    gymPlanService: GymPlanService;
     gymSessionRepository: GymSessionRepository;
     gymSessionService: GymSessionService;
     workoutRepository: WorkoutRepository;
@@ -69,6 +79,9 @@ export const createDbServices = ({
     const gymExerciseRecordRepository = createGymExerciseRecordRepository({
         db,
     });
+    const gymPlanRepository = createGymPlanRepository({
+        db,
+    });
     const workoutService = createWorkoutService({
         clock,
         exerciseDefinitionService,
@@ -84,12 +97,20 @@ export const createDbServices = ({
         clock,
         exerciseDefinitionService,
         gymExerciseRecordRepository,
+        gymPlanRepository,
         gymSessionRepository,
+    });
+    const gymPlanService = createGymPlanService({
+        clock,
+        exerciseDefinitionService,
+        gymPlanRepository,
     });
 
     return {
         exerciseDefinitionService,
         gymExerciseRecordRepository,
+        gymPlanRepository,
+        gymPlanService,
         gymSessionRepository,
         gymSessionService,
         workoutRepository,
