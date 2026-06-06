@@ -2,20 +2,20 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { dbServices } from '@src/db/dbServices';
 import type {
+    AddExerciseRecordToSessionInput,
     AddSetToExerciseRecordInput,
     StartGymSessionFromPlanInput,
     StartGymSessionFromSessionSnapshotInput,
     UpdateExerciseRecordSetInput,
 } from '@src/db/services/gyms/gymSessionServiceFactory';
 
+import { exerciseDefinitionKeys } from '../exerciseDefinitions/exerciseDefinitionKeys';
 import { gymPlanKeys } from '../gymPlans/gymPlanKeys';
 import { gymSessionKeys } from './gymSessionKeys';
 
-export interface AddGymExerciseRecordByNameInput {
-    exerciseDefinitionId?: string;
+export interface AddGymExerciseRecordByNameInput
+    extends AddExerciseRecordToSessionInput {
     name: string;
-    sessionId: string;
-    startedAtMs?: number;
 }
 
 const invalidateGymSessionQueries = async (
@@ -165,35 +165,15 @@ export const useAddGymExerciseRecordByName = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({
-            exerciseDefinitionId,
-            name,
-            sessionId,
-            startedAtMs,
-        }: AddGymExerciseRecordByNameInput) => {
-            let targetDefinitionId = exerciseDefinitionId;
-
-            if (!targetDefinitionId) {
-                const definition =
-                    dbServices.exerciseDefinitionService.findOrCreateUserExerciseDefinitionByName(
-                        name,
-                    );
-
-                if (!definition) {
-                    throw new Error('Exercise name is required');
-                }
-
-                targetDefinitionId = definition.id;
-            }
-
-            return dbServices.gymSessionService.addExerciseRecordToSession({
-                exerciseDefinitionId: targetDefinitionId,
-                sessionId,
-                startedAtMs,
-            });
-        },
+        mutationFn: async (input: AddGymExerciseRecordByNameInput) =>
+            dbServices.gymSessionService.addExerciseRecordToSession(input),
         onSuccess: async () => {
-            await invalidateGymSessionQueries(queryClient);
+            await Promise.all([
+                invalidateGymSessionQueries(queryClient),
+                queryClient.invalidateQueries({
+                    queryKey: exerciseDefinitionKeys.all,
+                }),
+            ]);
         },
     });
 };

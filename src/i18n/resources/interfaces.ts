@@ -98,6 +98,7 @@ export interface I18nResource {
             exerciseDefinitionNotGymAvailable: string;
             exerciseRecordNotFound: string;
             exerciseRecordNotInActiveSession: string;
+            exerciseNameRequired: string;
             exerciseSetNotFound: string;
             gymPlanArchived: string;
             gymPlanNotFound: string;

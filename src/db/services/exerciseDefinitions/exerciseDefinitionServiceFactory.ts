@@ -1,8 +1,8 @@
 import type {
     ExerciseDefinition,
     ExerciseDefinitionAvailability,
-    Workout,
-} from '@src/core/entities/entities';
+} from '@src/core/entities/exerciseDefinition.interfaces';
+import type { Workout } from '@src/core/entities/workout.interfaces';
 import { normalizeExerciseDefinitionName } from '@src/core/exercises/normalizeExerciseDefinitionName';
 import {
     createExerciseDefinitionError,
@@ -48,6 +48,7 @@ export interface ExerciseDefinitionService {
     createUserExerciseDefinition: (
         input: CreateUserExerciseDefinitionInput,
     ) => ExerciseDefinition;
+    deleteUnreferencedUserExerciseDefinitions: (ids: string[]) => void;
     deleteUserExerciseDefinition: (id: string) => void;
     findOrCreateUserExerciseDefinitionByName: (
         name: string,
@@ -130,18 +131,52 @@ export const createExerciseDefinitionService = ({
             if (existing.source === 'system') {
                 throw createExerciseDefinitionError(
                     exerciseDefinitionErrors.deleteSystemForbidden,
-                    `Cannot delete system exercise definition ${id}`,
                 );
             }
 
             if (exerciseDefinitionRepository.hasWorkoutExerciseReferences(id)) {
                 throw createExerciseDefinitionError(
                     exerciseDefinitionErrors.deleteReferenced,
-                    `Cannot delete referenced exercise definition ${id}`,
+                );
+            }
+
+            if (exerciseDefinitionRepository.hasGymSessionExerciseReferences(id)) {
+                throw createExerciseDefinitionError(
+                    exerciseDefinitionErrors.deleteReferenced,
+                );
+            }
+
+            if (exerciseDefinitionRepository.hasGymPlanExerciseReferences(id)) {
+                throw createExerciseDefinitionError(
+                    exerciseDefinitionErrors.deleteReferenced,
                 );
             }
 
             exerciseDefinitionRepository.deleteById(id);
+        },
+
+        deleteUnreferencedUserExerciseDefinitions: (ids: string[]): void => {
+            const uniqueIds = [...new Set(ids)];
+
+            uniqueIds.forEach((id) => {
+                const existing = exerciseDefinitionRepository.getById(id);
+                if (existing?.source !== 'user') return;
+
+                const hasReferences =
+                    exerciseDefinitionRepository.hasWorkoutExerciseReferences(
+                        id,
+                    ) ||
+                    exerciseDefinitionRepository.hasGymSessionExerciseReferences(
+                        id,
+                    ) ||
+                    exerciseDefinitionRepository.hasGymPlanExerciseReferences(
+                        id,
+                    );
+
+                if (!hasReferences) {
+                    exerciseDefinitionRepository.deleteById(id);
+                }
+            });
         },
 
         findOrCreateUserExerciseDefinitionByName: (
@@ -203,12 +238,25 @@ export const createExerciseDefinitionService = ({
             if (hasWorkoutReferences && target.availability === 'gym') {
                 throw createExerciseDefinitionError(
                     exerciseDefinitionErrors.mergeGymOnlyConflict,
-                    `Cannot merge workout-referenced exercise definition ${sourceId} into gym-only definition ${targetId}`,
                 );
             }
-            //Todo: Same checking but reversed when we have gym exercises references
+            const hasGymReferences =
+                exerciseDefinitionRepository.hasGymPlanExerciseReferences(
+                    sourceId,
+                );
+            if (hasGymReferences && target.availability === 'workout') {
+                throw createExerciseDefinitionError(
+                    exerciseDefinitionErrors.mergeWorkoutOnlyConflict,
+                );
+            }
 
             exerciseDefinitionRepository.replaceWorkoutExerciseDefinitionReferences(
+                {
+                    sourceId,
+                    targetId,
+                },
+            );
+            exerciseDefinitionRepository.replaceGymPlanExerciseDefinitionReferences(
                 {
                     sourceId,
                     targetId,
@@ -300,10 +348,18 @@ export const createExerciseDefinitionService = ({
             ) {
                 throw createExerciseDefinitionError(
                     exerciseDefinitionErrors.gymOnlyRestricted,
-                    `Cannot make workout-referenced exercise definition ${id} gym-only`,
                 );
             }
-            //Todo: Same checking but reversed when we have gym exercises references
+
+            if (
+                availability === 'workout' &&
+                existing.availability !== 'workout' &&
+                exerciseDefinitionRepository.hasGymPlanExerciseReferences(id)
+            ) {
+                throw createExerciseDefinitionError(
+                    exerciseDefinitionErrors.workoutOnlyRestricted,
+                );
+            }
 
             if (existing.source === 'user') {
                 return exerciseDefinitionRepository.update({

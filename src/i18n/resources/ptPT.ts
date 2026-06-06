@@ -106,6 +106,7 @@ export const ptPT: I18nResource = {
             exerciseRecordNotFound: 'O registo do exercício não foi encontrado.',
             exerciseRecordNotInActiveSession:
                 'O registo do exercício não pertence à sessão ativa.',
+            exerciseNameRequired: 'O nome do exercício é obrigatório.',
             exerciseSetNotFound: 'A série do exercício não foi encontrada.',
             gymPlanArchived:
                 'Planos arquivados não podem iniciar uma sessão.',

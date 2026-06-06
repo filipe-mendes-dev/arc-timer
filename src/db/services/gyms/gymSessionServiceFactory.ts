@@ -42,7 +42,8 @@ export interface StartGymSessionFromSessionSnapshotInput {
 }
 
 export interface AddExerciseRecordToSessionInput {
-    exerciseDefinitionId: string;
+    exerciseDefinitionId?: string;
+    name?: string;
     notes?: string;
     sessionId: string;
     startedAtMs?: number;
@@ -450,19 +451,35 @@ export const createGymSessionService = ({
 
         addExerciseRecordToSession: ({
             exerciseDefinitionId,
+            name,
             notes,
             sessionId,
             startedAtMs,
         }: AddExerciseRecordToSessionInput): GymExerciseRecord => {
             const session = getActiveSessionOrThrow(sessionId);
-            assertExerciseDefinitionCanBeUsed(exerciseDefinitionId);
+            let targetDefinitionId = exerciseDefinitionId;
+
+            if (!targetDefinitionId) {
+                const definition =
+                    exerciseDefinitionService.findOrCreateUserExerciseDefinitionByName(
+                        name ?? '',
+                    );
+
+                if (!definition) {
+                    throw createGymError(gymErrors.exerciseNameRequired);
+                }
+
+                targetDefinitionId = definition.id;
+            }
+
+            assertExerciseDefinitionCanBeUsed(targetDefinitionId);
 
             const nowMs = clock.now();
             const id = uid();
             gymExerciseRecordRepository.insertRecord({
                 id,
                 gymSessionId: session.id,
-                exerciseDefinitionId,
+                exerciseDefinitionId: targetDefinitionId,
                 sortIndex: gymExerciseRecordRepository.getNextRecordSortIndex(
                     session.id,
                 ),

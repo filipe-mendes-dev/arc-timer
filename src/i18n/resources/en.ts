@@ -104,6 +104,7 @@ export const en: I18nResource = {
             exerciseRecordNotFound: 'Exercise record was not found.',
             exerciseRecordNotInActiveSession:
                 'Exercise record is not in the active session.',
+            exerciseNameRequired: 'Exercise name is required.',
             exerciseSetNotFound: 'Exercise set was not found.',
             gymPlanArchived: 'Archived plans cannot start a session.',
             gymPlanNotFound: 'Gym plan was not found.',

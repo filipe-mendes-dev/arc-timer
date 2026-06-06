@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type {
     ExerciseDefinition,
     ExerciseDefinitionAvailability,
-} from '@src/core/entities/entities';
+} from '@src/core/entities/exerciseDefinition.interfaces';
 import { dbServices } from '@src/db/dbServices';
 
 import { workoutSessionKeys } from '../workoutSessions';
@@ -37,6 +37,10 @@ export type SaveExerciseDefinitionArgs =
     | CreateExerciseDefinitionMutationArgs
     | UpdateExerciseDefinitionMutationArgs
     | MergeExerciseDefinitionMutationArgs;
+
+export interface FindOrCreateExerciseDefinitionByNameArgs {
+    name: string;
+}
 
 export const useSaveExerciseDefinition = () => {
     const queryClient = useQueryClient();
@@ -85,6 +89,32 @@ export const useSaveExerciseDefinition = () => {
                     queryKey: workoutSessionKeys.all,
                 }),
             ]);
+        },
+    });
+};
+
+export const useFindOrCreateGymExerciseDefinitionByName = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({
+            name,
+        }: FindOrCreateExerciseDefinitionByNameArgs): Promise<ExerciseDefinition> => {
+            const definition =
+                dbServices.exerciseDefinitionService.findOrCreateUserExerciseDefinitionByName(
+                    name,
+                );
+
+            if (!definition) {
+                throw new Error('Exercise name is required');
+            }
+
+            return definition;
+        },
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: exerciseDefinitionKeys.all,
+            });
         },
     });
 };

@@ -37,6 +37,10 @@ export const gymErrors = {
         code: 'EXERCISE_SET_NOT_FOUND',
         message: 'gym.errors.exerciseSetNotFound',
     },
+    exerciseNameRequired: {
+        code: 'EXERCISE_NAME_REQUIRED',
+        message: 'gym.errors.exerciseNameRequired',
+    },
     gymPlanArchived: {
         code: 'GYM_PLAN_ARCHIVED',
         message: 'gym.errors.gymPlanArchived',
