@@ -22,12 +22,18 @@ export const useStyles = createStyles((theme: AppTheme) =>
             flexShrink: 1,
         },
         headerDateRow: {
-            gap: 6,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 16,
+            flexWrap: 'wrap',
         },
         headerDateItem: {
             flexDirection: 'row',
             alignItems: 'center',
             gap: 8,
+        },
+        errorBanner: {
+            paddingTop: theme.layout.section.gap,
         },
         overviewRow: {
             gap: 12,

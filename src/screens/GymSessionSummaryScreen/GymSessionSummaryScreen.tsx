@@ -88,8 +88,7 @@ const getCompletedSetCount = (session: GymSession): number =>
     session.exerciseRecords.reduce(
         (total, record) =>
             total +
-            record.sets.filter((set) => set.completedAtMs !== undefined)
-                .length,
+            record.sets.filter((set) => set.completedAtMs !== undefined).length,
         0,
     );
 
@@ -109,7 +108,10 @@ const GymSessionSummaryScreen = () => {
     const locale = i18n.resolvedLanguage ?? i18n.language;
 
     const exerciseNameById = new Map(
-        exerciseDefinitions.map((definition) => [definition.id, definition.name]),
+        exerciseDefinitions.map((definition) => [
+            definition.id,
+            definition.name,
+        ]),
     );
 
     const getSetDetails = (set: GymExerciseRecordSet): string => {
@@ -217,10 +219,13 @@ const GymSessionSummaryScreen = () => {
     const canOpenSourceGymPlan = sourceGymPlanId !== undefined;
     const isStartingSession =
         startSessionFromPlan.isPending || startSessionFromSnapshot.isPending;
-    let actionErrorMessage = '';
-    if (startSessionFromPlan.error || startSessionFromSnapshot.error) {
-        actionErrorMessage = t('gymSessionSummary.errors.runAgainFailed');
-    }
+
+    const actionErrorMessage = t(
+        startSessionFromPlan.error?.message ??
+            startSessionFromSnapshot.error?.message ??
+            '',
+    );
+
     const metrics: GymSessionMetric[] = [
         {
             key: 'duration',
@@ -295,242 +300,257 @@ const GymSessionSummaryScreen = () => {
                 ]}
             >
                 <ScreenSection topSpacing="small" gap={6}>
-                <View style={st.headerContainer}>
-                    <AppText
-                        variant="title2"
-                        numberOfLines={2}
-                        style={st.headerTitle}
-                    >
-                        {t('gymHistory.sessionTitle')}
-                    </AppText>
-
-                    <View style={st.headerDateRow}>
-                        <View style={st.headerDateItem}>
-                            <AppIcon
-                                id="calendar"
-                                size={14}
-                                color={theme.palette.text.secondary}
-                            />
-                            <AppText variant="bodySmall" tone="secondary">
-                                {startedAtLabel}
+                    <View>
+                        <View style={st.headerContainer}>
+                            <AppText
+                                variant="title2"
+                                numberOfLines={2}
+                                style={st.headerTitle}
+                            >
+                                {t('gymHistory.sessionTitle')}
                             </AppText>
-                        </View>
 
-                        <View style={st.headerDateItem}>
-                            <AppIcon
-                                id="checkmark"
-                                size={14}
-                                color={theme.palette.text.muted}
-                            />
-                            <AppText variant="bodySmall" tone="muted">
-                                {t('gymSessionSummary.endedAt', {
-                                    time: endedAtLabel,
-                                })}
-                            </AppText>
+                            <View style={st.headerDateRow}>
+                                <View style={st.headerDateItem}>
+                                    <AppIcon
+                                        id="calendar"
+                                        size={14}
+                                        color={theme.palette.text.secondary}
+                                    />
+                                    <AppText
+                                        variant="bodySmall"
+                                        tone="secondary"
+                                    >
+                                        {startedAtLabel}
+                                    </AppText>
+                                </View>
+
+                                <View style={st.headerDateItem}>
+                                    <AppIcon
+                                        id="checkmark"
+                                        size={14}
+                                        color={theme.palette.text.muted}
+                                    />
+                                    <AppText variant="bodySmall" tone="muted">
+                                        {t('gymSessionSummary.endedAt', {
+                                            time: endedAtLabel,
+                                        })}
+                                    </AppText>
+                                </View>
+                            </View>
                         </View>
+                        <ErrorBanner
+                            message={actionErrorMessage}
+                            onClose={() => {
+                                startSessionFromPlan.reset();
+                                startSessionFromSnapshot.reset();
+                            }}
+                            collapseContentStyle={st.errorBanner}
+                        />
                     </View>
-                </View>
                 </ScreenSection>
 
                 <ScreenSection
-                title={t('workoutSummary.overview')}
-                topSpacing="medium"
-                gap={12}
-            >
-                <MetaCard
-                    expandable={false}
-                    topLeftContent={{
-                        text: t('gym.sessionStats'),
-                        icon: (
-                            <AppIcon
-                                id="stats"
-                                size={14}
-                                color={
-                                    theme.palette.metaCard.topLeftContent.text
-                                }
-                            />
-                        ),
-                    }}
-                    summaryContent={
-                        <View style={st.overviewRow}>
-                            {metricRows.map((row, rowIndex) => (
-                                <View
-                                    key={`metrics-row-${rowIndex}`}
-                                    style={st.overviewMetricsRow}
-                                >
-                                    {row.map((metric) => (
-                                        <View
-                                            key={metric.key}
-                                            style={st.metricCard}
-                                        >
-                                            <View style={st.metricLabelSlot}>
-                                                <AppText
-                                                    variant="caption"
-                                                    tone="muted"
-                                                    style={st.metricLabel}
-                                                    numberOfLines={2}
+                    title={t('workoutSummary.overview')}
+                    topSpacing="medium"
+                    gap={12}
+                >
+                    <MetaCard
+                        expandable={false}
+                        topLeftContent={{
+                            text: t('gym.sessionStats'),
+                            icon: (
+                                <AppIcon
+                                    id="stats"
+                                    size={14}
+                                    color={
+                                        theme.palette.metaCard.topLeftContent
+                                            .text
+                                    }
+                                />
+                            ),
+                        }}
+                        summaryContent={
+                            <View style={st.overviewRow}>
+                                {metricRows.map((row, rowIndex) => (
+                                    <View
+                                        key={`metrics-row-${rowIndex}`}
+                                        style={st.overviewMetricsRow}
+                                    >
+                                        {row.map((metric) => (
+                                            <View
+                                                key={metric.key}
+                                                style={st.metricCard}
+                                            >
+                                                <View
+                                                    style={st.metricLabelSlot}
                                                 >
-                                                    {metric.label}
+                                                    <AppText
+                                                        variant="caption"
+                                                        tone="muted"
+                                                        style={st.metricLabel}
+                                                        numberOfLines={2}
+                                                    >
+                                                        {metric.label}
+                                                    </AppText>
+                                                </View>
+
+                                                <AppText
+                                                    variant="body"
+                                                    tone={getMetricTone(metric)}
+                                                >
+                                                    {metric.value}
                                                 </AppText>
                                             </View>
-
-                                            <AppText
-                                                variant="body"
-                                                tone={getMetricTone(metric)}
-                                            >
-                                                {metric.value}
-                                            </AppText>
-                                        </View>
-                                    ))}
-                                </View>
-                            ))}
-                        </View>
-                    }
-                />
-                    <ErrorBanner
-                        message={actionErrorMessage}
-                        onClose={() => {
-                            startSessionFromPlan.reset();
-                            startSessionFromSnapshot.reset();
-                        }}
+                                        ))}
+                                    </View>
+                                ))}
+                            </View>
+                        }
                     />
                 </ScreenSection>
 
                 <ScreenSection
-                title={t('gymSessionSummary.exercises')}
-                topSpacing="large"
-                gap={theme.layout.listItem.gap}
-            >
-                {session.exerciseRecords.map((record, index) => {
-                    const exerciseName =
-                        exerciseNameById.get(record.exerciseDefinitionId) ??
-                        t('common.labels.exerciseWithIndex', {
-                            index: index + 1,
-                        });
+                    title={t('gymSessionSummary.exercises')}
+                    topSpacing="large"
+                    gap={theme.layout.listItem.gap}
+                >
+                    {session.exerciseRecords.map((record, index) => {
+                        const exerciseName =
+                            exerciseNameById.get(record.exerciseDefinitionId) ??
+                            t('common.labels.exerciseWithIndex', {
+                                index: index + 1,
+                            });
 
-                    return (
-                        <MetaCard
-                            key={record.id}
-                            expandable
-                            initiallyExpanded={false}
-                            withBottomFade={false}
-                            minHeight={0}
-                            topLeftContent={{
-                                text: t('common.labels.exerciseWithIndex', {
-                                    index: index + 1,
-                                }),
-                                icon: (
-                                    <Ionicons
-                                        name="barbell-outline"
-                                        size={14}
-                                        color={
-                                            theme.palette.metaCard
-                                                .topLeftContent.text
-                                        }
-                                    />
-                                ),
-                            }}
-                            summaryContent={
-                                <View style={st.exerciseBody}>
-                                    <AppText
-                                        variant="body"
-                                        style={st.exerciseName}
-                                        numberOfLines={2}
-                                    >
-                                        {exerciseName}
-                                    </AppText>
-
-                                    <View style={st.exerciseMetaRow}>
+                        return (
+                            <MetaCard
+                                key={record.id}
+                                expandable
+                                initiallyExpanded={false}
+                                withBottomFade={false}
+                                minHeight={0}
+                                topLeftContent={{
+                                    text: t('common.labels.exerciseWithIndex', {
+                                        index: index + 1,
+                                    }),
+                                    icon: (
                                         <Ionicons
-                                            name="repeat-outline"
+                                            name="barbell-outline"
                                             size={14}
                                             color={
-                                                theme.palette.text.secondary
+                                                theme.palette.metaCard
+                                                    .topLeftContent.text
                                             }
                                         />
+                                    ),
+                                }}
+                                summaryContent={
+                                    <View style={st.exerciseBody}>
                                         <AppText
-                                            variant="bodySmall"
-                                            tone="secondary"
+                                            variant="body"
+                                            style={st.exerciseName}
+                                            numberOfLines={2}
                                         >
-                                            {t('common.units.set', {
-                                                count: record.sets.length,
-                                            })}
+                                            {exerciseName}
                                         </AppText>
-                                    </View>
-                                </View>
-                            }
-                            collapsibleContent={
-                                <View style={st.setsContainer}>
-                                    {record.sets.map((set, setIndex) => (
-                                        <View key={set.id} style={st.setRow}>
-                                            <View style={st.setIndexBubble}>
-                                                <AppText
-                                                    variant="caption"
-                                                    style={st.setIndexText}
-                                                >
-                                                    {setIndex + 1}
-                                                </AppText>
-                                            </View>
 
-                                            <View style={st.setTexts}>
-                                                <AppText
-                                                    variant="bodySmall"
-                                                    tone="primary"
-                                                >
-                                                    {t(
-                                                        'gymExerciseData.setWithIndex',
-                                                        {
-                                                            index:
-                                                                setIndex + 1,
-                                                        },
-                                                    )}
-                                                </AppText>
-
-                                                <AppText
-                                                    variant="caption"
-                                                    tone="muted"
-                                                    numberOfLines={2}
-                                                >
-                                                    {getSetDetails(set)}
-                                                </AppText>
-                                            </View>
+                                        <View style={st.exerciseMetaRow}>
+                                            <Ionicons
+                                                name="repeat-outline"
+                                                size={14}
+                                                color={
+                                                    theme.palette.text.secondary
+                                                }
+                                            />
+                                            <AppText
+                                                variant="bodySmall"
+                                                tone="secondary"
+                                            >
+                                                {t('common.units.set', {
+                                                    count: record.sets.length,
+                                                })}
+                                            </AppText>
                                         </View>
-                                    ))}
+                                    </View>
+                                }
+                                collapsibleContent={
+                                    <View style={st.setsContainer}>
+                                        {record.sets.map((set, setIndex) => (
+                                            <View
+                                                key={set.id}
+                                                style={st.setRow}
+                                            >
+                                                <View style={st.setIndexBubble}>
+                                                    <AppText
+                                                        variant="caption"
+                                                        style={st.setIndexText}
+                                                    >
+                                                        {setIndex + 1}
+                                                    </AppText>
+                                                </View>
 
-                                    {record.sets.length === 0 && (
-                                        <AppText
-                                            variant="bodySmall"
-                                            tone="secondary"
-                                        >
-                                            {t('gymExerciseData.noSetsTitle')}
-                                        </AppText>
-                                    )}
-                                </View>
-                            }
-                        />
-                    );
-                })}
+                                                <View style={st.setTexts}>
+                                                    <AppText
+                                                        variant="bodySmall"
+                                                        tone="primary"
+                                                    >
+                                                        {t(
+                                                            'gymExerciseData.setWithIndex',
+                                                            {
+                                                                index:
+                                                                    setIndex +
+                                                                    1,
+                                                            },
+                                                        )}
+                                                    </AppText>
 
-                {session.exerciseRecords.length === 0 && (
-                    <AppText variant="bodySmall" tone="muted">
-                        {t('gymSessionSummary.noExercises')}
-                    </AppText>
-                )}
+                                                    <AppText
+                                                        variant="caption"
+                                                        tone="muted"
+                                                        numberOfLines={2}
+                                                    >
+                                                        {getSetDetails(set)}
+                                                    </AppText>
+                                                </View>
+                                            </View>
+                                        ))}
+
+                                        {record.sets.length === 0 && (
+                                            <AppText
+                                                variant="bodySmall"
+                                                tone="secondary"
+                                            >
+                                                {t(
+                                                    'gymExerciseData.noSetsTitle',
+                                                )}
+                                            </AppText>
+                                        )}
+                                    </View>
+                                }
+                            />
+                        );
+                    })}
+
+                    {session.exerciseRecords.length === 0 && (
+                        <AppText variant="bodySmall" tone="muted">
+                            {t('gymSessionSummary.noExercises')}
+                        </AppText>
+                    )}
                 </ScreenSection>
 
                 {session.notes && (
                     <ScreenSection
-                    title={t('gymSessionSummary.notes')}
-                    topSpacing="large"
-                    gap={8}
-                >
-                    <AppText
-                        variant="bodySmall"
-                        tone="secondary"
-                        style={st.notes}
+                        title={t('gymSessionSummary.notes')}
+                        topSpacing="large"
+                        gap={8}
                     >
-                        {session.notes}
-                    </AppText>
+                        <AppText
+                            variant="bodySmall"
+                            tone="secondary"
+                            style={st.notes}
+                        >
+                            {session.notes}
+                        </AppText>
                     </ScreenSection>
                 )}
 
