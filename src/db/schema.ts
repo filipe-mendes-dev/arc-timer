@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm';
 import {
     index,
     integer,
+    primaryKey,
     sqliteTable,
     text,
     uniqueIndex,
@@ -25,6 +26,28 @@ export const exerciseDefinitionsTable = sqliteTable('exercise_definitions', {
     index('exercise_definitions_source_idx').on(table.source),
     index('exercise_definitions_availability_idx').on(table.availability),
 ]);
+
+export const exerciseDefinitionDataTable = sqliteTable('exercise_definition_data', {
+    exerciseDefinitionId: text('exercise_definition_id')
+        .primaryKey()
+        .references(() => exerciseDefinitionsTable.id, { onDelete: 'cascade' }),
+    notes: text('notes'),
+    createdAtMs: integer('created_at_ms').notNull(),
+    updatedAtMs: integer('updated_at_ms').notNull(),
+});
+
+export const exerciseDefinitionDefaultTrackingFieldsTable = sqliteTable('exercise_definition_default_tracking_fields', {
+    exerciseDefinitionId: text('exercise_definition_id')
+        .primaryKey()
+        .references(() => exerciseDefinitionsTable.id, { onDelete: 'cascade' }),
+    reps: integer('reps'),
+    weightGrams: integer('weight_grams'),
+    durationSec: integer('duration_sec'),
+    distanceMeters: integer('distance_meters'),
+    rpeTenths: integer('rpe_tenths'),
+    createdAtMs: integer('created_at_ms').notNull(),
+    updatedAtMs: integer('updated_at_ms').notNull(),
+});
 
 export const workoutsTable = sqliteTable('workouts', {
     id: text('id').primaryKey(),
@@ -250,5 +273,67 @@ export const gymExerciseRecordSetsTable = sqliteTable('gym_exercise_record_sets'
     uniqueIndex('gym_exercise_record_sets_record_set_unique_idx').on(
         table.gymExerciseRecordId,
         table.setIndex,
+    ),
+]);
+
+export const exerciseDefinitionStatsTable = sqliteTable('exercise_definition_stats', {
+    exerciseDefinitionId: text('exercise_definition_id')
+        .primaryKey()
+        .references(() => exerciseDefinitionsTable.id, { onDelete: 'cascade' }),
+    weightPrSetId: text('weight_pr_set_id').references(
+        () => gymExerciseRecordSetsTable.id,
+        { onDelete: 'set null' },
+    ),
+    weightPrGymSessionId: text('weight_pr_gym_session_id').references(
+        () => gymSessionsTable.id,
+        { onDelete: 'set null' },
+    ),
+    weightPrGrams: integer('weight_pr_grams'),
+    weightPrReps: integer('weight_pr_reps'),
+    weightPrCompletedAtMs: integer('weight_pr_completed_at_ms'),
+    distancePrSetId: text('distance_pr_set_id').references(
+        () => gymExerciseRecordSetsTable.id,
+        { onDelete: 'set null' },
+    ),
+    distancePrGymSessionId: text('distance_pr_gym_session_id').references(
+        () => gymSessionsTable.id,
+        { onDelete: 'set null' },
+    ),
+    distancePrMeters: integer('distance_pr_meters'),
+    distancePrReps: integer('distance_pr_reps'),
+    distancePrCompletedAtMs: integer('distance_pr_completed_at_ms'),
+    lastCompletedGymSessionId: text('last_completed_gym_session_id').references(
+        () => gymSessionsTable.id,
+        { onDelete: 'set null' },
+    ),
+    createdAtMs: integer('created_at_ms').notNull(),
+    updatedAtMs: integer('updated_at_ms').notNull(),
+}, (table) => [
+    index('exercise_definition_stats_last_session_idx').on(
+        table.lastCompletedGymSessionId,
+    ),
+]);
+
+export const exerciseDefinitionRecentGymSessionsTable = sqliteTable('exercise_definition_recent_gym_sessions', {
+    exerciseDefinitionId: text('exercise_definition_id')
+        .notNull()
+        .references(() => exerciseDefinitionsTable.id, { onDelete: 'cascade' }),
+    gymSessionId: text('gym_session_id')
+        .notNull()
+        .references(() => gymSessionsTable.id, { onDelete: 'cascade' }),
+    sortIndex: integer('sort_index').notNull(),
+    startedAtMs: integer('started_at_ms').notNull(),
+    createdAtMs: integer('created_at_ms').notNull(),
+    updatedAtMs: integer('updated_at_ms').notNull(),
+}, (table) => [
+    primaryKey({
+        columns: [table.exerciseDefinitionId, table.gymSessionId],
+    }),
+    uniqueIndex('exercise_definition_recent_sessions_sort_unique_idx').on(
+        table.exerciseDefinitionId,
+        table.sortIndex,
+    ),
+    index('exercise_definition_recent_sessions_session_idx').on(
+        table.gymSessionId,
     ),
 ]);
