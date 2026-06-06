@@ -56,10 +56,12 @@ export const ErrorBanner = forwardRef<View, ErrorBannerProps>(
         const renderedMessage = lastMessageRef.current;
 
         const handleClose = () => {
-            setDismissedBanner({
-                dismissalKey,
-                message: trimmedMessage,
-            });
+            if (isDismissible) {
+                setDismissedBanner({
+                    dismissalKey,
+                    message: trimmedMessage,
+                });
+            }
             onClose?.();
         };
 
