@@ -123,31 +123,19 @@ export const ExerciseDefinitionFormModal = ({
             if (isExerciseDefinitionError(e)) {
                 switch (e.code) {
                     case 'DUPLICATE_NAME':
-                        setNameError(
-                            t('exerciseDefinitions.validation.duplicateName'),
-                        );
+                        setNameError(t(e.message));
                         return;
                     case 'GYM_ONLY_RESTRICTED':
-                        setAvailabilityError(
-                            t(
-                                'exerciseDefinitions.validation.gymOnlyRestricted',
-                            ),
-                        );
+                        setAvailabilityError(t(e.message));
                         return;
                     case 'WORKOUT_ONLY_RESTRICTED':
-                        setAvailabilityError(
-                            t(
-                                'exerciseDefinitions.validation.workoutOnlyRestricted',
-                            ),
-                        );
+                        setAvailabilityError(t(e.message));
                         return;
                     case 'DELETE_REFERENCED':
                     case 'DELETE_SYSTEM_FORBIDDEN':
                     case 'MERGE_GYM_ONLY_CONFLICT':
                     case 'MERGE_WORKOUT_ONLY_CONFLICT':
-                        setSaveError(
-                            t('exerciseDefinitions.validation.saveFailed'),
-                        );
+                        setSaveError(t(e.message));
                         return;
                 }
             }
