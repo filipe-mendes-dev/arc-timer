@@ -14,11 +14,13 @@ import { useStyles } from './GymSessionListItem.styles';
 interface GymSessionListItemProps {
     onPress: () => void;
     session: GymSession;
+    title: string;
 }
 
 const GymSessionListItem = ({
     onPress,
     session,
+    title,
 }: GymSessionListItemProps) => {
     const { t } = useTranslation();
     const { theme } = useTheme();
@@ -46,7 +48,7 @@ const GymSessionListItem = ({
                             style={st.title}
                             numberOfLines={2}
                         >
-                            {t('gymHistory.sessionTitle')}
+                            {title}
                         </AppText>
 
                         <AppText
