@@ -92,6 +92,21 @@ export interface I18nResource {
         };
         errors: {
             activeSessionExists: string;
+            activeSessionCannotBeDeleted: string;
+            activeSessionNotFound: string;
+            exerciseDefinitionNotFound: string;
+            exerciseDefinitionNotGymAvailable: string;
+            exerciseRecordNotFound: string;
+            exerciseRecordNotInActiveSession: string;
+            exerciseSetNotFound: string;
+            gymPlanArchived: string;
+            gymPlanNotFound: string;
+            invalidGymExerciseRecordTimeRange: string;
+            invalidGymPlan: string;
+            invalidGymSessionTimeRange: string;
+            invalidGymSet: string;
+            sessionNotFound: string;
+            sessionNotMutable: string;
             startFailed: string;
         };
     };

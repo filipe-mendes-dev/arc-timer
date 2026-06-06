@@ -95,6 +95,27 @@ export const en: I18nResource = {
         },
         errors: {
             activeSessionExists: 'An active gym session already exists.',
+            activeSessionCannotBeDeleted:
+                'Active gym sessions must be finished or discarded.',
+            activeSessionNotFound: 'Active gym session was not found.',
+            exerciseDefinitionNotFound: 'Exercise was not found.',
+            exerciseDefinitionNotGymAvailable:
+                'This exercise cannot be used in gym sessions.',
+            exerciseRecordNotFound: 'Exercise record was not found.',
+            exerciseRecordNotInActiveSession:
+                'Exercise record is not in the active session.',
+            exerciseSetNotFound: 'Exercise set was not found.',
+            gymPlanArchived: 'Archived plans cannot start a session.',
+            gymPlanNotFound: 'Gym plan was not found.',
+            invalidGymExerciseRecordTimeRange:
+                'Exercise record cannot end before it starts.',
+            invalidGymPlan: 'Gym plan is invalid.',
+            invalidGymSessionTimeRange:
+                'Gym session cannot end before it starts.',
+            invalidGymSet:
+                'Gym set must include reps, weight, duration, or distance.',
+            sessionNotFound: 'Gym session was not found.',
+            sessionNotMutable: 'Gym session is not active.',
             startFailed: 'Could not start a gym session. Try again.',
         },
     },

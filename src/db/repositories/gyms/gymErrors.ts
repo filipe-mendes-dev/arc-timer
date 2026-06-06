@@ -7,67 +7,67 @@ import {
 export const gymErrors = {
     activeSessionExists: {
         code: 'ACTIVE_SESSION_EXISTS',
-        message: 'An active gym session already exists',
+        message: 'gym.errors.activeSessionExists',
     },
     activeSessionNotFound: {
         code: 'ACTIVE_SESSION_NOT_FOUND',
-        message: 'Active gym session was not found',
+        message: 'gym.errors.activeSessionNotFound',
     },
     activeSessionCannotBeDeleted: {
         code: 'ACTIVE_SESSION_CANNOT_BE_DELETED',
-        message: 'Active gym sessions must be discarded or completed',
+        message: 'gym.errors.activeSessionCannotBeDeleted',
     },
     exerciseDefinitionNotFound: {
         code: 'EXERCISE_DEFINITION_NOT_FOUND',
-        message: 'Exercise definition was not found',
+        message: 'gym.errors.exerciseDefinitionNotFound',
     },
     exerciseDefinitionNotGymAvailable: {
         code: 'EXERCISE_DEFINITION_NOT_GYM_AVAILABLE',
-        message: 'Exercise definition is not available for gym sessions',
+        message: 'gym.errors.exerciseDefinitionNotGymAvailable',
     },
     exerciseRecordNotFound: {
         code: 'EXERCISE_RECORD_NOT_FOUND',
-        message: 'Gym exercise record was not found',
+        message: 'gym.errors.exerciseRecordNotFound',
     },
     exerciseRecordNotInActiveSession: {
         code: 'EXERCISE_RECORD_NOT_IN_ACTIVE_SESSION',
-        message: 'Gym exercise record is not in an active session',
+        message: 'gym.errors.exerciseRecordNotInActiveSession',
     },
     exerciseSetNotFound: {
         code: 'EXERCISE_SET_NOT_FOUND',
-        message: 'Gym exercise record set was not found',
+        message: 'gym.errors.exerciseSetNotFound',
     },
     gymPlanArchived: {
         code: 'GYM_PLAN_ARCHIVED',
-        message: 'Gym plan is archived',
+        message: 'gym.errors.gymPlanArchived',
     },
     gymPlanNotFound: {
         code: 'GYM_PLAN_NOT_FOUND',
-        message: 'Gym plan was not found',
+        message: 'gym.errors.gymPlanNotFound',
     },
     invalidGymPlan: {
         code: 'INVALID_GYM_PLAN',
-        message: 'Gym plan is invalid',
+        message: 'gym.errors.invalidGymPlan',
     },
     invalidGymExerciseRecordTimeRange: {
         code: 'INVALID_GYM_EXERCISE_RECORD',
-        message: 'Gym exercise record cannot complete before it starts',
+        message: 'gym.errors.invalidGymExerciseRecordTimeRange',
     },
     invalidGymSessionTimeRange: {
         code: 'INVALID_GYM_SESSION',
-        message: 'Gym session cannot end before it starts',
+        message: 'gym.errors.invalidGymSessionTimeRange',
     },
     invalidGymSet: {
         code: 'INVALID_GYM_SET',
-        message: 'Gym set must include reps, weight, duration, or distance',
+        message: 'gym.errors.invalidGymSet',
     },
     sessionNotFound: {
         code: 'SESSION_NOT_FOUND',
-        message: 'Gym session was not found',
+        message: 'gym.errors.sessionNotFound',
     },
     sessionNotMutable: {
         code: 'SESSION_NOT_MUTABLE',
-        message: 'Gym session is not active',
+        message: 'gym.errors.sessionNotMutable',
     },
 } as const satisfies Record<string, AppErrorDefinition<string>>;
 

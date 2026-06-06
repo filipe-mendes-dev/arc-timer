@@ -96,6 +96,29 @@ export const ptPT: I18nResource = {
         },
         errors: {
             activeSessionExists: 'Já existe uma sessão de ginásio ativa.',
+            activeSessionCannotBeDeleted:
+                'As sessões de ginásio ativas têm de ser concluídas ou descartadas.',
+            activeSessionNotFound:
+                'Não foi encontrada uma sessão de ginásio ativa.',
+            exerciseDefinitionNotFound: 'O exercício não foi encontrado.',
+            exerciseDefinitionNotGymAvailable:
+                'Este exercício não pode ser usado em sessões de ginásio.',
+            exerciseRecordNotFound: 'O registo do exercício não foi encontrado.',
+            exerciseRecordNotInActiveSession:
+                'O registo do exercício não pertence à sessão ativa.',
+            exerciseSetNotFound: 'A série do exercício não foi encontrada.',
+            gymPlanArchived:
+                'Planos arquivados não podem iniciar uma sessão.',
+            gymPlanNotFound: 'O plano de ginásio não foi encontrado.',
+            invalidGymExerciseRecordTimeRange:
+                'O registo do exercício não pode terminar antes de começar.',
+            invalidGymPlan: 'O plano de ginásio é inválido.',
+            invalidGymSessionTimeRange:
+                'A sessão de ginásio não pode terminar antes de começar.',
+            invalidGymSet:
+                'A série precisa de repetições, peso, duração ou distância.',
+            sessionNotFound: 'A sessão de ginásio não foi encontrada.',
+            sessionNotMutable: 'A sessão de ginásio não está ativa.',
             startFailed: 'Não foi possível iniciar a sessão. Tenta novamente.',
         },
     },
