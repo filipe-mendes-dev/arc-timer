@@ -10,10 +10,10 @@ import {
     useDeleteGymPlan,
     useGymPlan,
     useRestoreGymPlan,
-    useStartGymSessionFromPlan,
     useToggleFavoriteGymPlan,
 } from '@src/data/gymPlans';
-import { useGymExerciseDefinitions } from '@src/data/gymSessions';
+import { useGymExerciseDefinitions } from '@src/data/exerciseDefinitions';
+import { isGymError, useStartGymSessionFromPlan } from '@src/data/gymSessions';
 import { useGymPlanBuilderStore } from '@src/state/stores/useGymPlanBuilderStore';
 
 import {
@@ -24,7 +24,6 @@ import {
 interface UseGymPlanDetailsScreenResult {
     definitionNameById: ReadonlyMap<string, string>;
     errorMessage: string;
-    exportError: string | null;
     gymPlan: GymPlan | undefined;
     hasArchivedStatus: boolean;
     id: string | undefined;
@@ -38,7 +37,7 @@ interface UseGymPlanDetailsScreenResult {
     exerciseCount: number;
     closeDeleteConfirm: () => void;
     confirmDeleteGymPlan: () => void;
-    dismissExportError: () => void;
+    dismissError: () => void;
     goBack: () => void;
     handleEditPlan: () => void;
     handleExport: () => Promise<void>;
@@ -62,7 +61,7 @@ export const useGymPlanDetailsScreen = (): UseGymPlanDetailsScreenResult => {
     const restoreGymPlan = useRestoreGymPlan();
     const deleteGymPlan = useDeleteGymPlan();
     const [isDeleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
-    const [exportError, setExportError] = useState<string | null>(null);
+    const [exportErrorKey, setExportErrorKey] = useState<string | null>(null);
     const [isExporting, setExporting] = useState(false);
 
     const definitionNameById = useMemo(
@@ -111,20 +110,18 @@ export const useGymPlanDetailsScreen = (): UseGymPlanDetailsScreenResult => {
     const handleExport = async () => {
         if (!gymPlan || isExporting) return;
 
-        setExportError(null);
+        setExportErrorKey(null);
         setExporting(true);
 
         const result = await exportGymPlanToFile(gymPlan);
 
         if (!result.ok) {
             if (result.error === 'SHARING_UNAVAILABLE') {
-                setExportError(
-                    t('gymPlanDetails.export.sharingUnavailable'),
-                );
+                setExportErrorKey('gymPlanDetails.export.sharingUnavailable');
             } else if (result.error === 'WRITE_FAILED') {
-                setExportError(t('gymPlanDetails.export.writeFailed'));
+                setExportErrorKey('gymPlanDetails.export.writeFailed');
             } else {
-                setExportError(t('gymPlanDetails.export.failed'));
+                setExportErrorKey('gymPlanDetails.export.failed');
             }
         }
 
@@ -175,13 +172,29 @@ export const useGymPlanDetailsScreen = (): UseGymPlanDetailsScreenResult => {
         ];
     }, [archiveGymPlan, gymPlan, hasArchivedStatus, restoreGymPlan, t]);
 
+    const actionError =
+        startSession.error ??
+        toggleFavorite.error ??
+        archiveGymPlan.error ??
+        restoreGymPlan.error ??
+        deleteGymPlan.error;
+
     let errorMessage = '';
-    if (startSession.error) {
+    if (exportErrorKey) {
+        errorMessage = t(exportErrorKey);
+    } else if (isGymError(actionError)) {
+        errorMessage = t(actionError.message);
+    } else if (actionError) {
         errorMessage = t('gymPlanDetails.errors.actionFailed');
     }
 
-    const dismissExportError = () => {
-        setExportError(null);
+    const dismissError = () => {
+        setExportErrorKey(null);
+        startSession.reset();
+        toggleFavorite.reset();
+        archiveGymPlan.reset();
+        restoreGymPlan.reset();
+        deleteGymPlan.reset();
     };
 
     const goBack = () => {
@@ -191,7 +204,6 @@ export const useGymPlanDetailsScreen = (): UseGymPlanDetailsScreenResult => {
     return {
         definitionNameById,
         errorMessage,
-        exportError,
         gymPlan,
         hasArchivedStatus,
         id,
@@ -205,7 +217,7 @@ export const useGymPlanDetailsScreen = (): UseGymPlanDetailsScreenResult => {
         exerciseCount,
         closeDeleteConfirm,
         confirmDeleteGymPlan,
-        dismissExportError,
+        dismissError,
         goBack,
         handleEditPlan,
         handleExport,

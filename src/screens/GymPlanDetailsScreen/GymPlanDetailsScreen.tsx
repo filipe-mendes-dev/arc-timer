@@ -51,6 +51,8 @@ const GymPlanDetailsScreen = () => {
         favoriteIconId = 'star';
     }
 
+    console.log('screen.errorMessage: ', screen.errorMessage);
+
     return (
         <>
             <MainContainer
@@ -158,11 +160,8 @@ const GymPlanDetailsScreen = () => {
                     />
                     <ErrorBanner
                         message={screen.errorMessage}
+                        onClose={screen.dismissError}
                         style={st.errorBanner}
-                    />
-                    <ErrorBanner
-                        message={screen.exportError ?? ''}
-                        onClose={screen.dismissExportError}
                     />
                 </ScreenSection>
 
