@@ -4,7 +4,11 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import type { WorkoutBlock } from '@src/core/entities/workout.interfaces';
 import { uid } from '@src/core/id';
 import { useWorkoutDraftStore } from '@src/state/stores/useWorkoutDraftStore';
-import { useUpsertWorkout, useWorkout } from '@src/data/workouts';
+import {
+    isWorkoutError,
+    useUpsertWorkout,
+    useWorkout,
+} from '@src/data/workouts';
 
 import { WorkoutBlockItem } from './components/WorkoutBlockItem/WorkoutBlockItem';
 import { Button } from '@src/components/ui/Button/Button';
@@ -213,11 +217,13 @@ const EditWorkoutScreen = () => {
             } else {
                 router.replace(`/workouts/${workout.id}`);
             }
-        } catch {
+        } catch (e) {
             const saveErrors: WorkoutEditError[] = [
                 {
                     field: 'blocks',
-                    message: t('editWorkout.validation.saveFailed'),
+                    message: isWorkoutError(e)
+                        ? t(e.message)
+                        : t('editWorkout.validation.saveFailed'),
                     targetId: 'blocks',
                 },
             ];
