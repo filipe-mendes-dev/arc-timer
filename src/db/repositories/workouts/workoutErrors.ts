@@ -7,7 +7,7 @@ import {
 export const workoutErrors = {
     unnamedExercises: {
         code: 'UNNAMED_EXERCISES',
-        message: 'Cannot save a workout with unnamed exercises',
+        message: 'editWorkout.validation.unnamedExercises',
     },
 } as const satisfies Record<string, AppErrorDefinition<string>>;
 

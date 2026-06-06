@@ -7,24 +7,31 @@ import {
 export const exerciseDefinitionErrors = {
     deleteReferenced: {
         code: 'DELETE_REFERENCED',
-        message: 'Cannot delete referenced exercise definition',
+        message: 'exerciseDefinitions.validation.deleteReferenced',
     },
     deleteSystemForbidden: {
         code: 'DELETE_SYSTEM_FORBIDDEN',
-        message: 'Cannot delete system exercise definition',
+        message: 'exerciseDefinitions.validation.deleteSystemForbidden',
     },
     duplicateName: {
         code: 'DUPLICATE_NAME',
-        message: 'Exercise definition already exists',
+        message: 'exerciseDefinitions.validation.duplicateName',
     },
     gymOnlyRestricted: {
         code: 'GYM_ONLY_RESTRICTED',
-        message: 'Cannot make workout-referenced exercise definition gym-only',
+        message: 'exerciseDefinitions.validation.gymOnlyRestricted',
+    },
+    workoutOnlyRestricted: {
+        code: 'WORKOUT_ONLY_RESTRICTED',
+        message: 'exerciseDefinitions.validation.workoutOnlyRestricted',
     },
     mergeGymOnlyConflict: {
         code: 'MERGE_GYM_ONLY_CONFLICT',
-        message:
-            'Cannot merge workout-referenced exercise definition into gym-only definition',
+        message: 'exerciseDefinitions.validation.mergeGymOnlyConflict',
+    },
+    mergeWorkoutOnlyConflict: {
+        code: 'MERGE_WORKOUT_ONLY_CONFLICT',
+        message: 'exerciseDefinitions.validation.mergeWorkoutOnlyConflict',
     },
 } as const satisfies Record<string, AppErrorDefinition<string>>;
 
