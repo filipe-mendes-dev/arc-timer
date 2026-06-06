@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { useDebouncedValue } from '@src/hooks/useDebouncedValue';
 import type { ExerciseDefinitionListParams } from '@src/db/services/exerciseDefinitions/exerciseDefinitionServiceFactory';
-import type { ExerciseDefinitionAvailability } from '@src/core/entities/entities';
+import type { ExerciseDefinitionAvailability } from '@src/core/entities/exerciseDefinition.interfaces';
 
 import { useExerciseDefinitions } from './exerciseDefinitionQueries';
 
