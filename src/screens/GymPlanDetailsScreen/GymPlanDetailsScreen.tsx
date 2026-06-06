@@ -51,8 +51,6 @@ const GymPlanDetailsScreen = () => {
         favoriteIconId = 'star';
     }
 
-    console.log('screen.errorMessage: ', screen.errorMessage);
-
     return (
         <>
             <MainContainer
