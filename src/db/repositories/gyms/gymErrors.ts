@@ -13,6 +13,10 @@ export const gymErrors = {
         code: 'ACTIVE_SESSION_NOT_FOUND',
         message: 'Active gym session was not found',
     },
+    activeSessionCannotBeDeleted: {
+        code: 'ACTIVE_SESSION_CANNOT_BE_DELETED',
+        message: 'Active gym sessions must be discarded or completed',
+    },
     exerciseDefinitionNotFound: {
         code: 'EXERCISE_DEFINITION_NOT_FOUND',
         message: 'Exercise definition was not found',
@@ -32,6 +36,18 @@ export const gymErrors = {
     exerciseSetNotFound: {
         code: 'EXERCISE_SET_NOT_FOUND',
         message: 'Gym exercise record set was not found',
+    },
+    gymPlanArchived: {
+        code: 'GYM_PLAN_ARCHIVED',
+        message: 'Gym plan is archived',
+    },
+    gymPlanNotFound: {
+        code: 'GYM_PLAN_NOT_FOUND',
+        message: 'Gym plan was not found',
+    },
+    invalidGymPlan: {
+        code: 'INVALID_GYM_PLAN',
+        message: 'Gym plan is invalid',
     },
     invalidGymExerciseRecordTimeRange: {
         code: 'INVALID_GYM_EXERCISE_RECORD',
