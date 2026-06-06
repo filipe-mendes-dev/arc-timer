@@ -143,6 +143,46 @@ const RootLayout = () => {
                             name="workouts/edit-block"
                             options={{ headerShown: false }}
                         />
+                        <Stack.Screen
+                            name="gymSession/index"
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="gymHistory/index"
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="gymHistory/[sessionId]"
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="gymExerciseAdd/index"
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="gymExerciseData/[recordId]"
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="gymPlans/index"
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="gymPlans/[id]"
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="gymPlans/edit"
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="gymPlans/edit-section"
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="gymPlans/edit-exercise"
+                            options={{ headerShown: false }}
+                        />
                     </Stack>
                 </SafeAreaProvider>
             </ThemeProvider>
