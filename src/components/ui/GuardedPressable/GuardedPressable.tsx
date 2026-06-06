@@ -60,14 +60,15 @@ export const GuardedPressable = React.forwardRef<View, GuardedPressableProps>(
 
         const getStyle = useCallback(
             (state: PressableStateCallbackType): StyleProp<ViewStyle> => {
-                const baseStyle =
-                    typeof style === 'function' ? style(state) : style;
-
-                if (isPressedFeedbackDisabled || !state.pressed) {
-                    return baseStyle;
+                if (typeof style === 'function') {
+                    return style(state);
                 }
 
-                return [baseStyle, st.pressed];
+                if (isPressedFeedbackDisabled || !state.pressed) {
+                    return style;
+                }
+
+                return [style, st.pressed];
             },
             [isPressedFeedbackDisabled, style],
         );
