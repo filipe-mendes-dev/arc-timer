@@ -79,6 +79,8 @@ export const createEmptyGymPlanDraft = (): GymPlan => {
         updatedAtMs: nowMs,
         isFavorite: false,
         status: 'draft',
+        sectionCount: 0,
+        exerciseCount: 0,
         draftTargetGymPlanId: undefined,
     };
 };

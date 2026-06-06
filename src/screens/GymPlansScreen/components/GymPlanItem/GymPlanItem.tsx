@@ -7,7 +7,7 @@ import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import type { ActionStripProps } from '@src/components/ui/MetaCard/MetaCard.interfaces';
 import { AppText } from '@src/components/ui/Typography/AppText';
-import type { GymPlan } from '@src/core/entities/gymPlan.interfaces';
+import type { GymPlanListItem } from '@src/core/entities/gymPlan.interfaces';
 import { useTheme } from '@src/theme/ThemeProvider';
 
 import { useGymPlanItemStyles } from './GymPlanItem.styles';
@@ -15,18 +15,12 @@ import { useGymPlanItemStyles } from './GymPlanItem.styles';
 interface GymPlanItemProps {
     isSelected?: boolean;
     isSelectMode?: boolean;
-    item: GymPlan;
+    item: GymPlanListItem;
     onPress: () => void;
     onRemove: () => void;
     onSelect: () => void;
     onToggleFavorite: () => void;
 }
-
-const getExerciseCount = (gymPlan: GymPlan): number =>
-    gymPlan.sections.reduce(
-        (total, section) => total + section.exercises.length,
-        0,
-    );
 
 interface GetActionStripInput {
     iconColor: string;
@@ -63,8 +57,6 @@ export const GymPlanItem = ({
     const { theme } = useTheme();
     const st = useGymPlanItemStyles();
     const isFavorite = item.isFavorite === true;
-    const sectionCount = item.sections.length;
-    const exerciseCount = getExerciseCount(item);
     const titleLeftIcon = (() => {
         if (isSelectMode) {
             return (
@@ -154,7 +146,7 @@ export const GymPlanItem = ({
                                 numberOfLines={1}
                             >
                                 {t('gymPlans.card.sections', {
-                                    count: sectionCount,
+                                    count: item.sectionCount,
                                 })}
                             </AppText>
                         </View>
@@ -171,7 +163,7 @@ export const GymPlanItem = ({
                                 numberOfLines={1}
                             >
                                 {t('gymPlans.card.exercises', {
-                                    count: exerciseCount,
+                                    count: item.exerciseCount,
                                 })}
                             </AppText>
                         </View>

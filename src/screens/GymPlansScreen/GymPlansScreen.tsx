@@ -1,5 +1,6 @@
 import { FlatList, View } from 'react-native';
 import type { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 import { MainContainer } from '@src/components/layout/MainContainer/MainContainer';
 import { ListEmptyState } from '@src/components/layout/ListEmptyState';
@@ -11,8 +12,9 @@ import { SearchField } from '@src/components/ui/SearchField/SearchField';
 import { GymPlanItem } from './components/GymPlanItem';
 import { NewGymPlanModal } from './components/NewGymPlanModal';
 import { useGymPlansScreenStyles } from './GymPlansScreen.styles';
+import { useGymPlansList } from './useGymPlansList';
 import { useGymPlansSelection } from './useGymPlansSelection';
-import { useGymPlansScreen } from './useGymPlansScreen';
+import { useNewGymPlanFlow } from './useNewGymPlanFlow';
 
 interface GymPlansEmptyStateProps {
     hasSearch: boolean;
@@ -46,7 +48,9 @@ const GymPlansEmptyState = ({
 
 const GymPlansScreen = () => {
     const st = useGymPlansScreenStyles();
-    const screen = useGymPlansScreen();
+    const { t } = useTranslation();
+    const list = useGymPlansList();
+    const newPlan = useNewGymPlanFlow();
     const selection = useGymPlansSelection();
 
     return (
@@ -59,7 +63,7 @@ const GymPlansScreen = () => {
             topBarRightAction={selection.topBarRightAction}
         >
             <FlatList
-                data={screen.filteredGymPlans}
+                data={list.filteredGymPlans}
                 keyExtractor={(item) => item.id}
                 style={st.list}
                 contentContainerStyle={st.listContent}
@@ -67,26 +71,24 @@ const GymPlansScreen = () => {
                     <View style={st.headerContainer}>
                         <View style={st.headerRow}>
                             <SearchField
-                                value={screen.search}
-                                onChangeText={screen.setSearch}
+                                value={list.search}
+                                onChangeText={list.setSearch}
                                 fullWidth
-                                placeholder={screen.t(
-                                    'gymPlans.searchPlaceholder',
-                                )}
+                                placeholder={t('gymPlans.searchPlaceholder')}
                             />
                             {!selection.isSelectMode && (
                                 <Button
-                                    title={screen.t('gymPlans.actions.new')}
+                                    title={t('gymPlans.actions.new')}
                                     variant="primary"
-                                    onPress={screen.openNewPlanModal}
-                                    loading={screen.isStartingDraft}
+                                    onPress={newPlan.openNewPlanModal}
+                                    loading={newPlan.isStartingDraft}
                                     style={st.newButton}
                                 />
                             )}
                         </View>
                         <ErrorBanner
-                            message={screen.importError}
-                            onClose={() => screen.setImportError('')}
+                            message={newPlan.importError}
+                            onClose={() => newPlan.setImportError('')}
                         />
                     </View>
                 }
@@ -94,41 +96,41 @@ const GymPlansScreen = () => {
                 renderItem={({ item }) => (
                     <GymPlanItem
                         item={item}
-                        onPress={() => screen.goToPlan(item.id)}
+                        onPress={() => list.goToPlan(item.id)}
                         onRemove={() => selection.requestRemoval(item.id)}
                         isSelectMode={selection.isSelectMode}
                         isSelected={selection.isSelected(item.id)}
                         onSelect={() => selection.toggleItem(item.id)}
-                        onToggleFavorite={() => screen.toggleFavoritePlan(item)}
+                        onToggleFavorite={() => list.toggleFavoritePlan(item)}
                     />
                 )}
                 ListEmptyComponent={
                     <GymPlansEmptyState
-                        hasSearch={screen.hasSearch}
-                        onNewPlan={screen.openNewPlanModal}
-                        t={screen.t}
+                        hasSearch={list.hasSearch}
+                        onNewPlan={newPlan.openNewPlanModal}
+                        t={t}
                     />
                 }
                 keyboardShouldPersistTaps="handled"
             />
 
             <NewGymPlanModal
-                visible={screen.isNewPlanModalVisible}
-                hasRecoverableDraft={screen.hasRecoverableDraft}
-                isImporting={screen.isImporting}
-                isStartingDraft={screen.isStartingDraft}
-                onClose={screen.closeNewPlanModal}
-                onCreateNew={screen.handleNewPlan}
-                onImportFromFile={screen.handleImportFromFile}
-                onResumeDraft={screen.handleResumeDraft}
+                visible={newPlan.isNewPlanModalVisible}
+                hasRecoverableDraft={newPlan.hasRecoverableDraft}
+                isImporting={newPlan.isImporting}
+                isStartingDraft={newPlan.isStartingDraft}
+                onClose={newPlan.closeNewPlanModal}
+                onCreateNew={newPlan.handleNewPlan}
+                onImportFromFile={newPlan.handleImportFromFile}
+                onResumeDraft={newPlan.handleResumeDraft}
             />
 
             <ConfirmDialog
                 visible={selection.hasPendingRemoval}
                 title={selection.confirmTitle}
                 message={selection.confirmMessage}
-                confirmLabel={screen.t('gymPlans.confirmRemove.confirm')}
-                cancelLabel={screen.t('common.actions.cancel')}
+                confirmLabel={t('gymPlans.confirmRemove.confirm')}
+                cancelLabel={t('common.actions.cancel')}
                 destructive
                 onConfirm={selection.confirmRemoval}
                 onCancel={selection.cancelRemoval}

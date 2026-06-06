@@ -35,7 +35,7 @@ export const exportGymPlanToFile = async (
     };
 
     const json = JSON.stringify(payload, null, 2);
-    const safeName = sanitizeFilename(gymPlan.name);
+    const safeName = sanitizeFilename(gymPlan.name ?? 'Gym Plan');
     const filename = `${safeName}.arcgp`;
     const file = new File(Paths.cache, filename);
 
@@ -61,7 +61,7 @@ export const exportGymPlanToFile = async (
     try {
         await Sharing.shareAsync(file.uri, {
             mimeType: ARC_GYM_PLAN_MIME,
-            dialogTitle: `Share gym plan "${gymPlan.name}"`,
+            dialogTitle: `Share gym plan "${gymPlan.name ?? 'Gym Plan'}"`,
         });
 
         return { ok: true };
