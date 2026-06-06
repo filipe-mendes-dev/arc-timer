@@ -1,6 +1,6 @@
 import type { UUID } from './common.interfaces';
 
-export type GymSessionStatus = 'active' | 'completed' | 'discarded';
+export type GymSessionStatus = 'active' | 'completed';
 
 export interface GymExerciseRecordSet {
     id: UUID;
