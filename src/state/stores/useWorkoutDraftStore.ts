@@ -53,6 +53,9 @@ const starterWorkout = (): Workout => ({
     name: 'New Workout',
     blocks: [starterBlock()],
     updatedAtMs: Date.now(),
+    isFavorite: false,
+    blockCount: 1,
+    exerciseCount: 3,
 });
 
 const quickWorkout = (): Workout => ({
@@ -65,6 +68,9 @@ const quickWorkout = (): Workout => ({
         },
     ],
     updatedAtMs: Date.now(),
+    isFavorite: false,
+    blockCount: 1,
+    exerciseCount: 3,
 });
 
 export const useWorkoutDraftStore = create<WorkoutDraftState>()(

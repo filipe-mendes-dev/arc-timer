@@ -4,8 +4,8 @@ import type {
 } from '@src/core/entities/workoutSession.interfaces';
 import type { Workout } from '@src/core/entities/workout.interfaces';
 
-import type { workoutSessionsTable } from '../schema';
-import { isWorkoutSessionStats } from './jsonGuards';
+import type { workoutSessionsTable } from '../../schema';
+import { isWorkoutSessionStats } from '../jsonGuards';
 
 export type WorkoutSessionRow = typeof workoutSessionsTable.$inferSelect;
 
@@ -41,6 +41,7 @@ export const workoutSessionFromDbRow = (
     id: row.id,
     startedAtMs: row.startedAtMs,
     endedAtMs: row.endedAtMs,
+    workoutName: workoutContent.name,
     workoutSnapshot: workoutContent,
     activeWorkoutId,
     workoutVersionId: row.workoutVersionId,

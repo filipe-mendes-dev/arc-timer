@@ -1,4 +1,4 @@
-import type { Workout } from '@src/core/entities/entities';
+import type { Workout } from '@src/core/entities/workout.interfaces';
 import type {
     WorkoutSession,
     WorkoutSessionStats,
@@ -8,7 +8,7 @@ import { uid } from '@src/core/id';
 import {
     workoutSessionFromDbRow,
     type WorkoutSessionRow,
-} from '../../mappers/workoutSessionMapper';
+} from '../../mappers/workouts/workoutSessionMapper';
 import type { ExerciseDefinitionService } from '../exerciseDefinitions/exerciseDefinitionServiceFactory';
 import type { WorkoutSessionRepository } from '../../repositories/workoutSessions/workoutSessionRepositoryFactory';
 import type { WorkoutRepository } from '../../repositories/workouts/workoutRepositoryFactory';
@@ -51,7 +51,9 @@ interface ResolveSessionDurationSecArgs {
     stats?: WorkoutSessionStats;
 }
 
-const resolveSessionDurationSec = (args: ResolveSessionDurationSecArgs): number => {
+const resolveSessionDurationSec = (
+    args: ResolveSessionDurationSecArgs,
+): number => {
     const { startedAtMs, endedAtMs, stats } = args;
 
     if (stats != null) {
@@ -74,13 +76,16 @@ interface BuildPersistedSessionArgs {
     stats?: WorkoutSessionStats;
 }
 
-const buildPersistedSession = (args: BuildPersistedSessionArgs): WorkoutSession => {
+const buildPersistedSession = (
+    args: BuildPersistedSessionArgs,
+): WorkoutSession => {
     const endedAtMs = Math.max(args.endedAtMs, args.startedAtMs);
 
     return {
         id: uid(),
         startedAtMs: args.startedAtMs,
         endedAtMs,
+        workoutName: args.workoutSnapshot.name,
         workoutSnapshot: args.workoutSnapshot,
         workoutVersionId: args.versionId,
         totalDurationSec: resolveSessionDurationSec({

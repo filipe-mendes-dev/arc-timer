@@ -257,6 +257,7 @@ export const createAsyncStorageMigration =
                 id: session.id,
                 startedAtMs: session.startedAtMs,
                 endedAtMs: session.endedAtMs,
+                workoutName: workoutSnapshot.name,
                 workoutSnapshot,
                 workoutVersionId,
                 totalDurationSec: session.totalDurationSec,
