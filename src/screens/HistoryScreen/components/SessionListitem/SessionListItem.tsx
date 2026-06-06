@@ -59,6 +59,7 @@ const SessionListItem = ({
             onPress={isSelectMode ? onSelect : onPress}
             containerStyle={st.card}
             showSelectionOutline={isSelected}
+            isPressedFeedbackDisabled={isSelectMode}
             date={new Date(session.startedAtMs).toISOString()}
             summaryContent={
                 <View style={st.row}>

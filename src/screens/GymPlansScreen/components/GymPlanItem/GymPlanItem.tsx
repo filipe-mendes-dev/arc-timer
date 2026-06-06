@@ -107,6 +107,7 @@ export const GymPlanItem = ({
     return (
         <MetaCard
             showSelectionOutline={isSelected}
+            isPressedFeedbackDisabled={isSelectMode}
             expandable={true}
             withBottomFade={false}
             minHeight={50}

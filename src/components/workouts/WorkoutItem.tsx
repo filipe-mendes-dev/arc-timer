@@ -88,6 +88,7 @@ export const WorkoutItem: React.FC<WorkoutItemProps> = ({
     return (
         <MetaCard
             showSelectionOutline={isSelected}
+            isPressedFeedbackDisabled={isSelectMode}
             topLeftContent={{
                 text: timeLabel,
                 icon: (
