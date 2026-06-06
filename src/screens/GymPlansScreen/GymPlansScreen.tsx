@@ -12,9 +12,9 @@ import { SearchField } from '@src/components/ui/SearchField/SearchField';
 import { GymPlanItem } from './components/GymPlanItem';
 import { NewGymPlanModal } from './components/NewGymPlanModal';
 import { useGymPlansScreenStyles } from './GymPlansScreen.styles';
-import { useGymPlansList } from './useGymPlansList';
-import { useGymPlansSelection } from './useGymPlansSelection';
-import { useNewGymPlanFlow } from './useNewGymPlanFlow';
+import { useGymPlansList } from './hooks/useGymPlansList';
+import { useGymPlansSelection } from './hooks/useGymPlansSelection';
+import { useNewGymPlanFlow } from './hooks/useNewGymPlanFlow';
 
 interface GymPlansEmptyStateProps {
     hasSearch: boolean;

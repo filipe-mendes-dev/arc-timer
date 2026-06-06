@@ -2,13 +2,10 @@ import { useCallback, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import {
-    useDiscardGymPlanDraft,
-    useDraftGymPlan,
-} from '@src/data/gymPlans';
+import { useDiscardGymPlanDraft, useDraftGymPlan } from '@src/data/gymPlans';
 import { useGymPlanBuilderStore } from '@src/state/stores/useGymPlanBuilderStore';
 
-import { importGymPlanDraftFromFile } from './GymPlansScreen.import';
+import { importGymPlanDraftFromFile } from '../GymPlansScreen.import';
 
 interface UseNewGymPlanFlowResult {
     closeNewPlanModal: () => void;
@@ -33,7 +30,9 @@ export const useNewGymPlanFlow = (): UseNewGymPlanFlowResult => {
     const startImportedDraft = useGymPlanBuilderStore(
         (state) => state.startImportedDraft,
     );
-    const startNewDraft = useGymPlanBuilderStore((state) => state.startNewDraft);
+    const startNewDraft = useGymPlanBuilderStore(
+        (state) => state.startNewDraft,
+    );
     const [isNewPlanModalVisible, setNewPlanModalVisible] = useState(false);
     const [importError, setImportErrorState] = useState('');
     const [isImporting, setImporting] = useState(false);
