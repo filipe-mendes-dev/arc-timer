@@ -2,8 +2,6 @@ import { View } from 'react-native';
 
 import { MainContainer } from '@src/components/layout/MainContainer/MainContainer';
 import { ScreenSection } from '@src/components/layout/ScreenSection/ScreenSection';
-import { Modal } from '@src/components/modals/Modal';
-import { Button } from '@src/components/ui/Button/Button';
 import { ErrorBanner } from '@src/components/ui/ErrorBanner/ErrorBanner';
 import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
@@ -12,6 +10,7 @@ import { AppText } from '@src/components/ui/Typography/AppText';
 import { useTheme } from '@src/theme/ThemeProvider';
 import { HomeActionTile } from '@src/screens/HomeScreen/components/HomeActionTile/HomeActionTile';
 
+import { GymActiveSessionEndModal } from '../GymActiveSessionScreen/components/GymActiveSessionEndModal';
 import { useStyles } from './GymScreen.styles';
 import { useGymScreen } from './useGymScreen';
 
@@ -21,14 +20,13 @@ const GymScreen = () => {
     const {
         activeSession,
         activeSessionSetCount,
-        discardGymSession,
         errorMessage,
-        finishGymSession,
         handleCloseError,
         handleConfirmDiscard,
         handleConfirmFinish,
         handleStartSession,
         isFinishModalVisible,
+        isDiscardingSession,
         isFinishingSession,
         router,
         setFinishModalVisible,
@@ -203,54 +201,14 @@ const GymScreen = () => {
                 />
             </View>
 
-            <Modal
+            <GymActiveSessionEndModal
                 visible={isFinishModalVisible}
-                onRequestClose={() => setFinishModalVisible(false)}
-                containerStyle={st.modalContainer}
-                contentStyle={st.modalContent}
-            >
-                <View style={st.modalBody}>
-                    <View style={st.modalTextContainer}>
-                        <AppText variant="title3" style={st.modalTitle}>
-                            {t('gym.finishSessionModal.title')}
-                        </AppText>
-
-                        <AppText
-                            variant="bodySmall"
-                            tone="secondary"
-                            style={st.modalMessage}
-                        >
-                            {t('gym.finishSessionModal.message')}
-                        </AppText>
-                    </View>
-
-                    <View style={st.modalActions}>
-                        <Button
-                            title={t('gym.finishSessionModal.complete')}
-                            variant="primary"
-                            loading={finishGymSession.isPending}
-                            disabled={discardGymSession.isPending}
-                            onPress={handleConfirmFinish}
-                        />
-
-                        <Button
-                            title={t('gym.finishSessionModal.discard')}
-                            variant="danger"
-                            loading={discardGymSession.isPending}
-                            disabled={finishGymSession.isPending}
-                            onPress={handleConfirmDiscard}
-                        />
-
-                        <Button
-                            title={t('common.actions.cancel')}
-                            variant="ghost"
-                            disabled={isFinishingSession}
-                            onPress={() => setFinishModalVisible(false)}
-                            style={st.cancelButton}
-                        />
-                    </View>
-                </View>
-            </Modal>
+                isDiscardingSession={isDiscardingSession}
+                isFinishingSession={isFinishingSession}
+                onCancel={() => setFinishModalVisible(false)}
+                onComplete={handleConfirmFinish}
+                onDiscard={handleConfirmDiscard}
+            />
         </MainContainer>
     );
 };
