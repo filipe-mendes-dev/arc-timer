@@ -75,7 +75,12 @@ export const useFinishGymSession = () => {
     return useMutation({
         mutationFn: async () => dbServices.gymSessionService.finishGymSession(),
         onSuccess: async () => {
-            await invalidateGymSessionQueries(queryClient);
+            await Promise.all([
+                invalidateGymSessionQueries(queryClient),
+                queryClient.invalidateQueries({
+                    queryKey: exerciseDefinitionKeys.all,
+                }),
+            ]);
         },
     });
 };
@@ -104,7 +109,12 @@ export const useDeleteGymSession = () => {
             queryClient.removeQueries({
                 queryKey: gymSessionKeys.detail(id),
             });
-            await invalidateGymSessionQueries(queryClient);
+            await Promise.all([
+                invalidateGymSessionQueries(queryClient),
+                queryClient.invalidateQueries({
+                    queryKey: exerciseDefinitionKeys.all,
+                }),
+            ]);
         },
     });
 };

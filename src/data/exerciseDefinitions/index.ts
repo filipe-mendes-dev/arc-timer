@@ -1,6 +1,8 @@
 export { exerciseDefinitionKeys } from './exerciseDefinitionKeys';
 export {
+    useDeleteExerciseDefinition,
     useFindOrCreateGymExerciseDefinitionByName,
+    useSaveExerciseDefinitionData,
     useSaveExerciseDefinition,
 } from './exerciseDefinitionMutations';
 export {
@@ -13,6 +15,7 @@ export type {
     CreateExerciseDefinitionMutationArgs,
     FindOrCreateExerciseDefinitionByNameArgs,
     MergeExerciseDefinitionMutationArgs,
+    SaveExerciseDefinitionDataArgs,
     SaveExerciseDefinitionArgs,
     UpdateExerciseDefinitionChanges,
     UpdateExerciseDefinitionMutationArgs,

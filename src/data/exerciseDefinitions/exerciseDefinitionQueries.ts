@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import type { ExerciseDefinition } from '@src/core/entities/exerciseDefinition.interfaces';
+import type { ExerciseDefinitionListItem } from '@src/core/entities/exerciseDefinition.interfaces';
 import { dbServices } from '@src/db/dbServices';
 import type { ExerciseDefinitionListParams } from '@src/db/services/exerciseDefinitions/exerciseDefinitionServiceFactory';
 
@@ -15,13 +15,14 @@ export const useExerciseDefinitions = (
     options: UseExerciseDefinitionsOptions = {},
 ) =>
     useQuery({
-        queryKey: exerciseDefinitionKeys.list(params),
+        queryKey: exerciseDefinitionKeys.listItems(params),
         queryFn: () => dbServices.exerciseDefinitionService.list(params),
         enabled: options.enabled ?? true,
-        initialData: (): ExerciseDefinition[] =>
-            options.enabled === false
-                ? []
-                : dbServices.exerciseDefinitionService.list(params),
+        initialData: (): ExerciseDefinitionListItem[] => {
+            if (options.enabled === false) return [];
+
+            return dbServices.exerciseDefinitionService.list(params);
+        },
     });
 
 export const useGymExerciseDefinitions = (name?: string) =>

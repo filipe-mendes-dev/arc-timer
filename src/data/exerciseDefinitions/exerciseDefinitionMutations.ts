@@ -3,6 +3,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type {
     ExerciseDefinition,
     ExerciseDefinitionAvailability,
+    ExerciseDefinitionData,
+    ExerciseDefinitionTargetSetData,
+    ExerciseTrackingField,
 } from '@src/core/entities/exerciseDefinition.interfaces';
 import { dbServices } from '@src/db/dbServices';
 
@@ -40,6 +43,13 @@ export type SaveExerciseDefinitionArgs =
 
 export interface FindOrCreateExerciseDefinitionByNameArgs {
     name: string;
+}
+
+export interface SaveExerciseDefinitionDataArgs {
+    defaultTargetSet?: ExerciseDefinitionTargetSetData;
+    defaultTrackingFields: ExerciseTrackingField[];
+    exerciseDefinitionId: string;
+    notes?: string;
 }
 
 export const useSaveExerciseDefinition = () => {
@@ -89,6 +99,54 @@ export const useSaveExerciseDefinition = () => {
                     queryKey: workoutSessionKeys.all,
                 }),
             ]);
+        },
+    });
+};
+
+export const useSaveExerciseDefinitionData = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({
+            defaultTargetSet,
+            defaultTrackingFields,
+            exerciseDefinitionId,
+            notes,
+        }: SaveExerciseDefinitionDataArgs): Promise<ExerciseDefinitionData> =>
+            dbServices.exerciseDefinitionService.upsertExerciseDefinitionData({
+                defaultTargetSet,
+                defaultTrackingFields,
+                exerciseDefinitionId,
+                notes,
+            }),
+        onSuccess: async (_, variables) => {
+            await queryClient.invalidateQueries({
+                queryKey: exerciseDefinitionKeys.detail(
+                    variables.exerciseDefinitionId,
+                ),
+            });
+        },
+    });
+};
+
+export const useDeleteExerciseDefinition = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (id: string): Promise<string> => {
+            dbServices.exerciseDefinitionService.deleteUserExerciseDefinition(
+                id,
+            );
+
+            return id;
+        },
+        onSuccess: async (id) => {
+            queryClient.removeQueries({
+                queryKey: exerciseDefinitionKeys.detail(id),
+            });
+            await queryClient.invalidateQueries({
+                queryKey: exerciseDefinitionKeys.all,
+            });
         },
     });
 };
