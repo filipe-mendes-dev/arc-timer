@@ -5,7 +5,6 @@ import { ScreenSection } from '@src/components/layout/ScreenSection/ScreenSectio
 import { Modal } from '@src/components/modals/Modal';
 import { Button } from '@src/components/ui/Button/Button';
 import { ErrorBanner } from '@src/components/ui/ErrorBanner/ErrorBanner';
-import GuardedPressable from '@src/components/ui/GuardedPressable/GuardedPressable';
 import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { Separator } from '@src/components/ui/Separator/Separator';
