@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import type { ExerciseDefinition } from '@src/core/entities/exerciseDefinition.interfaces';
@@ -7,12 +6,8 @@ import {
     isExerciseDefinitionError,
     useSaveExerciseDefinition,
 } from '@src/data/exerciseDefinitions';
-import { Modal } from '@src/components/modals/Modal';
-import { Button } from '@src/components/ui/Button/Button';
+import { ActionModal } from '@src/components/modals/ActionModal';
 import { TextField } from '@src/components/ui/TextField/TextField';
-import { AppText } from '@src/components/ui/Typography/AppText';
-
-import { useExerciseDefinitionDetailsScreenStyles } from '../ExerciseDefinitionDetailsScreen.styles';
 
 interface ExerciseDefinitionNameModalProps {
     definition: ExerciseDefinition | null;
@@ -26,7 +21,6 @@ export const ExerciseDefinitionNameModal = ({
     onClose,
 }: ExerciseDefinitionNameModalProps) => {
     const { t } = useTranslation();
-    const st = useExerciseDefinitionDetailsScreenStyles();
     const saveExerciseDefinition = useSaveExerciseDefinition();
     const lastDefinitionRef = useRef<ExerciseDefinition | null>(null);
     const [name, setName] = useState('');
@@ -78,48 +72,33 @@ export const ExerciseDefinitionNameModal = ({
     };
 
     return (
-        <Modal
+        <ActionModal
             visible={visible}
-            onRequestClose={onClose}
-            containerStyle={st.modalContainer}
-            contentStyle={st.modalContent}
+            title={t('exerciseDefinitions.nameModal.title')}
+            description={t('exerciseDefinitions.nameModal.description')}
+            error={{
+                message: nameError ?? '',
+                onClose: () => setNameError(undefined),
+            }}
+            primaryAction={{
+                loading: saveExerciseDefinition.isPending,
+                onPress: handleSave,
+            }}
+            secondaryAction={{
+                onPress: onClose,
+            }}
+            onClose={onClose}
         >
-            <View style={st.modalBody}>
-                <View style={st.modalText}>
-                    <AppText variant="title3">
-                        {t('exerciseDefinitions.nameModal.title')}
-                    </AppText>
-                    <AppText variant="bodySmall" tone="secondary">
-                        {t('exerciseDefinitions.nameModal.description')}
-                    </AppText>
-                </View>
-
-                <TextField
-                    label={t('exerciseDefinitions.fields.name')}
-                    value={name}
-                    onChangeText={(value) => {
-                        setName(value);
-                        setNameError(undefined);
-                    }}
-                    autoCapitalize="words"
-                    returnKeyType="done"
-                    errorText={nameError}
-                />
-
-                <View style={st.modalActions}>
-                    <Button
-                        title={t('common.actions.save')}
-                        variant="primary"
-                        loading={saveExerciseDefinition.isPending}
-                        onPress={handleSave}
-                    />
-                    <Button
-                        title={t('common.actions.cancel')}
-                        variant="ghost"
-                        onPress={onClose}
-                    />
-                </View>
-            </View>
-        </Modal>
+            <TextField
+                label={t('exerciseDefinitions.fields.name')}
+                value={name}
+                onChangeText={(value) => {
+                    setName(value);
+                    setNameError(undefined);
+                }}
+                autoCapitalize="words"
+                returnKeyType="done"
+            />
+        </ActionModal>
     );
 };

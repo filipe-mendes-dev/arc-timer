@@ -1,21 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
-import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import type {
     ExerciseDefinitionTargetSetData,
     ExerciseTrackingField,
 } from '@src/core/entities/exerciseDefinition.interfaces';
-import { Button } from '@src/components/ui/Button/Button';
+import { ActionModal } from '@src/components/modals/ActionModal';
 import { Stepper } from '@src/components/ui/Stepper/Stepper';
-import { AppText } from '@src/components/ui/Typography/AppText';
-import { Modal } from '@src/components/modals/Modal';
 
 import {
     trackingFieldLabelKeyByField,
     type ExerciseDefinitionTargetValue,
 } from '../ExerciseDefinitionDetailsScreen.helpers';
-import { useExerciseDefinitionDetailsScreenStyles } from '../ExerciseDefinitionDetailsScreen.styles';
 
 interface DefaultFieldValueModalProps {
     field: ExerciseTrackingField | null;
@@ -91,7 +87,6 @@ export const DefaultFieldValueModal = ({
     onSave,
 }: DefaultFieldValueModalProps) => {
     const { t } = useTranslation();
-    const st = useExerciseDefinitionDetailsScreenStyles();
     const lastFieldRef = useRef<ExerciseTrackingField | null>(null);
     const lastTargetSetRef = useRef<
         ExerciseDefinitionTargetSetData | undefined
@@ -129,110 +124,92 @@ export const DefaultFieldValueModal = ({
     };
 
     return (
-        <Modal
+        <ActionModal
             visible={visible}
-            onRequestClose={onClose}
-            containerStyle={st.modalContainer}
-            contentStyle={st.modalContent}
+            title={t('exerciseDefinitions.defaultValueModal.title', {
+                field: fieldLabel,
+            })}
+            description={t('exerciseDefinitions.defaultValueModal.description')}
+            primaryAction={{
+                loading: isSaving,
+                onPress: handleSave,
+            }}
+            secondaryAction={{
+                onPress: onClose,
+            }}
+            onClose={onClose}
         >
-            <View style={st.modalBody}>
-                <View style={st.modalText}>
-                    <AppText variant="title3">
-                        {t('exerciseDefinitions.defaultValueModal.title', {
-                            field: fieldLabel,
-                        })}
-                    </AppText>
-                    <AppText variant="bodySmall" tone="secondary">
-                        {t('exerciseDefinitions.defaultValueModal.description')}
-                    </AppText>
-                </View>
+            {visibleField === 'reps' && (
+                <Stepper
+                    label={fieldLabel}
+                    value={value}
+                    onChange={setValue}
+                    min={0}
+                    step={1}
+                />
+            )}
 
-                {visibleField === 'reps' && (
-                    <Stepper
-                        label={fieldLabel}
-                        value={value}
-                        onChange={setValue}
-                        min={0}
-                        step={1}
-                    />
-                )}
+            {visibleField === 'weight' && (
+                <Stepper
+                    label={fieldLabel}
+                    value={value}
+                    onChange={setValue}
+                    allowDecimal
+                    decimalPlaces={1}
+                    min={0}
+                    step={2.5}
+                    formatValue={(nextValue) =>
+                        t('gymExerciseData.setDetails.weight', {
+                            value: nextValue,
+                        })
+                    }
+                />
+            )}
 
-                {visibleField === 'weight' && (
-                    <Stepper
-                        label={fieldLabel}
-                        value={value}
-                        onChange={setValue}
-                        allowDecimal
-                        decimalPlaces={1}
-                        min={0}
-                        step={2.5}
-                        formatValue={(nextValue) =>
-                            t('gymExerciseData.setDetails.weight', {
-                                value: nextValue,
-                            })
-                        }
-                    />
-                )}
+            {visibleField === 'duration' && (
+                <Stepper
+                    label={fieldLabel}
+                    value={value}
+                    onChange={setValue}
+                    min={0}
+                    step={30}
+                    formatValue={(nextValue) =>
+                        t('gymExerciseData.setDetails.duration', {
+                            value: `${nextValue} sec`,
+                        })
+                    }
+                />
+            )}
 
-                {visibleField === 'duration' && (
-                    <Stepper
-                        label={fieldLabel}
-                        value={value}
-                        onChange={setValue}
-                        min={0}
-                        step={30}
-                        formatValue={(nextValue) =>
-                            t('gymExerciseData.setDetails.duration', {
-                                value: `${nextValue} sec`,
-                            })
-                        }
-                    />
-                )}
+            {visibleField === 'distance' && (
+                <Stepper
+                    label={fieldLabel}
+                    value={value}
+                    onChange={setValue}
+                    allowDecimal
+                    decimalPlaces={2}
+                    min={0}
+                    step={0.5}
+                    formatValue={(nextValue) =>
+                        t('gymExerciseData.setDetails.distance', {
+                            value: nextValue,
+                        })
+                    }
+                />
+            )}
 
-                {visibleField === 'distance' && (
-                    <Stepper
-                        label={fieldLabel}
-                        value={value}
-                        onChange={setValue}
-                        allowDecimal
-                        decimalPlaces={2}
-                        min={0}
-                        step={0.5}
-                        formatValue={(nextValue) =>
-                            t('gymExerciseData.setDetails.distance', {
-                                value: nextValue,
-                            })
-                        }
-                    />
-                )}
-
-                {visibleField === 'rpe' && (
-                    <Stepper
-                        label={fieldLabel}
-                        value={value}
-                        onChange={setValue}
-                        allowDecimal
-                        decimalPlaces={1}
-                        min={0}
-                        max={10}
-                        step={0.5}
-                    />
-                )}
-
-                <View style={st.modalActions}>
-                    <Button
-                        title={t('common.actions.save')}
-                        variant="primary"
-                        loading={isSaving}
-                        onPress={handleSave}
-                    />
-                    <Button
-                        title={t('common.actions.cancel')}
-                        variant="ghost"
-                        onPress={onClose}
-                    />
-                </View>
-            </View>
-        </Modal>
+            {visibleField === 'rpe' && (
+                <Stepper
+                    label={fieldLabel}
+                    value={value}
+                    onChange={setValue}
+                    allowDecimal
+                    decimalPlaces={1}
+                    min={0}
+                    max={10}
+                    step={0.5}
+                />
+            )}
+        </ActionModal>
     );
 };

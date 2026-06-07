@@ -76,25 +76,6 @@ export const useExerciseDefinitionDetailsScreenStyles = createStyles(
             sessionDurationText: {
                 color: theme.palette.metaCard.datePill.icon,
             },
-            modalContainer: {
-                padding: theme.layout.modal.padding,
-            },
-            modalContent: {
-                backgroundColor: theme.palette.background.card,
-                borderRadius: theme.layout.card.borderRadius,
-                borderWidth: theme.layout.card.borderWidth,
-                borderColor: theme.palette.border.subtle,
-                padding: theme.layout.card.padding,
-            },
-            modalBody: {
-                gap: 16,
-            },
-            modalText: {
-                gap: 6,
-            },
-            modalActions: {
-                gap: 12,
-            },
             availabilityModalOptions: {
                 gap: 8,
             },

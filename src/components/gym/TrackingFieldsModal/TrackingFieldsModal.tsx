@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react';
-import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { Modal } from '@src/components/modals/Modal';
-import { Button } from '@src/components/ui/Button/Button';
-import { ErrorBanner } from '@src/components/ui/ErrorBanner/ErrorBanner';
-import { AppText } from '@src/components/ui/Typography/AppText';
+import { ActionModal } from '@src/components/modals/ActionModal';
 import {
     OptionPills,
     type OptionPillsOption,
@@ -16,7 +12,6 @@ import type {
     TrackingFieldsModalCopy,
     TrackingFieldsValue,
 } from './TrackingFieldsModal.types';
-import { useStyles } from './TrackingFieldsModal.styles';
 
 interface TrackingFieldsModalProps<FieldValues extends TrackingFieldsValue> {
     copy: TrackingFieldsModalCopy;
@@ -63,7 +58,6 @@ export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
     onSave,
 }: TrackingFieldsModalProps<FieldValues>) => {
     const { t } = useTranslation();
-    const st = useStyles();
     const [draftValue, setDraftValue] = useState<FieldValues | null>(value);
     const [dismissalKey, setDismissalKey] = useState(0);
     const fieldsWithDataToRemove =
@@ -120,20 +114,25 @@ export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
     }
 
     return (
-        <Modal
+        <ActionModal
             visible={visible}
-            onRequestClose={onClose}
-            containerStyle={st.modalContainer}
-            contentStyle={st.modalContent}
+            title={t(copy.title)}
+            description={t(copy.description)}
+            error={{
+                message: hasFieldsWithDataToRemove ? warningMessage : '',
+                isDismissible: true,
+                dismissalKey,
+            }}
+            primaryAction={{
+                title: primaryButtonTitle,
+                loading: isSaving,
+                onPress: () => onSave(draftValue),
+            }}
+            secondaryAction={{
+                onPress: onClose,
+            }}
+            onClose={onClose}
         >
-            <View style={st.modalText}>
-                <AppText variant="title3">{t(copy.title)}</AppText>
-
-                <AppText variant="bodySmall" tone="secondary">
-                    {t(copy.description)}
-                </AppText>
-            </View>
-
             <OptionPills
                 options={trackingFieldOptions}
                 selectedValues={selectedTrackingFields}
@@ -149,31 +148,6 @@ export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
                     setDismissalKey((prev) => prev + 1);
                 }}
             />
-
-            <View style={st.modalActions}>
-                <View>
-                    <ErrorBanner
-                        message={
-                            hasFieldsWithDataToRemove ? warningMessage : ''
-                        }
-                        isDismissible
-                        dismissalKey={dismissalKey}
-                        collapseContentStyle={st.errorbanner}
-                    />
-                    <Button
-                        title={primaryButtonTitle}
-                        variant="primary"
-                        loading={isSaving}
-                        onPress={() => onSave(draftValue)}
-                    />
-                </View>
-                <Button
-                    title={t('common.actions.cancel')}
-                    variant="ghost"
-                    onPress={onClose}
-                    style={st.cancelButton}
-                />
-            </View>
-        </Modal>
+        </ActionModal>
     );
 };
