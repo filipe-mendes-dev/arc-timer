@@ -14,35 +14,19 @@ export const useStyles = createStyles((theme: AppTheme) =>
             borderWidth: theme.layout.card.borderWidth,
             borderColor: theme.palette.border.subtle,
             padding: theme.layout.card.padding,
-        },
-        modalBody: {
-            gap: 16,
+            gap: 12,
         },
         modalText: {
             gap: 6,
         },
-        fieldToggleGrid: {
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            gap: 10,
-        },
-        fieldToggle: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 8,
-            paddingHorizontal: 12,
-            paddingVertical: 10,
-            borderRadius: 999,
-            borderWidth: theme.layout.card.borderWidth,
-            borderColor: theme.palette.border.subtle,
-            backgroundColor: theme.palette.background.primary,
-        },
-        fieldToggleSelected: {
-            borderColor: theme.palette.accent.primary,
-            backgroundColor: theme.palette.accent.surface,
-        },
         modalActions: {
-            gap: 12,
+            gap: 6,
+        },
+        errorbanner: {
+            paddingBottom: theme.layout.modal.padding,
+        },
+        cancelButton: {
+            marginBottom: -6,
         },
     }),
 );

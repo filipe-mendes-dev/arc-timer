@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -6,21 +5,18 @@ import { useTranslation } from 'react-i18next';
 import { Modal } from '@src/components/modals/Modal';
 import { Button } from '@src/components/ui/Button/Button';
 import { ErrorBanner } from '@src/components/ui/ErrorBanner/ErrorBanner';
-import GuardedPressable from '@src/components/ui/GuardedPressable/GuardedPressable';
 import { AppText } from '@src/components/ui/Typography/AppText';
-import { useTheme } from '@src/theme/ThemeProvider';
+import {
+    OptionPills,
+    type OptionPillsOption,
+} from '@src/screens/SettingsScreen/components/OptionPills';
 
 import type {
+    TrackingFieldKey,
     TrackingFieldsModalCopy,
     TrackingFieldsValue,
 } from './TrackingFieldsModal.types';
 import { useStyles } from './TrackingFieldsModal.styles';
-
-interface TrackingFieldToggleProps {
-    isSelected: boolean;
-    label: string;
-    onPress: () => void;
-}
 
 interface TrackingFieldsModalProps<FieldValues extends TrackingFieldsValue> {
     copy: TrackingFieldsModalCopy;
@@ -33,31 +29,19 @@ interface TrackingFieldsModalProps<FieldValues extends TrackingFieldsValue> {
     onToggleField: (field: keyof FieldValues) => void;
 }
 
-const TrackingFieldToggle = ({
-    isSelected,
-    label,
-    onPress,
-}: TrackingFieldToggleProps) => {
-    const { theme } = useTheme();
-    const st = useStyles();
-    const accentColor = theme.palette.accent.primary;
-    const mutedColor = theme.palette.text.muted;
-    const iconName = isSelected ? 'checkmark-circle' : 'ellipse-outline';
-    const iconColor = isSelected ? accentColor : mutedColor;
-    const tone = isSelected ? 'primary' : 'muted';
+const getSelectedTrackingFields = (
+    trackingFields: TrackingFieldsValue,
+): TrackingFieldKey[] => {
+    const selectedFields: TrackingFieldKey[] = [];
 
-    return (
-        <GuardedPressable
-            onPress={onPress}
-            style={[st.fieldToggle, isSelected && st.fieldToggleSelected]}
-        >
-            <Ionicons name={iconName} size={18} color={iconColor} />
+    if (trackingFields.hasReps) selectedFields.push('hasReps');
+    if (trackingFields.hasWeight) selectedFields.push('hasWeight');
+    if (trackingFields.hasDurationSec) selectedFields.push('hasDurationSec');
+    if (trackingFields.hasDistanceMeters) {
+        selectedFields.push('hasDistanceMeters');
+    }
 
-            <AppText variant="bodySmall" tone={tone}>
-                {label}
-            </AppText>
-        </GuardedPressable>
-    );
+    return selectedFields;
 };
 
 export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
@@ -88,6 +72,26 @@ export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
 
     if (!trackingFields) return null;
 
+    const trackingFieldOptions: OptionPillsOption<TrackingFieldKey>[] = [
+        {
+            value: 'hasReps',
+            label: t('gymExerciseData.fields.reps'),
+        },
+        {
+            value: 'hasWeight',
+            label: t('gymExerciseData.fields.weightKg'),
+        },
+        {
+            value: 'hasDurationSec',
+            label: t('gymExerciseData.fields.durationSec'),
+        },
+        {
+            value: 'hasDistanceMeters',
+            label: t('gymExerciseData.fields.distanceMeters'),
+        },
+    ];
+    const selectedTrackingFields = getSelectedTrackingFields(trackingFields);
+
     return (
         <Modal
             visible={visible}
@@ -95,65 +99,33 @@ export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
             containerStyle={st.modalContainer}
             contentStyle={st.modalContent}
         >
-            <View style={st.modalBody}>
-                <View style={st.modalText}>
-                    <AppText variant="title3">{t(copy.title)}</AppText>
+            <View style={st.modalText}>
+                <AppText variant="title3">{t(copy.title)}</AppText>
 
-                    <AppText variant="bodySmall" tone="secondary">
-                        {t(copy.description)}
-                    </AppText>
-                </View>
+                <AppText variant="bodySmall" tone="secondary">
+                    {t(copy.description)}
+                </AppText>
+            </View>
 
-                <View style={st.fieldToggleGrid}>
-                    <TrackingFieldToggle
-                        label={t('gymExerciseData.fields.reps')}
-                        isSelected={trackingFields.hasReps}
-                        onPress={() => {
-                            onToggleField('hasReps');
-                            setDismissalKey((prev) => prev + 1);
-                        }}
-                    />
+            <OptionPills
+                options={trackingFieldOptions}
+                selectedValues={selectedTrackingFields}
+                onToggle={(value) => {
+                    onToggleField(value as keyof FieldValues);
+                    setDismissalKey((prev) => prev + 1);
+                }}
+            />
 
-                    <TrackingFieldToggle
-                        label={t('gymExerciseData.fields.weightKg')}
-                        isSelected={trackingFields.hasWeight}
-                        onPress={() => {
-                            onToggleField('hasWeight');
-                            setDismissalKey((prev) => prev + 1);
-                        }}
-                    />
-
-                    <TrackingFieldToggle
-                        label={t('gymExerciseData.fields.durationSec')}
-                        isSelected={trackingFields.hasDurationSec}
-                        onPress={() => {
-                            onToggleField('hasDurationSec');
-                            setDismissalKey((prev) => prev + 1);
-                        }}
-                    />
-
-                    <TrackingFieldToggle
-                        label={t('gymExerciseData.fields.distanceMeters')}
-                        isSelected={trackingFields.hasDistanceMeters}
-                        onPress={() => {
-                            onToggleField('hasDistanceMeters');
-                            setDismissalKey((prev) => prev + 1);
-                        }}
-                    />
-                </View>
-
-                <View style={st.modalActions}>
+            <View style={st.modalActions}>
+                <View>
                     <ErrorBanner
-                        message={hasFieldsWithDataToRemove ? warningMessage : ''}
+                        message={
+                            hasFieldsWithDataToRemove ? warningMessage : ''
+                        }
                         isDismissible
                         dismissalKey={dismissalKey}
+                        collapseContentStyle={st.errorbanner}
                     />
-                    <Button
-                        title={t('common.actions.cancel')}
-                        variant="secondary"
-                        onPress={onClose}
-                    />
-
                     <Button
                         title={primaryButtonTitle}
                         variant="primary"
@@ -161,6 +133,12 @@ export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
                         onPress={onSave}
                     />
                 </View>
+                <Button
+                    title={t('common.actions.cancel')}
+                    variant="ghost"
+                    onPress={onClose}
+                    style={st.cancelButton}
+                />
             </View>
         </Modal>
     );
