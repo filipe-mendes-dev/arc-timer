@@ -9,6 +9,7 @@ export interface GymPlanExerciseTargetSet {
     weightGrams?: number;
     durationSec?: number;
     distanceMeters?: number;
+    rpeTenths?: number;
     createdAtMs: number;
     updatedAtMs: number;
 }

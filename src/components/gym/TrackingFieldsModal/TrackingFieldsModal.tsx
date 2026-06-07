@@ -8,13 +8,14 @@ import {
 } from '@src/screens/SettingsScreen/components/OptionPills';
 
 import type {
-    TrackingFieldKey,
     TrackingFieldsModalCopy,
+    TrackingFieldsModalField,
     TrackingFieldsValue,
 } from './TrackingFieldsModal.types';
 
 interface TrackingFieldsModalProps<FieldValues extends TrackingFieldsValue> {
     copy: TrackingFieldsModalCopy;
+    fields: readonly TrackingFieldsModalField<FieldValues>[];
     fieldsWithData: readonly (keyof FieldValues)[];
     isSaving: boolean;
     value: FieldValues | null;
@@ -22,22 +23,6 @@ interface TrackingFieldsModalProps<FieldValues extends TrackingFieldsValue> {
     onClose: () => void;
     onSave: (value: FieldValues) => void;
 }
-
-const getSelectedTrackingFields = (
-    trackingFields: TrackingFieldsValue,
-): TrackingFieldKey[] => {
-    const selectedFields: TrackingFieldKey[] = [];
-
-    if (trackingFields.hasReps) selectedFields.push('hasReps');
-    if (trackingFields.hasWeight) selectedFields.push('hasWeight');
-    if (trackingFields.hasDurationSec) selectedFields.push('hasDurationSec');
-    if (trackingFields.hasDistanceMeters) {
-        selectedFields.push('hasDistanceMeters');
-    }
-    if (trackingFields.hasRpe) selectedFields.push('hasRpe');
-
-    return selectedFields;
-};
 
 const getFieldsWithDataToRemove = <FieldValues extends TrackingFieldsValue>(
     value: FieldValues,
@@ -50,6 +35,7 @@ const getFieldsWithDataToRemove = <FieldValues extends TrackingFieldsValue>(
 
 export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
     copy,
+    fields,
     fieldsWithData,
     isSaving,
     value,
@@ -66,7 +52,14 @@ export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
             : [];
     const hasFieldsWithDataToRemove = fieldsWithDataToRemove.length > 0;
     const fieldNames = fieldsWithDataToRemove
-        .map((field) => t(`gymExerciseData.fieldsByKey.${String(field)}`))
+        .map((field) => {
+            const matchingField = fields.find(
+                (definition) => definition.key === field,
+            );
+
+            return matchingField ? t(matchingField.labelKey) : '';
+        })
+        .filter((fieldName) => fieldName.length > 0)
         .join(', ');
     const warningMessage = t(copy.removeDataWarning, {
         fields: fieldNames,
@@ -86,32 +79,15 @@ export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
 
     if (!value || !draftValue) return null;
 
-    const trackingFieldOptions: OptionPillsOption<TrackingFieldKey>[] = [
-        {
-            value: 'hasReps',
-            label: t('gymExerciseData.fields.reps'),
-        },
-        {
-            value: 'hasWeight',
-            label: t('gymExerciseData.fields.weightKg'),
-        },
-        {
-            value: 'hasDurationSec',
-            label: t('gymExerciseData.fields.durationSec'),
-        },
-        {
-            value: 'hasDistanceMeters',
-            label: t('gymExerciseData.fields.distanceMeters'),
-        },
-    ];
-    const selectedTrackingFields = getSelectedTrackingFields(draftValue);
-
-    if (draftValue.hasRpe !== undefined) {
-        trackingFieldOptions.push({
-            value: 'hasRpe',
-            label: t('gymExerciseData.fieldsByKey.hasRpe'),
-        });
-    }
+    const trackingFieldOptions: OptionPillsOption<
+        Extract<keyof FieldValues, string>
+    >[] = fields.map((field) => ({
+        value: field.key,
+        label: t(field.labelKey),
+    }));
+    const selectedTrackingFields = fields
+        .filter((field) => draftValue[field.key] === true)
+        .map((field) => field.key);
 
     return (
         <ActionModal

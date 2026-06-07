@@ -51,6 +51,8 @@ const isGymPlanExerciseTargetSet = (
             typeof value.durationSec === 'number') &&
         (value.distanceMeters === undefined ||
             typeof value.distanceMeters === 'number') &&
+        (value.rpeTenths === undefined ||
+            typeof value.rpeTenths === 'number') &&
         typeof value.createdAtMs === 'number' &&
         typeof value.updatedAtMs === 'number'
     );

@@ -6,15 +6,15 @@ import type {
     ExerciseDefinitionTargetSetData,
     ExerciseTrackingField,
 } from '@src/core/entities/exerciseDefinition.interfaces';
+import {
+    fieldsFromTrackingFieldValue,
+    trackingFieldValueFromFields,
+    type ExerciseDefinitionTrackingFieldsValue,
+} from '@src/core/entities/exerciseTrackingFields';
 import type { GymSessionListItem } from '@src/core/entities/gymSession.interfaces';
 
-export interface ExerciseDefinitionTrackingFields {
-    hasDistanceMeters: boolean;
-    hasDurationSec: boolean;
-    hasReps: boolean;
-    hasRpe: boolean;
-    hasWeight: boolean;
-}
+export interface ExerciseDefinitionTrackingFields
+    extends ExerciseDefinitionTrackingFieldsValue {}
 
 export interface ExerciseDefinitionMetricItem {
     field: ExerciseTrackingField;
@@ -43,33 +43,6 @@ export const availabilityLabelKeyByAvailability = {
     gym: 'exerciseDefinitions.availability.gym',
     workout: 'exerciseDefinitions.availability.workout',
 } as const;
-
-export const trackingFieldLabelKeyByField = {
-    reps: 'exerciseDefinitions.trackingField.reps',
-    weight: 'exerciseDefinitions.trackingField.weight',
-    duration: 'exerciseDefinitions.trackingField.duration',
-    distance: 'exerciseDefinitions.trackingField.distance',
-    rpe: 'exerciseDefinitions.trackingField.rpe',
-} as const;
-
-export const trackingFields: ExerciseTrackingField[] = [
-    'reps',
-    'weight',
-    'duration',
-    'distance',
-    'rpe',
-];
-
-export const trackingFieldKeyByField: Record<
-    ExerciseTrackingField,
-    keyof ExerciseDefinitionTrackingFields
-> = {
-    reps: 'hasReps',
-    weight: 'hasWeight',
-    duration: 'hasDurationSec',
-    distance: 'hasDistanceMeters',
-    rpe: 'hasRpe',
-};
 
 export const trackingFieldsModalCopy = {
     description: 'exerciseDefinitions.trackingModal.subtitle',
@@ -166,26 +139,14 @@ export const getSourceIconName = (
 
 export const trackingFieldsFromDefinition = (
     definition: ExerciseDefinition,
-): ExerciseDefinitionTrackingFields => {
-    const fields = definition.data?.defaultTrackingFields ?? [];
-
-    return {
-        hasReps: fields.includes('reps'),
-        hasWeight: fields.includes('weight'),
-        hasDurationSec: fields.includes('duration'),
-        hasDistanceMeters: fields.includes('distance'),
-        hasRpe: fields.includes('rpe'),
-    };
-};
+): ExerciseDefinitionTrackingFields =>
+    trackingFieldValueFromFields(
+        definition.data?.defaultTrackingFields ?? [],
+    );
 
 export const fieldsFromTrackingValue = (
     trackingValue: ExerciseDefinitionTrackingFields,
-): ExerciseTrackingField[] =>
-    trackingFields.filter((field) => {
-        const key = trackingFieldKeyByField[field];
-
-        return trackingValue[key];
-    });
+): ExerciseTrackingField[] => fieldsFromTrackingFieldValue(trackingValue);
 
 export const targetSetFromDefinition = (
     definition: ExerciseDefinition,
