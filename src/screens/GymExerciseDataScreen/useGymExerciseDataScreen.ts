@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import type { GymExerciseRecordSet } from '@src/core/entities/gymSession.interfaces';
-import { useGymExerciseDefinitions } from '@src/data/exerciseDefinitions';
+import { useExerciseDefinition } from '@src/data/exerciseDefinitions';
 import {
     useAddGymExerciseRecordSet,
     useDeleteGymExerciseRecordSet,
@@ -31,21 +31,24 @@ const getRecordIdParam = (recordId?: string | string[]): string | undefined => {
     return recordId;
 };
 
-const getPreviousWeightKg = (
-    previousSet: GymExerciseRecordSet | undefined,
-): number => {
-    if (previousSet?.weightGrams) {
-        return previousSet.weightGrams / 1000;
-    }
+const getFirstSetWeightGrams = (
+    weightPrGrams: number | undefined,
+): number | undefined => weightPrGrams ?? getWeightGrams(DEFAULT_WEIGHT_KG);
 
-    return DEFAULT_WEIGHT_KG;
-};
+const getNextWeightGrams = (
+    previousSet: GymExerciseRecordSet | undefined,
+    weightPrGrams: number | undefined,
+): number | undefined =>
+    previousSet
+        ? previousSet.weightGrams
+        : getFirstSetWeightGrams(weightPrGrams);
 
 interface ClearTrackingFieldInput {
     distanceMeters?: null;
     durationSec?: null;
     id: string;
     reps?: null;
+    rpeTenths?: null;
     weightGrams?: null;
 }
 
@@ -71,6 +74,10 @@ const getRemovedTrackingFields = (
         removedFields.push('hasDistanceMeters');
     }
 
+    if (current.hasRpe && !draft.hasRpe) {
+        removedFields.push('hasRpe');
+    }
+
     return removedFields;
 };
 
@@ -90,21 +97,37 @@ const setHasTrackingFieldData = (
         return set.durationSec !== undefined;
     }
 
-    return set.distanceMeters !== undefined;
-};
-
-const getFieldsWithDataToRemove = (
-    sets: GymExerciseRecordSet[],
-    current: TrackingFields,
-    draft: TrackingFields | null,
-): (keyof TrackingFields)[] => {
-    if (!draft) {
-        return [];
+    if (field === 'hasDistanceMeters') {
+        return set.distanceMeters !== undefined;
     }
 
-    return getRemovedTrackingFields(current, draft).filter((field) =>
-        sets.some((set) => setHasTrackingFieldData(set, field)),
-    );
+    return set.rpeTenths !== undefined;
+};
+
+const getFieldsWithData = (
+    sets: GymExerciseRecordSet[],
+): (keyof TrackingFields)[] => {
+    const fieldsWithData: (keyof TrackingFields)[] = [];
+
+    if (sets.some((set) => setHasTrackingFieldData(set, 'hasReps'))) {
+        fieldsWithData.push('hasReps');
+    }
+    if (sets.some((set) => setHasTrackingFieldData(set, 'hasWeight'))) {
+        fieldsWithData.push('hasWeight');
+    }
+    if (sets.some((set) => setHasTrackingFieldData(set, 'hasDurationSec'))) {
+        fieldsWithData.push('hasDurationSec');
+    }
+    if (
+        sets.some((set) => setHasTrackingFieldData(set, 'hasDistanceMeters'))
+    ) {
+        fieldsWithData.push('hasDistanceMeters');
+    }
+    if (sets.some((set) => setHasTrackingFieldData(set, 'hasRpe'))) {
+        fieldsWithData.push('hasRpe');
+    }
+
+    return fieldsWithData;
 };
 
 export const useGymExerciseDataScreen = () => {
@@ -120,11 +143,11 @@ export const useGymExerciseDataScreen = () => {
         (item) => item.id === recordId,
     );
     const sets = record?.sets ?? [];
-    const { data: exerciseDefinitions = [] } = useGymExerciseDefinitions();
+    const { data: definition } = useExerciseDefinition(
+        record?.exerciseDefinitionId,
+    );
     const [trackingFields, setTrackingFields] =
         useState<TrackingFields>(() => inferTrackingFieldsFromSets(sets));
-    const [draftTrackingFields, setDraftTrackingFields] =
-        useState<TrackingFields | null>(null);
     const [isTrackingFieldsModalVisible, setTrackingFieldsModalVisible] =
         useState(false);
     const [editingDraft, setEditingDraft] = useState<SetDraft | null>(null);
@@ -142,9 +165,6 @@ export const useGymExerciseDataScreen = () => {
         selectedIds,
         toggleItem,
     } = useListSelection();
-    const definition = exerciseDefinitions.find(
-        (item) => item.id === record?.exerciseDefinitionId,
-    );
     const exerciseName =
         definition?.name ?? t('gymExerciseData.exerciseFallback');
     const completedSetCount = sets.filter(
@@ -186,33 +206,18 @@ export const useGymExerciseDataScreen = () => {
         return '';
     };
 
-    const updateDraftTrackingField = (field: keyof TrackingFields) => {
-        setDraftTrackingFields((current) => {
-            if (!current) return current;
-
-            return {
-                ...current,
-                [field]: !current[field],
-            };
-        });
-    };
-
     const openTrackingFieldsModal = () => {
-        setDraftTrackingFields(trackingFields);
         setTrackingFieldsModalVisible(true);
     };
 
     const closeTrackingFieldsModal = () => {
-        setDraftTrackingFields(null);
         setTrackingFieldsModalVisible(false);
     };
 
-    const handleSaveTrackingFields = () => {
-        if (!draftTrackingFields) return;
-
+    const handleSaveTrackingFields = (nextTrackingFields: TrackingFields) => {
         const removedFields = getRemovedTrackingFields(
             trackingFields,
-            draftTrackingFields,
+            nextTrackingFields,
         );
 
         for (const set of sets) {
@@ -240,47 +245,60 @@ export const useGymExerciseDataScreen = () => {
                 clearInput.weightGrams = null;
             }
 
+            if (removedFields.includes('hasRpe')) {
+                clearInput.rpeTenths = null;
+            }
+
             updateSet.mutate(clearInput);
         }
 
-        setTrackingFields(draftTrackingFields);
+        setTrackingFields(nextTrackingFields);
         closeTrackingFieldsModal();
     };
 
-    const fieldsWithDataToRemove = getFieldsWithDataToRemove(
-        sets,
-        trackingFields,
-        draftTrackingFields,
-    );
+    const fieldsWithData = getFieldsWithData(sets);
 
     const handleAddSet = () => {
         if (!record) return;
 
         const previousSet = sets.at(-1);
-        const previousWeightKg = getPreviousWeightKg(previousSet);
         const nextReps = previousSet?.reps ?? DEFAULT_REPS;
         const nextDurationSec = previousSet?.durationSec;
         const nextDistanceMeters = previousSet?.distanceMeters;
-        const nextWeightGrams = getWeightGrams(previousWeightKg);
+        const nextRpeTenths = previousSet?.rpeTenths;
+        const nextWeightGrams = getNextWeightGrams(
+            previousSet,
+            definition?.stats?.weightPr?.value,
+        );
         const hasMeaningfulValue =
             (trackingFields.hasReps && nextReps > 0) ||
             (trackingFields.hasWeight && nextWeightGrams !== undefined) ||
             (trackingFields.hasDurationSec && nextDurationSec !== undefined) ||
             (trackingFields.hasDistanceMeters &&
-                nextDistanceMeters !== undefined);
+                nextDistanceMeters !== undefined) ||
+            (trackingFields.hasRpe && nextRpeTenths !== undefined);
 
         if (!hasMeaningfulValue) return;
 
-        const distanceMeters = trackingFields.hasDistanceMeters ? nextDistanceMeters : undefined;
-        const durationSec = trackingFields.hasDurationSec ? nextDurationSec : undefined;
-        const reps = trackingFields.hasReps && nextReps > 0 ? nextReps : undefined;
-        const weightGrams = trackingFields.hasWeight ? nextWeightGrams : undefined;
+        const distanceMeters = trackingFields.hasDistanceMeters
+            ? nextDistanceMeters
+            : undefined;
+        const durationSec = trackingFields.hasDurationSec
+            ? nextDurationSec
+            : undefined;
+        const reps =
+            trackingFields.hasReps && nextReps > 0 ? nextReps : undefined;
+        const weightGrams = trackingFields.hasWeight
+            ? nextWeightGrams
+            : undefined;
+        const rpeTenths = trackingFields.hasRpe ? nextRpeTenths : undefined;
 
         addSet.mutate({
             distanceMeters,
             durationSec,
             exerciseRecordId: record.id,
             reps,
+            rpeTenths,
             weightGrams,
         });
     };
@@ -288,14 +306,24 @@ export const useGymExerciseDataScreen = () => {
     const handleSaveDraft = () => {
         if (!editingDraft) return;
 
-        const draftDistanceMeters = getPositiveValue(editingDraft.distanceMeters);
+        const draftDistanceMeters = getPositiveValue(
+            editingDraft.distanceMeters,
+        );
         const draftDurationSec = getPositiveValue(editingDraft.durationSec);
         const draftReps = getPositiveValue(editingDraft.reps);
+        const draftRpeTenths = getPositiveValue(editingDraft.rpeTenths);
         const draftWeightGrams = getWeightGrams(editingDraft.weightKg);
-        const distanceMeters = trackingFields.hasDistanceMeters ? draftDistanceMeters : undefined;
-        const durationSec = trackingFields.hasDurationSec ? draftDurationSec : undefined;
+        const distanceMeters = trackingFields.hasDistanceMeters
+            ? draftDistanceMeters
+            : undefined;
+        const durationSec = trackingFields.hasDurationSec
+            ? draftDurationSec
+            : undefined;
         const reps = trackingFields.hasReps ? draftReps : undefined;
-        const weightGrams = trackingFields.hasWeight ? draftWeightGrams : undefined;
+        const weightGrams = trackingFields.hasWeight
+            ? draftWeightGrams
+            : undefined;
+        const rpeTenths = trackingFields.hasRpe ? draftRpeTenths : undefined;
 
         updateSet.mutate(
             {
@@ -303,6 +331,7 @@ export const useGymExerciseDataScreen = () => {
                 durationSec,
                 id: editingDraft.id,
                 reps,
+                rpeTenths,
                 weightGrams,
             },
             {
@@ -368,7 +397,6 @@ export const useGymExerciseDataScreen = () => {
         closeTrackingFieldsModal,
         deleteConfirmMessage: getDeleteConfirmMessage(),
         deleteConfirmTitle: getDeleteConfirmTitle(),
-        draftTrackingFields,
         editingDraft,
         enterSelectMode,
         errorMessage: getErrorMessage(),
@@ -388,7 +416,7 @@ export const useGymExerciseDataScreen = () => {
         handleSelectSet,
         handleToggleCompleteSet,
         hasSelection,
-        fieldsWithDataToRemove,
+        fieldsWithData,
         isAddingSet: addSet.isPending,
         isDeletingSet: (set: GymExerciseRecordSet) =>
             deleteSet.isPending && deleteSet.variables === set.id,
@@ -407,7 +435,6 @@ export const useGymExerciseDataScreen = () => {
         sets,
         t,
         trackingFields,
-        updateDraftTrackingField,
         getSetDetails: (set: GymExerciseRecordSet) => getSetDetails(set, t),
     };
 };

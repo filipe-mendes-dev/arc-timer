@@ -3,88 +3,27 @@ import type { TFunction } from 'i18next';
 import type { GymExerciseRecordSet } from '@src/core/entities/gymSession.interfaces';
 
 import type { SetDraft, TrackingFields } from './GymExerciseDataScreen.types';
-
-export const DEFAULT_REPS = 12;
-export const DEFAULT_WEIGHT_KG = 10;
-
-export const initialTrackingFields: TrackingFields = {
-    hasDistanceMeters: false,
-    hasDurationSec: false,
-    hasReps: true,
-    hasRpe: false,
-    hasWeight: true,
-};
+import { defaultTrackingFields } from 'src/helpers/exerciseDefinition.helpers';
+import {
+    formatDistance,
+    formatDurationMinutes,
+    gramsToKg,
+} from 'src/helpers/gymExerciseRecord.helpers';
 
 export const inferTrackingFieldsFromSets = (
     sets: GymExerciseRecordSet[],
 ): TrackingFields => {
     if (sets.length === 0) {
-        return initialTrackingFields;
+        return defaultTrackingFields;
     }
 
-    const trackingFields = {
-        hasDistanceMeters: sets.some(
-            (set) => set.distanceMeters !== undefined,
-        ),
+    return {
+        hasDistanceMeters: sets.some((set) => set.distanceMeters !== undefined),
         hasDurationSec: sets.some((set) => set.durationSec !== undefined),
         hasReps: sets.some((set) => set.reps !== undefined),
         hasRpe: sets.some((set) => set.rpeTenths !== undefined),
         hasWeight: sets.some((set) => set.weightGrams !== undefined),
     };
-
-    if (
-        !trackingFields.hasDistanceMeters &&
-        !trackingFields.hasDurationSec &&
-        !trackingFields.hasReps &&
-        !trackingFields.hasRpe &&
-        !trackingFields.hasWeight
-    ) {
-        return initialTrackingFields;
-    }
-
-    return trackingFields;
-};
-
-export const formatWeight = (weightGrams: number): string => {
-    const weightKg = weightGrams / 1000;
-    return Number.isInteger(weightKg) ? `${weightKg}` : weightKg.toFixed(1);
-};
-
-export const formatDistance = (distanceMeters: number): string => {
-    const distanceKm = distanceMeters / 1000;
-
-    if (Number.isInteger(distanceKm)) {
-        return `${distanceKm}`;
-    }
-
-    return distanceKm.toFixed(2);
-};
-
-export const formatDurationMinutes = (durationSec: number): string => {
-    const durationMin = Math.round(durationSec / 60);
-
-    if (durationSec > 0 && durationMin < 1) {
-        return '1 min';
-    }
-
-    if (durationMin < 60) {
-        return `${durationMin} min`;
-    }
-
-    const hours = Math.floor(durationMin / 60);
-    const minutes = durationMin % 60;
-
-    if (minutes === 0) {
-        return `${hours} h`;
-    }
-
-    return `${hours} h ${minutes} min`;
-};
-
-export const getWeightGrams = (weightKg: number): number | undefined => {
-    if (weightKg <= 0) return undefined;
-
-    return Math.round(weightKg * 1000);
 };
 
 export const getPositiveValue = (value: number): number | undefined => {
@@ -116,7 +55,7 @@ export const getSetDetails = (
     if (set.weightGrams !== undefined) {
         details.push(
             t('gymExerciseData.setDetails.weight', {
-                value: formatWeight(set.weightGrams),
+                value: gramsToKg(set.weightGrams),
             }),
         );
     }
