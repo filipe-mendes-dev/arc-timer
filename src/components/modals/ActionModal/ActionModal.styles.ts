@@ -3,12 +3,12 @@ import { StyleSheet } from 'react-native';
 import { createStyles } from '@src/theme/createStyles';
 import type { AppTheme } from '@src/theme/theme';
 
-export const useStyles = createStyles((theme: AppTheme) =>
+export const useActionModalStyles = createStyles((theme: AppTheme) =>
     StyleSheet.create({
-        modalContainer: {
+        container: {
             padding: theme.layout.modal.padding,
         },
-        modalContent: {
+        content: {
             backgroundColor: theme.palette.background.card,
             borderRadius: theme.layout.card.borderRadius,
             borderWidth: theme.layout.card.borderWidth,
@@ -16,16 +16,16 @@ export const useStyles = createStyles((theme: AppTheme) =>
             padding: theme.layout.card.padding,
             gap: 12,
         },
-        modalText: {
+        text: {
             gap: 6,
         },
-        modalActions: {
+        actions: {
             gap: 6,
         },
-        errorbanner: {
+        errorCollapse: {
             paddingBottom: theme.layout.modal.padding,
         },
-        cancelButton: {
+        secondaryButton: {
             marginBottom: -6,
         },
     }),
