@@ -154,6 +154,24 @@ export const GymExerciseSetEditModal = ({
                                 }
                             />
                         )}
+
+                        {trackingFields.hasRpe && (
+                            <Stepper
+                                label={t('exerciseDefinitions.trackingField.rpe')}
+                                value={visibleDraft.rpeTenths / 10}
+                                onChange={(value) =>
+                                    onChangeDraft({
+                                        ...visibleDraft,
+                                        rpeTenths: Math.round(value * 10),
+                                    })
+                                }
+                                allowDecimal
+                                decimalPlaces={1}
+                                min={0}
+                                max={10}
+                                step={0.5}
+                            />
+                        )}
                     </View>
                 )}
 

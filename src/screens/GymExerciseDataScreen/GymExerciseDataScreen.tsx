@@ -1,6 +1,7 @@
 import { FlatList, View } from 'react-native';
 
 import { ListEmptyState } from '@src/components/layout/ListEmptyState';
+import { TrackingFieldsModal } from '@src/components/gym/TrackingFieldsModal';
 import { ScreenShell } from '@src/components/layout/ScreenShell';
 import ConfirmDialog from '@src/components/modals/ConfirmDialog/ConfirmDialog';
 import { DropdownPortalProvider } from '@src/components/ui/Dropdown/DropdownPortal';
@@ -11,9 +12,15 @@ import { GymExerciseDataFooter } from './components/GymExerciseDataFooter';
 import { GymExerciseDataHeader } from './components/GymExerciseDataHeader';
 import { GymExerciseSetEditModal } from './components/GymExerciseSetEditModal/GymExerciseSetEditModal';
 import GymExerciseSetLine from './components/GymExerciseSetLine/GymExerciseSetLine';
-import { GymExerciseTrackingFieldsModal } from './components/GymExerciseTrackingFieldsModal/GymExerciseTrackingFieldsModal';
 import { useStyles } from './GymExerciseDataScreen.styles';
 import { useGymExerciseDataScreen } from './useGymExerciseDataScreen';
+
+const trackingFieldsModalCopy = {
+    description: 'gymExerciseData.defaults.description',
+    removeDataAndSave: 'gymExerciseData.defaults.removeDataAndSave',
+    removeDataWarning: 'gymExerciseData.defaults.removeDataWarning',
+    title: 'gymExerciseData.defaults.title',
+};
 
 const GymExerciseDataScreen = () => {
     const st = useStyles();
@@ -102,14 +109,14 @@ const GymExerciseDataScreen = () => {
                     onTrackingFields={screen.openTrackingFieldsModal}
                 />
 
-                <GymExerciseTrackingFieldsModal
-                    fieldsWithDataToRemove={screen.fieldsWithDataToRemove}
+                <TrackingFieldsModal
+                    copy={trackingFieldsModalCopy}
+                    fieldsWithData={screen.fieldsWithData}
                     isSaving={screen.isSavingSet}
-                    trackingFields={screen.draftTrackingFields}
+                    value={screen.trackingFields}
                     visible={screen.isTrackingFieldsModalVisible}
                     onClose={screen.closeTrackingFieldsModal}
                     onSave={screen.handleSaveTrackingFields}
-                    onToggleField={screen.updateDraftTrackingField}
                 />
 
                 <GymExerciseSetEditModal

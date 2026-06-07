@@ -126,13 +126,12 @@ const GymPlanExerciseEditScreen = () => {
 
             <TrackingFieldsModal
                 copy={trackingFieldsModalCopy}
-                fieldsWithDataToRemove={screen.fieldsWithDataToRemove}
+                fieldsWithData={screen.fieldsWithData}
                 isSaving={false}
-                trackingFields={screen.draftTrackingFields}
+                value={screen.trackingFields}
                 visible={screen.isTrackingFieldsModalVisible}
                 onClose={screen.closeTrackingFieldsModal}
                 onSave={screen.saveTrackingFields}
-                onToggleField={screen.toggleTrackingField}
             />
 
             <GymExerciseSetEditModal

@@ -49,10 +49,9 @@ import {
 interface UseGymPlanExerciseEditScreenResult {
     cancelDeleteSets: () => void;
     closeTrackingFieldsModal: () => void;
-    draftTrackingFields: TrackingFields | null;
     editingDraft: SetDraft | null;
     exerciseSuggestions: TextFieldSuggestionItem[];
-    fieldsWithDataToRemove: (keyof TrackingFields)[];
+    fieldsWithData: (keyof TrackingFields)[];
     goBack: () => void;
     handleNameBlur: () => void;
     handleNameChange: (value: string) => void;
@@ -66,10 +65,9 @@ interface UseGymPlanExerciseEditScreenResult {
     pendingDeleteSets: GymPlanExerciseTargetSet[];
     saveExercise: () => void;
     saveSetDraft: () => void;
-    saveTrackingFields: () => void;
+    saveTrackingFields: (value: TrackingFields) => void;
     setEditingDraft: (draft: SetDraft | null) => void;
     targetSets: GymPlanExerciseTargetSet[];
-    toggleTrackingField: (field: keyof TrackingFields) => void;
     topBarLeftAction: TopBarDirectAction | undefined;
     topBarOptions: readonly TopBarOption[];
     topBarRightAction: TopBarDirectAction | undefined;
@@ -111,8 +109,6 @@ export const useGymPlanExerciseEditScreen =
         const [hasEnteredNameInput, setHasEnteredNameInput] = useState(false);
         const [trackingFields, setTrackingFields] =
             useState<TrackingFields>(initialTrackingFields);
-        const [draftTrackingFields, setDraftTrackingFields] =
-            useState<TrackingFields | null>(null);
         const [isTrackingFieldsModalVisible, setTrackingFieldsModalVisible] =
             useState(false);
         const [editingDraft, setEditingDraft] = useState<SetDraft | null>(null);
@@ -178,16 +174,21 @@ export const useGymPlanExerciseEditScreen =
             suggestedExerciseDefinitions,
             trimmedNameInput,
         ]);
-        const fieldsWithDataToRemove = useMemo(() => {
-            if (!draftTrackingFields) return [];
-
-            return getRemovedTrackingFields(
-                trackingFields,
-                draftTrackingFields,
-            ).filter((field) =>
-                targetSets.some((set) => setHasTrackingFieldData(set, field)),
-            );
-        }, [draftTrackingFields, targetSets, trackingFields]);
+        const fieldsWithData = useMemo(
+            () =>
+                ([
+                    'hasReps',
+                    'hasWeight',
+                    'hasDurationSec',
+                    'hasDistanceMeters',
+                    'hasRpe',
+                ] as (keyof TrackingFields)[]).filter((field) =>
+                    targetSets.some((set) =>
+                        setHasTrackingFieldData(set, field),
+                    ),
+                ),
+            [targetSets],
+        );
 
         useEffect(() => {
             if (!lookup) return;
@@ -327,38 +328,22 @@ export const useGymPlanExerciseEditScreen =
         };
 
         const openTrackingFieldsModal = (): void => {
-            setDraftTrackingFields(trackingFields);
             setTrackingFieldsModalVisible(true);
         };
 
         const closeTrackingFieldsModal = (): void => {
-            setDraftTrackingFields(null);
             setTrackingFieldsModalVisible(false);
         };
 
-        const saveTrackingFields = (): void => {
-            if (!draftTrackingFields) return;
-
+        const saveTrackingFields = (value: TrackingFields): void => {
             const removedFields = getRemovedTrackingFields(
                 trackingFields,
-                draftTrackingFields,
+                value,
             );
 
             setTargetSets(removeTrackingFieldData(targetSets, removedFields));
-            setTrackingFields(draftTrackingFields);
-            setDraftTrackingFields(null);
+            setTrackingFields(value);
             setTrackingFieldsModalVisible(false);
-        };
-
-        const toggleTrackingField = (field: keyof TrackingFields): void => {
-            setDraftTrackingFields((current) => {
-                if (!current) return current;
-
-                return {
-                    ...current,
-                    [field]: !current[field],
-                };
-            });
         };
 
         const saveExercise = (): void => {
@@ -415,10 +400,9 @@ export const useGymPlanExerciseEditScreen =
             cancelDeleteSets,
             closeTrackingFieldsModal,
             confirmDeleteSets,
-            draftTrackingFields,
             editingDraft,
             exerciseSuggestions,
-            fieldsWithDataToRemove,
+            fieldsWithData,
             getSetDetails,
             goBack,
             handleNameBlur,
@@ -443,7 +427,6 @@ export const useGymPlanExerciseEditScreen =
             setEditingDraft,
             targetSets,
             toggleSetSelection: toggleItem,
-            toggleTrackingField,
             topBarLeftAction: topBarConfig.leftAction,
             topBarOptions,
             topBarRightAction: topBarConfig.rightAction,

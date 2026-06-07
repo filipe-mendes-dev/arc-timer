@@ -59,6 +59,7 @@ export const initialTrackingFields: TrackingFields = {
     hasDistanceMeters: false,
     hasDurationSec: false,
     hasReps: true,
+    hasRpe: false,
     hasWeight: true,
 };
 
@@ -101,6 +102,7 @@ export const inferTrackingFieldsFromTargetSets = (
         ),
         hasDurationSec: sets.some((set) => set.durationSec !== undefined),
         hasReps: sets.some((set) => set.reps !== undefined),
+        hasRpe: sets.some((set) => set.rpeTenths !== undefined),
         hasWeight: sets.some((set) => set.weightGrams !== undefined),
     };
 
@@ -108,6 +110,7 @@ export const inferTrackingFieldsFromTargetSets = (
         !trackingFields.hasDistanceMeters &&
         !trackingFields.hasDurationSec &&
         !trackingFields.hasReps &&
+        !trackingFields.hasRpe &&
         !trackingFields.hasWeight
     ) {
         return initialTrackingFields;
@@ -134,6 +137,9 @@ export const getRemovedTrackingFields = (
     if (current.hasDistanceMeters && !draft.hasDistanceMeters) {
         removedFields.push('hasDistanceMeters');
     }
+    if (current.hasRpe && !draft.hasRpe) {
+        removedFields.push('hasRpe');
+    }
 
     return removedFields;
 };
@@ -145,8 +151,11 @@ export const setHasTrackingFieldData = (
     if (field === 'hasReps') return set.reps !== undefined;
     if (field === 'hasWeight') return set.weightGrams !== undefined;
     if (field === 'hasDurationSec') return set.durationSec !== undefined;
+    if (field === 'hasDistanceMeters') {
+        return set.distanceMeters !== undefined;
+    }
 
-    return set.distanceMeters !== undefined;
+    return set.rpeTenths !== undefined;
 };
 
 export const getTargetSetDetails = (
@@ -179,6 +188,13 @@ export const getTargetSetDetails = (
             }),
         );
     }
+    if (set.rpeTenths !== undefined) {
+        details.push(
+            t('gymExerciseData.setDetails.rpe', {
+                value: set.rpeTenths / 10,
+            }),
+        );
+    }
 
     if (details.length === 0) return t('gymExerciseData.setDetails.empty');
 
@@ -208,6 +224,9 @@ export const targetSetFromDraft = (
     }
     if (trackingFields.hasDistanceMeters) {
         targetSet.distanceMeters = getPositiveValue(draft.distanceMeters);
+    }
+    if (trackingFields.hasRpe) {
+        targetSet.rpeTenths = getPositiveValue(draft.rpeTenths);
     }
 
     return targetSet;
@@ -251,6 +270,9 @@ export const createNextTargetSet = (
     if (trackingFields.hasDistanceMeters) {
         nextSet.distanceMeters = previousSet?.distanceMeters;
     }
+    if (trackingFields.hasRpe) {
+        nextSet.rpeTenths = previousSet?.rpeTenths;
+    }
 
     return nextSet;
 };
@@ -283,6 +305,9 @@ export const removeTrackingFieldData = (
         }
         if (removedFields.includes('hasWeight')) {
             nextSet.weightGrams = undefined;
+        }
+        if (removedFields.includes('hasRpe')) {
+            nextSet.rpeTenths = undefined;
         }
 
         return nextSet;

@@ -5,13 +5,11 @@ import type {
     ExerciseDefinitionTargetSetData,
     ExerciseTrackingField,
 } from '@src/core/entities/exerciseDefinition.interfaces';
+import { trackingFieldLabelKeyByField } from '@src/core/entities/exerciseTrackingFields';
 import { ActionModal } from '@src/components/modals/ActionModal';
 import { Stepper } from '@src/components/ui/Stepper/Stepper';
 
-import {
-    trackingFieldLabelKeyByField,
-    type ExerciseDefinitionTargetValue,
-} from '../ExerciseDefinitionDetailsScreen.helpers';
+import type { ExerciseDefinitionTargetValue } from '../ExerciseDefinitionDetailsScreen.helpers';
 
 interface DefaultFieldValueModalProps {
     field: ExerciseTrackingField | null;
