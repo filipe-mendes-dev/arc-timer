@@ -1,6 +1,10 @@
 import type {
     ExerciseDefinition,
     ExerciseDefinitionAvailability,
+    ExerciseDefinitionData,
+    ExerciseDefinitionListItem,
+    ExerciseDefinitionTargetSetData,
+    ExerciseTrackingField,
 } from '@src/core/entities/exerciseDefinition.interfaces';
 import type { Workout } from '@src/core/entities/workout.interfaces';
 import { normalizeExerciseDefinitionName } from '@src/core/exercises/normalizeExerciseDefinitionName';
@@ -19,6 +23,8 @@ import type {
     ExerciseDefinitionListParams,
     ExerciseDefinitionRepository,
 } from '../../repositories/exerciseDefinitions/exerciseDefinitionRepositoryFactory';
+import type { ExerciseDefinitionDataRepository } from '../../repositories/exerciseDefinitions/exerciseDefinitionDataRepositoryFactory';
+import type { ExerciseDefinitionStatsRepository } from '../../repositories/exerciseDefinitions/exerciseDefinitionStatsRepositoryFactory';
 import { systemClock, type Clock } from '../../repositories/repositoryClock';
 
 export type {
@@ -44,6 +50,13 @@ export interface MergeExerciseDefinitionInput {
     targetId: string;
 }
 
+export interface UpsertExerciseDefinitionDataInput {
+    defaultTargetSet?: ExerciseDefinitionTargetSetData;
+    defaultTrackingFields: ExerciseTrackingField[];
+    exerciseDefinitionId: string;
+    notes?: string;
+}
+
 export interface ExerciseDefinitionService {
     createUserExerciseDefinition: (
         input: CreateUserExerciseDefinitionInput,
@@ -55,7 +68,7 @@ export interface ExerciseDefinitionService {
     ) => ExerciseDefinition | null;
     getById: (id: string) => ExerciseDefinition | null;
     getByNormalizedName: (normalizedName: string) => ExerciseDefinition | null;
-    list: (params?: ExerciseDefinitionListParams) => ExerciseDefinition[];
+    list: (params?: ExerciseDefinitionListParams) => ExerciseDefinitionListItem[];
     mergeExerciseDefinition: (
         input: MergeExerciseDefinitionInput,
     ) => ExerciseDefinition;
@@ -64,16 +77,23 @@ export interface ExerciseDefinitionService {
     updateExerciseDefinition: (
         input: UpdateExerciseDefinitionInput,
     ) => ExerciseDefinition;
+    upsertExerciseDefinitionData: (
+        input: UpsertExerciseDefinitionDataInput,
+    ) => ExerciseDefinitionData;
 }
 
 export interface CreateExerciseDefinitionServiceArgs {
     clock?: Clock;
+    exerciseDefinitionDataRepository: ExerciseDefinitionDataRepository;
     exerciseDefinitionRepository: ExerciseDefinitionRepository;
+    exerciseDefinitionStatsRepository: ExerciseDefinitionStatsRepository;
 }
 
 export const createExerciseDefinitionService = ({
     clock = systemClock,
+    exerciseDefinitionDataRepository,
     exerciseDefinitionRepository,
+    exerciseDefinitionStatsRepository,
 }: CreateExerciseDefinitionServiceArgs): ExerciseDefinitionService => {
     const getSystemDefinitionByNormalizedName = (
         normalizedName: string,
@@ -186,21 +206,21 @@ export const createExerciseDefinitionService = ({
             const normalizedName = normalizeExerciseName(trimmedName);
             if (normalizedName.length === 0) return null;
 
-            return (
-                exerciseDefinitionRepository.getByNormalizedName(
-                    normalizedName,
-                ) ??
-                service.createUserExerciseDefinition({
-                    name: trimmedName,
-                })
+            const existing = exerciseDefinitionRepository.getByNormalizedName(
+                normalizedName,
             );
+            if (existing) return existing;
+
+            return service.createUserExerciseDefinition({
+                name: trimmedName,
+            });
         },
 
         list: ({
             filters,
             pagination,
             scope = 'active',
-        }: ExerciseDefinitionListParams = {}): ExerciseDefinition[] =>
+        }: ExerciseDefinitionListParams = {}): ExerciseDefinitionListItem[] =>
             exerciseDefinitionRepository.list({
                 filters,
                 pagination,
@@ -243,6 +263,9 @@ export const createExerciseDefinitionService = ({
             const hasGymReferences =
                 exerciseDefinitionRepository.hasGymPlanExerciseReferences(
                     sourceId,
+                ) ||
+                exerciseDefinitionRepository.hasGymSessionExerciseReferences(
+                    sourceId,
                 );
             if (hasGymReferences && target.availability === 'workout') {
                 throw createExerciseDefinitionError(
@@ -262,12 +285,29 @@ export const createExerciseDefinitionService = ({
                     targetId,
                 },
             );
+            exerciseDefinitionRepository.replaceGymSessionExerciseDefinitionReferences(
+                {
+                    sourceId,
+                    targetId,
+                },
+            );
+            exerciseDefinitionStatsRepository.rebuildForExerciseDefinitionIds({
+                exerciseDefinitionIds: [sourceId, targetId],
+                updatedAtMs: clock.now(),
+            });
 
             if (source.source === 'user') {
                 exerciseDefinitionRepository.deleteById(sourceId);
             }
 
-            return target;
+            const updatedTarget = exerciseDefinitionRepository.getById(targetId);
+            if (!updatedTarget) {
+                throw new Error(
+                    `Exercise definition ${targetId} was not found`,
+                );
+            }
+
+            return updatedTarget;
         },
 
         getById: (id: string): ExerciseDefinition | null =>
@@ -332,10 +372,10 @@ export const createExerciseDefinitionService = ({
             id,
             name,
         }: UpdateExerciseDefinitionInput): ExerciseDefinition => {
-            const nameInput =
-                name !== undefined
-                    ? normalizeExerciseDefinitionName(name)
-                    : undefined;
+            let nameInput: ReturnType<typeof normalizeExerciseDefinitionName> | undefined;
+            if (name !== undefined) {
+                nameInput = normalizeExerciseDefinitionName(name);
+            }
             const existing = exerciseDefinitionRepository.getById(id);
             if (!existing) {
                 throw new Error(`Exercise definition ${id} was not found`);
@@ -395,6 +435,36 @@ export const createExerciseDefinitionService = ({
             }
 
             return updated;
+        },
+
+        upsertExerciseDefinitionData: ({
+            defaultTargetSet,
+            defaultTrackingFields,
+            exerciseDefinitionId,
+            notes,
+        }: UpsertExerciseDefinitionDataInput): ExerciseDefinitionData => {
+            const definition = exerciseDefinitionRepository.getById(
+                exerciseDefinitionId,
+            );
+            if (!definition) {
+                throw new Error(
+                    `Exercise definition ${exerciseDefinitionId} was not found`,
+                );
+            }
+
+            if (definition.availability === 'workout') {
+                throw new Error(
+                    `Exercise definition ${exerciseDefinitionId} is not gym available`,
+                );
+            }
+
+            return exerciseDefinitionDataRepository.upsert({
+                defaultTargetSet,
+                defaultTrackingFields,
+                exerciseDefinitionId,
+                notes,
+                updatedAtMs: clock.now(),
+            });
         },
     };
 

@@ -20,6 +20,7 @@ import type {
 } from '../../repositories/gyms/gymSessionRepositoryFactory';
 import { systemClock, type Clock } from '../../repositories/repositoryClock';
 import type { ExerciseDefinitionService } from '../exerciseDefinitions/exerciseDefinitionServiceFactory';
+import type { ExerciseDefinitionStatsRepository } from '../../repositories/exerciseDefinitions/exerciseDefinitionStatsRepositoryFactory';
 
 export interface ListGymSessionsInput {
     limit?: number;
@@ -108,6 +109,7 @@ export interface GymSessionService {
 export interface CreateGymSessionServiceArgs {
     clock?: Clock;
     exerciseDefinitionService: ExerciseDefinitionService;
+    exerciseDefinitionStatsRepository: ExerciseDefinitionStatsRepository;
     gymExerciseRecordRepository: GymExerciseRecordRepository;
     gymPlanRepository: GymPlanRepository;
     gymSessionRepository: GymSessionRepository;
@@ -177,6 +179,7 @@ const hasMeaningfulSetValue = (
 export const createGymSessionService = ({
     clock = systemClock,
     exerciseDefinitionService,
+    exerciseDefinitionStatsRepository,
     gymExerciseRecordRepository,
     gymPlanRepository,
     gymSessionRepository,
@@ -583,7 +586,8 @@ export const createGymSessionService = ({
 
         finishGymSession: (input: FinishGymSessionInput = {}): GymSession => {
             const session = getActiveSessionOrThrow();
-            const endedAtMs = input.endedAtMs ?? clock.now();
+            const nowMs = clock.now();
+            const endedAtMs = input.endedAtMs ?? nowMs;
             if (endedAtMs < session.startedAtMs) {
                 throw createGymError(gymErrors.invalidGymSessionTimeRange);
             }
@@ -593,7 +597,13 @@ export const createGymSessionService = ({
                 status: 'completed',
                 endedAtMs,
                 notes: input.notes,
-                updatedAtMs: clock.now(),
+                updatedAtMs: nowMs,
+            });
+            exerciseDefinitionStatsRepository.rebuildForExerciseDefinitionIds({
+                exerciseDefinitionIds: gymExerciseRecordRepository
+                    .getBySessionId(session.id)
+                    .map((record) => record.exerciseDefinitionId),
+                updatedAtMs: nowMs,
             });
 
             return hydrateSessionRow(getSessionOrThrow(session.id));
@@ -618,7 +628,15 @@ export const createGymSessionService = ({
                 throw createGymError(gymErrors.activeSessionCannotBeDeleted);
             }
 
+            const exerciseDefinitionIds = gymExerciseRecordRepository
+                .getBySessionId(session.id)
+                .map((record) => record.exerciseDefinitionId);
+
             gymSessionRepository.delete(id);
+            exerciseDefinitionStatsRepository.rebuildForExerciseDefinitionIds({
+                exerciseDefinitionIds,
+                updatedAtMs: clock.now(),
+            });
         },
 
         deleteExerciseRecord: (id: string): void => {

@@ -4,6 +4,7 @@ import type { BaseSQLiteDatabase } from 'drizzle-orm/sqlite-core';
 import type {
     ExerciseDefinition,
     ExerciseDefinitionAvailability,
+    ExerciseDefinitionListItem,
     ExerciseDefinitionSource,
 } from '@src/core/entities/exerciseDefinition.interfaces';
 import { normalizeExerciseName } from '@src/core/exercises/normalizeExerciseName';
@@ -19,6 +20,8 @@ import {
     exerciseDefinitionErrors,
 } from './exerciseDefinitionErrors';
 import type * as schema from '../../schema';
+import type { ExerciseDefinitionDataRepository } from './exerciseDefinitionDataRepositoryFactory';
+import type { ExerciseDefinitionStatsRepository } from './exerciseDefinitionStatsRepositoryFactory';
 
 export type ExerciseDefinitionRepositoryDb = BaseSQLiteDatabase<
     'sync',
@@ -70,14 +73,18 @@ export interface ExerciseDefinitionListParams {
 export interface ExerciseDefinitionRepository {
     create: (input: CreateExerciseDefinitionInput) => ExerciseDefinition;
     deleteById: (id: string) => void;
-    getAll: () => ExerciseDefinition[];
+    getAll: () => ExerciseDefinitionListItem[];
     getById: (id: string) => ExerciseDefinition | null;
     getByNormalizedName: (normalizedName: string) => ExerciseDefinition | null;
     hasGymSessionExerciseReferences: (id: string) => boolean;
     hasGymPlanExerciseReferences: (id: string) => boolean;
     hasWorkoutExerciseReferences: (id: string) => boolean;
-    list: (params?: ExerciseDefinitionListParams) => ExerciseDefinition[];
+    list: (params?: ExerciseDefinitionListParams) => ExerciseDefinitionListItem[];
     replaceGymPlanExerciseDefinitionReferences: (input: {
+        sourceId: string;
+        targetId: string;
+    }) => void;
+    replaceGymSessionExerciseDefinitionReferences: (input: {
         sourceId: string;
         targetId: string;
     }) => void;
@@ -90,11 +97,13 @@ export interface ExerciseDefinitionRepository {
 
 export interface CreateExerciseDefinitionRepositoryArgs {
     db: ExerciseDefinitionRepositoryDb;
+    exerciseDefinitionDataRepository: ExerciseDefinitionDataRepository;
+    exerciseDefinitionStatsRepository: ExerciseDefinitionStatsRepository;
 }
 
 const exerciseDefinitionFromRow = (
     row: ExerciseDefinitionDbRow,
-): ExerciseDefinition => ({
+): ExerciseDefinitionListItem => ({
     id: row.id,
     name: row.name,
     normalizedName: row.normalizedName,
@@ -104,8 +113,24 @@ const exerciseDefinitionFromRow = (
     updatedAtMs: row.updatedAtMs,
 });
 
+const exerciseDefinitionFromListItem = (
+    item: ExerciseDefinitionListItem,
+    exerciseDefinitionDataRepository: ExerciseDefinitionDataRepository,
+    exerciseDefinitionStatsRepository: ExerciseDefinitionStatsRepository,
+): ExerciseDefinition => ({
+    ...item,
+    data:
+        exerciseDefinitionDataRepository.getByExerciseDefinitionId(item.id) ??
+        undefined,
+    stats:
+        exerciseDefinitionStatsRepository.getByExerciseDefinitionId(item.id) ??
+        undefined,
+});
+
 export const createExerciseDefinitionRepository = ({
     db,
+    exerciseDefinitionDataRepository,
+    exerciseDefinitionStatsRepository,
 }: CreateExerciseDefinitionRepositoryArgs): ExerciseDefinitionRepository => {
     const assertUniqueNormalizedName = (
         normalizedName: string,
@@ -137,7 +162,9 @@ export const createExerciseDefinitionRepository = ({
     };
 
     const repository: ExerciseDefinitionRepository = {
-        create: (input: CreateExerciseDefinitionInput): ExerciseDefinition => {
+        create: (
+            input: CreateExerciseDefinitionInput,
+        ): ExerciseDefinition => {
             assertUniqueNormalizedName(input.normalizedName);
 
             const definitionInsert: ExerciseDefinitionDbInsert = input;
@@ -146,7 +173,11 @@ export const createExerciseDefinitionRepository = ({
                 .values(definitionInsert)
                 .run();
 
-            return input;
+            return exerciseDefinitionFromListItem(
+                input,
+                exerciseDefinitionDataRepository,
+                exerciseDefinitionStatsRepository,
+            );
         },
 
         deleteById: (id: string): void => {
@@ -155,7 +186,7 @@ export const createExerciseDefinitionRepository = ({
                 .run();
         },
 
-        getAll: (): ExerciseDefinition[] =>
+        getAll: (): ExerciseDefinitionListItem[] =>
             db
                 .select()
                 .from(exerciseDefinitionsTable)
@@ -170,7 +201,13 @@ export const createExerciseDefinitionRepository = ({
                 .where(eq(exerciseDefinitionsTable.id, id))
                 .get();
 
-            return row ? exerciseDefinitionFromRow(row) : null;
+            return row
+                ? exerciseDefinitionFromListItem(
+                      exerciseDefinitionFromRow(row),
+                      exerciseDefinitionDataRepository,
+                      exerciseDefinitionStatsRepository,
+                  )
+                : null;
         },
 
         getByNormalizedName: (
@@ -182,7 +219,13 @@ export const createExerciseDefinitionRepository = ({
                 .where(eq(exerciseDefinitionsTable.normalizedName, normalizedName))
                 .get();
 
-            return row ? exerciseDefinitionFromRow(row) : null;
+            return row
+                ? exerciseDefinitionFromListItem(
+                      exerciseDefinitionFromRow(row),
+                      exerciseDefinitionDataRepository,
+                      exerciseDefinitionStatsRepository,
+                  )
+                : null;
         },
 
         hasGymSessionExerciseReferences: (id: string): boolean => {
@@ -222,7 +265,7 @@ export const createExerciseDefinitionRepository = ({
             filters,
             pagination,
             scope = 'active',
-        }: ExerciseDefinitionListParams = {}): ExerciseDefinition[] => {
+        }: ExerciseDefinitionListParams = {}): ExerciseDefinitionListItem[] => {
             const normalizedNameFilter = normalizeNameFilter(filters?.name);
             const normalizedNamePrefixFilter = normalizeNameFilter(
                 filters?.namePrefix,
@@ -303,6 +346,16 @@ export const createExerciseDefinitionRepository = ({
                 .run();
         },
 
+        replaceGymSessionExerciseDefinitionReferences: ({
+            sourceId,
+            targetId,
+        }): void => {
+            db.update(gymExerciseRecordsTable)
+                .set({ exerciseDefinitionId: targetId })
+                .where(eq(gymExerciseRecordsTable.exerciseDefinitionId, sourceId))
+                .run();
+        },
+
         replaceWorkoutExerciseDefinitionReferences: ({
             sourceId,
             targetId,
@@ -313,7 +366,9 @@ export const createExerciseDefinitionRepository = ({
                 .run();
         },
 
-        update: (input: UpdateExerciseDefinitionInput): ExerciseDefinition => {
+        update: (
+            input: UpdateExerciseDefinitionInput,
+        ): ExerciseDefinition => {
             const existing = repository.getById(input.id);
             if (!existing) {
                 throw new Error(`Exercise definition ${input.id} was not found`);
@@ -323,7 +378,7 @@ export const createExerciseDefinitionRepository = ({
                 assertUniqueNormalizedName(input.normalizedName, input.id);
             }
 
-            const next: ExerciseDefinition = {
+            const next: ExerciseDefinitionListItem = {
                 ...existing,
                 name: input.name ?? existing.name,
                 normalizedName: input.normalizedName ?? existing.normalizedName,
@@ -344,7 +399,11 @@ export const createExerciseDefinitionRepository = ({
                 .where(eq(exerciseDefinitionsTable.id, input.id))
                 .run();
 
-            return next;
+            return exerciseDefinitionFromListItem(
+                next,
+                exerciseDefinitionDataRepository,
+                exerciseDefinitionStatsRepository,
+            );
         },
     };
 
