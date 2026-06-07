@@ -4,13 +4,14 @@ import type { GymExerciseRecordSet } from '@src/core/entities/gymSession.interfa
 
 import type { SetDraft, TrackingFields } from './GymExerciseDataScreen.types';
 
-export const DEFAULT_REPS = 10;
-export const DEFAULT_WEIGHT_KG = 0;
+export const DEFAULT_REPS = 12;
+export const DEFAULT_WEIGHT_KG = 10;
 
 export const initialTrackingFields: TrackingFields = {
     hasDistanceMeters: false,
     hasDurationSec: false,
     hasReps: true,
+    hasRpe: false,
     hasWeight: true,
 };
 
@@ -27,6 +28,7 @@ export const inferTrackingFieldsFromSets = (
         ),
         hasDurationSec: sets.some((set) => set.durationSec !== undefined),
         hasReps: sets.some((set) => set.reps !== undefined),
+        hasRpe: sets.some((set) => set.rpeTenths !== undefined),
         hasWeight: sets.some((set) => set.weightGrams !== undefined),
     };
 
@@ -34,6 +36,7 @@ export const inferTrackingFieldsFromSets = (
         !trackingFields.hasDistanceMeters &&
         !trackingFields.hasDurationSec &&
         !trackingFields.hasReps &&
+        !trackingFields.hasRpe &&
         !trackingFields.hasWeight
     ) {
         return initialTrackingFields;
@@ -95,6 +98,7 @@ export const draftFromSet = (set: GymExerciseRecordSet): SetDraft => ({
     durationSec: set.durationSec ?? 0,
     id: set.id,
     reps: set.reps ?? 0,
+    rpeTenths: set.rpeTenths ?? 0,
     weightKg: set.weightGrams ? set.weightGrams / 1000 : 0,
 });
 
@@ -129,6 +133,14 @@ export const getSetDetails = (
         details.push(
             t('gymExerciseData.setDetails.distance', {
                 value: formatDistance(set.distanceMeters),
+            }),
+        );
+    }
+
+    if (set.rpeTenths !== undefined) {
+        details.push(
+            t('gymExerciseData.setDetails.rpe', {
+                value: set.rpeTenths / 10,
             }),
         );
     }
