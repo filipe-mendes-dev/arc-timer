@@ -22,6 +22,7 @@ import { uid } from '@src/core/id';
 import type {
     ExerciseDefinitionListParams,
     ExerciseDefinitionRepository,
+    UpdateExerciseDefinitionInput as RepositoryUpdateExerciseDefinitionInput,
 } from '../../repositories/exerciseDefinitions/exerciseDefinitionRepositoryFactory';
 import type { ExerciseDefinitionDataRepository } from '../../repositories/exerciseDefinitions/exerciseDefinitionDataRepositoryFactory';
 import type { ExerciseDefinitionStatsRepository } from '../../repositories/exerciseDefinitions/exerciseDefinitionStatsRepositoryFactory';
@@ -123,6 +124,42 @@ export const createExerciseDefinitionService = ({
         });
     };
 
+    const promoteSystemDefinitionToUser = (
+        definition: ExerciseDefinition,
+        availability?: ExerciseDefinitionAvailability,
+    ): ExerciseDefinition => {
+        if (
+            availability === 'gym' &&
+            definition.availability !== 'gym' &&
+            exerciseDefinitionRepository.hasWorkoutExerciseReferences(
+                definition.id,
+            )
+        ) {
+            throw createExerciseDefinitionError(
+                exerciseDefinitionErrors.gymOnlyRestricted,
+            );
+        }
+
+        if (
+            availability === 'workout' &&
+            definition.availability !== 'workout' &&
+            exerciseDefinitionRepository.hasGymPlanExerciseReferences(
+                definition.id,
+            )
+        ) {
+            throw createExerciseDefinitionError(
+                exerciseDefinitionErrors.workoutOnlyRestricted,
+            );
+        }
+
+        return exerciseDefinitionRepository.update({
+            id: definition.id,
+            source: 'user',
+            availability,
+            updatedAtMs: clock.now(),
+        });
+    };
+
     const service: ExerciseDefinitionService = {
         createUserExerciseDefinition: ({
             availability = 'both',
@@ -130,6 +167,13 @@ export const createExerciseDefinitionService = ({
         }: CreateUserExerciseDefinitionInput): ExerciseDefinition => {
             const nameInput = normalizeExerciseDefinitionName(name);
             const nowMs = clock.now();
+            const existing = exerciseDefinitionRepository.getByNormalizedName(
+                nameInput.normalizedName,
+            );
+
+            if (existing?.source === 'system') {
+                return promoteSystemDefinitionToUser(existing, availability);
+            }
 
             return exerciseDefinitionRepository.create({
                 id: uid(),
@@ -209,6 +253,9 @@ export const createExerciseDefinitionService = ({
             const existing = exerciseDefinitionRepository.getByNormalizedName(
                 normalizedName,
             );
+            if (existing?.source === 'system') {
+                return promoteSystemDefinitionToUser(existing);
+            }
             if (existing) return existing;
 
             return service.createUserExerciseDefinition({
@@ -411,27 +458,39 @@ export const createExerciseDefinitionService = ({
                 });
             }
 
-            if (
-                nameInput === undefined ||
-                existing.normalizedName === nameInput.normalizedName
-            ) {
+            const hasNameChange =
+                nameInput !== undefined &&
+                existing.normalizedName !== nameInput.normalizedName;
+            const hasAvailabilityChange =
+                availability !== undefined &&
+                existing.availability !== availability;
+
+            if (!hasNameChange && !hasAvailabilityChange) {
                 return existing;
             }
 
-            const updated = exerciseDefinitionRepository.update({
+            const updateInput: RepositoryUpdateExerciseDefinitionInput = {
                 id: existing.id,
-                name: nameInput.name,
-                normalizedName: nameInput.normalizedName,
                 source: 'user',
                 availability,
                 updatedAtMs: clock.now(),
-            });
-            const oldSystemDefinition = getSystemDefinitionByNormalizedName(
-                existing.normalizedName,
-            );
+            };
 
-            if (oldSystemDefinition) {
-                seedSystemDefinition(oldSystemDefinition);
+            if (hasNameChange && nameInput !== undefined) {
+                updateInput.name = nameInput.name;
+                updateInput.normalizedName = nameInput.normalizedName;
+            }
+
+            const updated = exerciseDefinitionRepository.update(updateInput);
+
+            if (hasNameChange) {
+                const oldSystemDefinition = getSystemDefinitionByNormalizedName(
+                    existing.normalizedName,
+                );
+
+                if (oldSystemDefinition) {
+                    seedSystemDefinition(oldSystemDefinition);
+                }
             }
 
             return updated;

@@ -374,7 +374,10 @@ export const createExerciseDefinitionRepository = ({
                 throw new Error(`Exercise definition ${input.id} was not found`);
             }
 
-            if (input.normalizedName !== undefined) {
+            if (
+                input.normalizedName !== undefined &&
+                input.normalizedName !== existing.normalizedName
+            ) {
                 assertUniqueNormalizedName(input.normalizedName, input.id);
             }
 
