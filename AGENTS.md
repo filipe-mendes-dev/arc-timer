@@ -50,6 +50,7 @@ You are working in a React Native / Expo Router project (Arc Timer). Follow thes
     - ✅ put styles in the styles file or a hook.
 - Keep logic stable and predictable:
     - Don’t change existing logic the user didn’t ask to modify unless you **explicitly call it out** and justify why.
+- Keep JSX in the component return unless there is a clear reason to extract it. If JSX must be extracted for readability or reuse, move it to a separate component instead of hiding it in local render helpers.
 - **Never use multi-line ternaries** — they trigger a TypeScript LSP panic (`semantic tokens: token spans multiple lines`). This applies to JSX, TypeScript expressions, and JSX props:
     - ❌ `{condition ? (\n  <Component />\n) : null}`
     - ✅ `{condition && <Component />}`
