@@ -9,8 +9,14 @@ export const useExerciseDefinitionCardStyles = createStyles(
             summaryContainer: {
                 gap: 10,
             },
+            titleRow: {
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 12,
+            },
             title: {
                 color: theme.palette.text.primary,
+                flex: 1,
                 flexShrink: 1,
             },
             metaRow: {

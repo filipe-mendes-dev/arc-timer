@@ -1,46 +1,56 @@
-import { useMemo, useState } from 'react';
 import { FlatList, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import { MainContainer } from '@src/components/layout/MainContainer/MainContainer';
 import { SearchField } from '@src/components/ui/SearchField/SearchField';
 import { Button } from '@src/components/ui/Button/Button';
 import { ListEmptyState } from '@src/components/layout/ListEmptyState';
-import {
-    useExerciseDefinitions,
-    type ExerciseDefinitionListParams,
-} from '@src/data/exerciseDefinitions';
-import { useDebouncedValue } from '@src/hooks/useDebouncedValue';
+import ConfirmDialog from '@src/components/modals/ConfirmDialog/ConfirmDialog';
 import { ExerciseDefinitionCard } from './components/ExerciseDefinitionCard/ExerciseDefinitionCard';
 import { ExerciseDefinitionFormModal } from './components/ExerciseDefinitionFormModal/ExerciseDefinitionFormModal';
 import { useExerciseDefinitionsScreenStyles } from './ExerciseDefinitionsScreen.styles';
+import { useExerciseDefinitionsList } from './hooks/useExerciseDefinitionsList';
+import { useExerciseDefinitionsSelection } from './hooks/useExerciseDefinitionsSelection';
 
-const SEARCH_DEBOUNCE_DELAY_MS = 150;
+interface ExerciseDefinitionsEmptyStateProps {
+    hasSearch: boolean;
+    onNewExercise: () => void;
+    t: TFunction;
+}
+
+const ExerciseDefinitionsEmptyState = ({
+    hasSearch,
+    onNewExercise,
+    t,
+}: ExerciseDefinitionsEmptyStateProps) => {
+    if (hasSearch) {
+        return (
+            <ListEmptyState
+                title={t('exerciseDefinitions.searchEmptyTitle')}
+                description={t('exerciseDefinitions.searchEmptyDescription')}
+            />
+        );
+    }
+
+    return (
+        <ListEmptyState
+            title={t('exerciseDefinitions.emptyTitle')}
+            description={t('exerciseDefinitions.emptyDescription')}
+            actionLabel={t('exerciseDefinitions.createButton')}
+            onPressAction={onNewExercise}
+        />
+    );
+};
 
 const ExerciseDefinitionsScreen = () => {
     const { t } = useTranslation();
-    const router = useRouter();
     const st = useExerciseDefinitionsScreenStyles();
+    const list = useExerciseDefinitionsList();
+    const selection = useExerciseDefinitionsSelection();
 
-    const [search, setSearch] = useState('');
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const debouncedSearch = useDebouncedValue(
-        search.trim(),
-        SEARCH_DEBOUNCE_DELAY_MS,
-    );
-
-    const listParams = useMemo<ExerciseDefinitionListParams>(
-        () => ({
-            filters: {
-                name: debouncedSearch,
-            },
-            scope: 'active',
-        }),
-        [debouncedSearch],
-    );
-    const { data: list = [] } = useExerciseDefinitions(listParams);
-    const hasSearch = debouncedSearch.length > 0;
 
     const openModal = () => {
         setIsModalVisible(true);
@@ -52,12 +62,15 @@ const ExerciseDefinitionsScreen = () => {
 
     return (
         <MainContainer
-            title={t('exerciseDefinitions.title')}
+            title={selection.screenTitle}
             scroll={false}
             noPadding
+            topBarOptions={selection.topBarOptions}
+            topBarLeftAction={selection.topBarLeftAction}
+            topBarRightAction={selection.topBarRightAction}
         >
             <FlatList
-                data={list}
+                data={list.exerciseDefinitions}
                 keyExtractor={(item) => item.id}
                 style={st.list}
                 contentContainerStyle={st.listContent}
@@ -65,20 +78,22 @@ const ExerciseDefinitionsScreen = () => {
                     <View style={st.headerContainer}>
                         <View style={st.headerRow}>
                             <SearchField
-                                value={search}
-                                onChangeText={setSearch}
+                                value={list.search}
+                                onChangeText={list.setSearch}
                                 fullWidth
                                 placeholder={t(
                                     'exerciseDefinitions.searchPlaceholder',
                                 )}
                             />
 
-                            <Button
-                                title={t('exerciseDefinitions.newButton')}
-                                variant="primary"
-                                onPress={openModal}
-                                style={st.newButton}
-                            />
+                            {!selection.isSelectMode && (
+                                <Button
+                                    title={t('exerciseDefinitions.newButton')}
+                                    variant="primary"
+                                    onPress={openModal}
+                                    style={st.newButton}
+                                />
+                            )}
                         </View>
                     </View>
                 }
@@ -86,31 +101,18 @@ const ExerciseDefinitionsScreen = () => {
                 renderItem={({ item }) => (
                     <ExerciseDefinitionCard
                         item={item}
-                        onPress={() =>
-                            router.push(`/exercise-definitions/${item.id}`)
-                        }
+                        onPress={() => list.goToExerciseDefinition(item.id)}
+                        onRemove={() => selection.requestRemoval(item.id)}
+                        isSelectMode={selection.isSelectMode}
+                        isSelected={selection.isSelected(item.id)}
+                        onSelect={() => selection.toggleItem(item.id)}
                     />
                 )}
                 ListEmptyComponent={
-                    <ListEmptyState
-                        title={
-                            hasSearch
-                                ? t('exerciseDefinitions.searchEmptyTitle')
-                                : t('exerciseDefinitions.emptyTitle')
-                        }
-                        description={
-                            hasSearch
-                                ? t(
-                                      'exerciseDefinitions.searchEmptyDescription',
-                                  )
-                                : t('exerciseDefinitions.emptyDescription')
-                        }
-                        actionLabel={
-                            hasSearch
-                                ? undefined
-                                : t('exerciseDefinitions.createButton')
-                        }
-                        onPressAction={hasSearch ? undefined : openModal}
+                    <ExerciseDefinitionsEmptyState
+                        hasSearch={list.hasSearch}
+                        onNewExercise={openModal}
+                        t={t}
                     />
                 }
                 keyboardShouldPersistTaps="handled"
@@ -119,6 +121,17 @@ const ExerciseDefinitionsScreen = () => {
             <ExerciseDefinitionFormModal
                 visible={isModalVisible}
                 onClose={closeModal}
+            />
+
+            <ConfirmDialog
+                visible={selection.hasPendingRemoval}
+                title={selection.confirmTitle}
+                message={selection.confirmMessage}
+                confirmLabel={t('exerciseDefinitions.confirmRemove.confirm')}
+                cancelLabel={t('common.actions.cancel')}
+                destructive
+                onConfirm={selection.confirmRemoval}
+                onCancel={selection.cancelRemoval}
             />
         </MainContainer>
     );
