@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 
 import { ListEmptyState } from '@src/components/layout/ListEmptyState';
 import { ScreenSection } from '@src/components/layout/ScreenSection/ScreenSection';
-import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { MetricCard } from '@src/components/ui/MetricCard';
 
 import type { ExerciseDefinitionStatItem } from '../ExerciseDefinitionDetailsScreen.helpers';
