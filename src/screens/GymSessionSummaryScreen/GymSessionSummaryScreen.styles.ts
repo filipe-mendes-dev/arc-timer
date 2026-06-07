@@ -56,42 +56,6 @@ export const useStyles = createStyles((theme: AppTheme) =>
         metricLabel: {
             flexShrink: 1,
         },
-        exerciseBody: {
-            gap: 10,
-        },
-        exerciseName: {
-            flexShrink: 1,
-        },
-        exerciseMetaRow: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 6,
-        },
-        setsContainer: {
-            gap: 10,
-        },
-        setRow: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 10,
-        },
-        setIndexBubble: {
-            width: 28,
-            height: 28,
-            borderRadius: 14,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: theme.palette.accent.soft,
-        },
-        setIndexText: {
-            fontSize: 12,
-            fontWeight: '700',
-            color: theme.palette.accent.primary,
-        },
-        setTexts: {
-            flex: 1,
-            minWidth: 0,
-        },
         notes: {
             flexShrink: 1,
         },
