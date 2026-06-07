@@ -1,41 +1,64 @@
-import { useState } from 'react';
+import { useMemo } from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
+import { TrackingFieldsModal } from '@src/components/gym/TrackingFieldsModal';
 import { MainContainer } from '@src/components/layout/MainContainer/MainContainer';
+import type { TopBarOption } from '@src/components/navigation/TopBar/TopBar.interfaces';
 import { Button } from '@src/components/ui/Button/Button';
 import { AppText } from '@src/components/ui/Typography/AppText';
-import { ScreenSection } from '@src/components/layout/ScreenSection/ScreenSection';
-import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
-import { useTheme } from '@src/theme/ThemeProvider';
-import { useExerciseDefinition } from '@src/data/exerciseDefinitions';
-import { ExerciseDefinitionFormModal } from '@src/screens/ExerciseDefinitionsScreen/components/ExerciseDefinitionFormModal/ExerciseDefinitionFormModal';
+import ConfirmDialog from '@src/components/modals/ConfirmDialog/ConfirmDialog';
+
+import { DefaultFieldValueModal } from './components/DefaultFieldValueModal';
+import { ExerciseDefinitionAvailabilityModal } from './components/ExerciseDefinitionAvailabilityModal';
+import { ExerciseDefinitionDefaultFieldsSection } from './components/ExerciseDefinitionDefaultFieldsSection';
+import { ExerciseDefinitionNameModal } from './components/ExerciseDefinitionNameModal';
+import { ExerciseDefinitionOverviewSection } from './components/ExerciseDefinitionOverviewSection';
+import { ExerciseDefinitionStatsSection } from './components/ExerciseDefinitionStatsSection';
+import { RecentSessionsSection } from './components/RecentSessionsSection';
+import { trackingFieldsModalCopy } from './ExerciseDefinitionDetailsScreen.helpers';
+import { useExerciseDefinitionDefaultFields } from './hooks/useExerciseDefinitionDefaultFields';
+import { useExerciseDefinitionDetailsScreen } from './hooks/useExerciseDefinitionDetailsScreen';
 import { useExerciseDefinitionDetailsScreenStyles } from './ExerciseDefinitionDetailsScreen.styles';
-
-const sourceLabelKeyBySource = {
-    system: 'exerciseDefinitions.source.system',
-    user: 'exerciseDefinitions.source.user',
-} as const;
-
-const availabilityLabelKeyByAvailability = {
-    both: 'exerciseDefinitions.availability.both',
-    gym: 'exerciseDefinitions.availability.gym',
-    workout: 'exerciseDefinitions.availability.workout',
-} as const;
 
 const ExerciseDefinitionDetailsScreen = () => {
     const { t } = useTranslation();
-    const { id } = useLocalSearchParams<{ id?: string }>();
-    const router = useRouter();
-    const { theme } = useTheme();
     const st = useExerciseDefinitionDetailsScreenStyles();
-    const { data: definition } = useExerciseDefinition(id);
+    const screen = useExerciseDefinitionDetailsScreen();
+    const defaultFields = useExerciseDefinitionDefaultFields({
+        definition: screen.definition,
+        emptyValue: t('exerciseDefinitions.emptyValue'),
+    });
+    const { definition, openDeleteDialog } = screen;
+    const { openTrackingFieldsModal } = defaultFields;
+    const topBarOptions = useMemo<readonly TopBarOption[]>(() => {
+        if (!definition) return [];
 
-    const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+        const options: TopBarOption[] = [];
 
-    if (!id || !definition) {
+        if (definition.availability !== 'workout') {
+            options.push({
+                id: 'edit-exercise-definition-tracking-fields',
+                label: t('exerciseDefinitions.fields.trackingFields'),
+                icon: 'edit',
+                onPress: openTrackingFieldsModal,
+            });
+        }
+
+        if (definition.source !== 'system') {
+            options.push({
+                id: 'delete-exercise-definition',
+                label: t('common.actions.remove'),
+                icon: 'trash',
+                destructive: true,
+                onPress: openDeleteDialog,
+            });
+        }
+
+        return options;
+    }, [definition, openDeleteDialog, openTrackingFieldsModal, t]);
+
+    if (screen.isNotFound || !screen.definition) {
         return (
             <MainContainer
                 title={t('exerciseDefinitions.detailsTitle')}
@@ -48,7 +71,7 @@ const ExerciseDefinitionDetailsScreen = () => {
                     <Button
                         title={t('common.actions.back')}
                         variant="secondary"
-                        onPress={() => router.back()}
+                        onPress={screen.goBack}
                         style={st.errorButton}
                     />
                 </View>
@@ -56,107 +79,79 @@ const ExerciseDefinitionDetailsScreen = () => {
         );
     }
 
-    const topBarOptions = [
-        {
-            id: 'edit-exercise-definition',
-            label: t('common.actions.edit'),
-            icon: 'edit',
-            onPress: () => setIsEditModalVisible(true),
-        },
-    ] as const;
-
     return (
         <>
             <MainContainer
-                title={definition.name}
-                gap={0}
+                title={screen.screenTitle}
                 topBarOptions={topBarOptions}
             >
-                <ScreenSection
-                    title={t('exerciseDefinitions.overview')}
-                    topSpacing="small"
-                    gap={12}
-                >
-                    <MetaCard
-                        expandable={false}
-                        topLeftContent={{
-                            text: t(sourceLabelKeyBySource[definition.source]),
-                            icon: (
-                                <Ionicons
-                                    name={
-                                        definition.source === 'system'
-                                            ? 'sparkles-outline'
-                                            : 'person-outline'
-                                    }
-                                    size={14}
-                                    color={
-                                        theme.palette.metaCard.topLeftContent
-                                            .text
-                                    }
-                                />
-                            ),
-                            backgroundColor:
-                                theme.palette.metaCard.topLeftContent
-                                    .background,
-                            color: theme.palette.metaCard.topLeftContent.text,
-                            borderColor:
-                                theme.palette.metaCard.topLeftContent.border,
-                        }}
-                        summaryContent={
-                            <View style={st.overviewContainer}>
-                                <View style={st.metricCard}>
-                                    <AppText
-                                        variant="caption"
-                                        tone="muted"
-                                        style={st.metricLabel}
-                                    >
-                                        {t('exerciseDefinitions.fields.source')}
-                                    </AppText>
-                                    <AppText
-                                        variant="body"
-                                        style={st.metricValue}
-                                        numberOfLines={1}
-                                    >
-                                        {t(
-                                            sourceLabelKeyBySource[
-                                                definition.source
-                                            ],
-                                        )}
-                                    </AppText>
-                                </View>
+                <ExerciseDefinitionOverviewSection
+                    definition={screen.definition}
+                    onPressAvailability={screen.openAvailabilityModal}
+                    onPressName={screen.openNameModal}
+                />
 
-                                <View style={st.metricCardWide}>
-                                    <AppText
-                                        variant="caption"
-                                        tone="muted"
-                                        style={st.metricLabel}
-                                    >
-                                        {t(
-                                            'exerciseDefinitions.fields.availability',
-                                        )}
-                                    </AppText>
-                                    <AppText
-                                        variant="bodySmall"
-                                        style={st.metricValue}
-                                        numberOfLines={2}
-                                    >
-                                        {t(
-                                            availabilityLabelKeyByAvailability[
-                                                definition.availability
-                                            ],
-                                        )}
-                                    </AppText>
-                                </View>
-                            </View>
-                        }
-                    />
-                </ScreenSection>
+                <ExerciseDefinitionDefaultFieldsSection
+                    items={defaultFields.defaultMetricItems}
+                    onPressField={defaultFields.openDefaultValueModal}
+                />
+
+                <ExerciseDefinitionStatsSection
+                    items={screen.exerciseStatItems}
+                />
+
+                <RecentSessionsSection
+                    sessions={
+                        screen.definition.stats?.recentCompletedGymSessions ??
+                        []
+                    }
+                    onPressSession={screen.goToGymSession}
+                />
             </MainContainer>
 
-            <ExerciseDefinitionFormModal
-                visible={isEditModalVisible}
-                definition={definition}
-                onClose={() => setIsEditModalVisible(false)}
+            <ExerciseDefinitionNameModal
+                visible={screen.isNameModalVisible}
+                definition={screen.definition}
+                onClose={screen.closeNameModal}
+            />
+
+            <ExerciseDefinitionAvailabilityModal
+                visible={screen.isAvailabilityModalVisible}
+                definition={screen.definition}
+                onClose={screen.closeAvailabilityModal}
+            />
+
+            <TrackingFieldsModal
+                copy={trackingFieldsModalCopy}
+                visible={defaultFields.isTrackingFieldsModalVisible}
+                value={defaultFields.trackingFieldValue}
+                fieldsWithData={defaultFields.fieldsWithDefaultData}
+                isSaving={defaultFields.isSavingDefaults}
+                onClose={defaultFields.closeTrackingFieldsModal}
+                onSave={defaultFields.saveTrackingFields}
+            />
+
+            <DefaultFieldValueModal
+                visible={!!defaultFields.editingDefaultField}
+                field={defaultFields.editingDefaultField}
+                isSaving={defaultFields.isSavingDefaults}
+                targetSet={screen.definition.data?.defaultTargetSet}
+                onClose={defaultFields.closeDefaultValueModal}
+                onSave={defaultFields.saveDefaultFieldValue}
+            />
+
+            <ConfirmDialog
+                visible={screen.isDeleteDialogVisible}
+                title={t('exerciseDefinitions.confirmRemove.title')}
+                message={
+                    screen.deleteError ??
+                    t('exerciseDefinitions.confirmRemove.message')
+                }
+                confirmLabel={t('exerciseDefinitions.confirmRemove.confirm')}
+                cancelLabel={t('common.actions.cancel')}
+                destructive
+                onConfirm={screen.confirmDelete}
+                onCancel={screen.closeDeleteDialog}
             />
         </>
     );

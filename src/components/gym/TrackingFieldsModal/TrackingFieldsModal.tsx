@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -20,13 +20,12 @@ import { useStyles } from './TrackingFieldsModal.styles';
 
 interface TrackingFieldsModalProps<FieldValues extends TrackingFieldsValue> {
     copy: TrackingFieldsModalCopy;
-    fieldsWithDataToRemove: readonly (keyof FieldValues)[];
+    fieldsWithData: readonly (keyof FieldValues)[];
     isSaving: boolean;
-    trackingFields: FieldValues | null;
+    value: FieldValues | null;
     visible: boolean;
     onClose: () => void;
-    onSave: () => void;
-    onToggleField: (field: keyof FieldValues) => void;
+    onSave: (value: FieldValues) => void;
 }
 
 const getSelectedTrackingFields = (
@@ -40,23 +39,37 @@ const getSelectedTrackingFields = (
     if (trackingFields.hasDistanceMeters) {
         selectedFields.push('hasDistanceMeters');
     }
+    if (trackingFields.hasRpe) selectedFields.push('hasRpe');
 
     return selectedFields;
 };
 
+const getFieldsWithDataToRemove = <FieldValues extends TrackingFieldsValue>(
+    value: FieldValues,
+    draftValue: FieldValues,
+    fieldsWithData: readonly (keyof FieldValues)[],
+): (keyof FieldValues)[] =>
+    fieldsWithData.filter(
+        (field) => value[field] === true && draftValue[field] === false,
+    );
+
 export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
     copy,
-    fieldsWithDataToRemove,
+    fieldsWithData,
     isSaving,
-    trackingFields,
+    value,
     visible,
     onClose,
     onSave,
-    onToggleField,
 }: TrackingFieldsModalProps<FieldValues>) => {
     const { t } = useTranslation();
     const st = useStyles();
+    const [draftValue, setDraftValue] = useState<FieldValues | null>(value);
     const [dismissalKey, setDismissalKey] = useState(0);
+    const fieldsWithDataToRemove =
+        value && draftValue
+            ? getFieldsWithDataToRemove(value, draftValue, fieldsWithData)
+            : [];
     const hasFieldsWithDataToRemove = fieldsWithDataToRemove.length > 0;
     const fieldNames = fieldsWithDataToRemove
         .map((field) => t(`gymExerciseData.fieldsByKey.${String(field)}`))
@@ -70,7 +83,14 @@ export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
         ? removeSaveLabel
         : saveLabel;
 
-    if (!trackingFields) return null;
+    useEffect(() => {
+        if (!visible) return;
+
+        setDraftValue(value);
+        setDismissalKey((current) => current + 1);
+    }, [value, visible]);
+
+    if (!value || !draftValue) return null;
 
     const trackingFieldOptions: OptionPillsOption<TrackingFieldKey>[] = [
         {
@@ -90,7 +110,14 @@ export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
             label: t('gymExerciseData.fields.distanceMeters'),
         },
     ];
-    const selectedTrackingFields = getSelectedTrackingFields(trackingFields);
+    const selectedTrackingFields = getSelectedTrackingFields(draftValue);
+
+    if (draftValue.hasRpe !== undefined) {
+        trackingFieldOptions.push({
+            value: 'hasRpe',
+            label: t('gymExerciseData.fieldsByKey.hasRpe'),
+        });
+    }
 
     return (
         <Modal
@@ -110,8 +137,15 @@ export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
             <OptionPills
                 options={trackingFieldOptions}
                 selectedValues={selectedTrackingFields}
-                onToggle={(value) => {
-                    onToggleField(value as keyof FieldValues);
+                onToggle={(field) => {
+                    setDraftValue((current) => {
+                        if (!current) return current;
+
+                        return {
+                            ...current,
+                            [field]: !current[field],
+                        };
+                    });
                     setDismissalKey((prev) => prev + 1);
                 }}
             />
@@ -130,7 +164,7 @@ export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
                         title={primaryButtonTitle}
                         variant="primary"
                         loading={isSaving}
-                        onPress={onSave}
+                        onPress={() => onSave(draftValue)}
                     />
                 </View>
                 <Button
