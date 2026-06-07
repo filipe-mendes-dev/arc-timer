@@ -99,9 +99,9 @@ export const useGymActiveSessionScreen = () => {
 
     const handleConfirmFinish = () => {
         finishGymSession.mutate(undefined, {
-            onSuccess: () => {
+            onSuccess: (session) => {
                 setEndSessionModalVisible(false);
-                router.replace('/gym');
+                router.replace(`/gymHistory/${session.id}`);
             },
         });
     };
