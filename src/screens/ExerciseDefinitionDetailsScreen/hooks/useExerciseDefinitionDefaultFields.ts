@@ -5,6 +5,12 @@ import type {
     ExerciseDefinitionTargetSetData,
     ExerciseTrackingField,
 } from '@src/core/entities/exerciseDefinition.interfaces';
+import {
+    exerciseTrackingFields,
+    trackingFieldKeyByField,
+    trackingFieldLabelKeyByField,
+    trackingFieldValueFromFields,
+} from '@src/core/entities/exerciseTrackingFields';
 import { useSaveExerciseDefinitionData } from '@src/data/exerciseDefinitions';
 
 import {
@@ -14,9 +20,6 @@ import {
     formatRpe,
     formatWeight,
     targetSetFromDefinition,
-    trackingFieldKeyByField,
-    trackingFieldLabelKeyByField,
-    trackingFields,
     type ExerciseDefinitionMetricItem,
     type ExerciseDefinitionTargetValue,
     type ExerciseDefinitionTrackingFields,
@@ -99,13 +102,8 @@ const hasTargetSetValue = (
 
 const trackingFieldsFromSelectedFields = (
     selectedFields: readonly ExerciseTrackingField[],
-): ExerciseDefinitionTrackingFields => ({
-    hasDistanceMeters: selectedFields.includes('distance'),
-    hasDurationSec: selectedFields.includes('duration'),
-    hasReps: selectedFields.includes('reps'),
-    hasRpe: selectedFields.includes('rpe'),
-    hasWeight: selectedFields.includes('weight'),
-});
+): ExerciseDefinitionTrackingFields =>
+    trackingFieldValueFromFields(selectedFields);
 
 const getSelectedFieldsWithValues = (
     definition: ExerciseDefinition,
@@ -146,7 +144,7 @@ export const useExerciseDefinitionDefaultFields = ({
     const defaultMetricItems = useMemo<ExerciseDefinitionMetricItem[]>(() => {
         if (!definition) return [];
 
-        return trackingFields
+        return exerciseTrackingFields
             .filter((field) => selectedFields.includes(field))
             .map((field) => ({
                 field,
@@ -160,7 +158,7 @@ export const useExerciseDefinitionDefaultFields = ({
     >(() => {
         if (!definition) return [];
 
-        return trackingFields
+        return exerciseTrackingFields
             .filter((field) => hasDefaultValue(definition, field))
             .map((field) => trackingFieldKeyByField[field]);
     }, [definition]);
