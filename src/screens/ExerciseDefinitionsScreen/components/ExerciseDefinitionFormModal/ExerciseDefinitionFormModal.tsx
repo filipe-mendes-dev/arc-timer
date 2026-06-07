@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'expo-router';
 
 import type {
     ExerciseDefinition,
@@ -34,6 +35,7 @@ export const ExerciseDefinitionFormModal = ({
     visible,
 }: ExerciseDefinitionFormModalProps) => {
     const { t } = useTranslation();
+    const router = useRouter();
     const st = useExerciseDefinitionFormModalStyles();
     const saveExerciseDefinition = useSaveExerciseDefinition();
 
@@ -113,12 +115,13 @@ export const ExerciseDefinitionFormModal = ({
                 return;
             }
 
-            await saveExerciseDefinition.mutateAsync({
+            const savedDefinition = await saveExerciseDefinition.mutateAsync({
                 availability,
                 intent: 'create',
                 name: trimmedName,
             });
             onClose();
+            router.push(`/exercise-definitions/${savedDefinition.id}`);
         } catch (e) {
             if (isExerciseDefinitionError(e)) {
                 switch (e.code) {
