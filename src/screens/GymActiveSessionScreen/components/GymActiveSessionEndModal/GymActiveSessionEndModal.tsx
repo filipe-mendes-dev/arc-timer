@@ -3,10 +3,9 @@ import { useTranslation } from 'react-i18next';
 
 import { Modal } from '@src/components/modals/Modal';
 import { Button } from '@src/components/ui/Button/Button';
-import GuardedPressable from '@src/components/ui/GuardedPressable/GuardedPressable';
 import { AppText } from '@src/components/ui/Typography/AppText';
 
-import { useStyles } from './styles';
+import { useStyles } from './GymActiveSessionEndModal.styles';
 
 interface GymActiveSessionEndModalProps {
     isDiscardingSession: boolean;
@@ -68,15 +67,13 @@ export const GymActiveSessionEndModal = ({
                         onPress={onDiscard}
                     />
 
-                    <GuardedPressable
+                    <Button
+                        title={t('common.actions.cancel')}
+                        variant="ghost"
                         disabled={isActionPending}
-                        style={st.cancelButton}
                         onPress={onCancel}
-                    >
-                        <AppText variant="bodySmall" tone="muted">
-                            {t('common.actions.cancel')}
-                        </AppText>
-                    </GuardedPressable>
+                        style={st.cancelButton}
+                    />
                 </View>
             </View>
         </Modal>
