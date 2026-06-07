@@ -57,7 +57,7 @@ export interface AddSetToExerciseRecordInput {
     isWarmup?: boolean;
     notes?: string;
     reps?: number;
-    rpeTenths?: number;
+    rpeTenths?: number | null;
     weightGrams?: number;
 }
 
@@ -69,7 +69,7 @@ export interface UpdateExerciseRecordSetInput {
     isWarmup?: boolean;
     notes?: string;
     reps?: number | null;
-    rpeTenths?: number;
+    rpeTenths?: number | null;
     setIndex?: number;
     weightGrams?: number | null;
 }
@@ -176,6 +176,9 @@ const hasMeaningfulSetValue = (
     set.durationSec !== undefined ||
     set.distanceMeters !== undefined;
 
+const hasCompletedSet = (record: PersistedGymExerciseRecord): boolean =>
+    record.sets.some((set) => set.completedAtMs !== undefined);
+
 export const createGymSessionService = ({
     clock = systemClock,
     exerciseDefinitionService,
@@ -271,6 +274,21 @@ export const createGymSessionService = ({
             throw createGymError(gymErrors.invalidGymSet);
         }
     };
+
+    const getSessionCreatedUserExerciseDefinitionIds = (
+        exerciseDefinitionIds: string[],
+        startedAtMs: number,
+        endedAtMs: number,
+    ): string[] =>
+        [...new Set(exerciseDefinitionIds)].filter((id) => {
+            const definition = exerciseDefinitionService.getById(id);
+
+            return (
+                definition?.source === 'user' &&
+                definition.createdAtMs >= startedAtMs &&
+                definition.createdAtMs <= endedAtMs
+            );
+        });
 
     const service: GymSessionService = {
         getActiveGymSession: (): GymSession | null => {
@@ -372,6 +390,7 @@ export const createGymSessionService = ({
                             weightGrams: targetSet.weightGrams,
                             durationSec: targetSet.durationSec,
                             distanceMeters: targetSet.distanceMeters,
+                            rpeTenths: targetSet.rpeTenths,
                             isWarmup: false,
                             createdAtMs: nowMs,
                             updatedAtMs: nowMs,
@@ -592,6 +611,30 @@ export const createGymSessionService = ({
                 throw createGymError(gymErrors.invalidGymSessionTimeRange);
             }
 
+            const records = gymExerciseRecordRepository.getBySessionId(
+                session.id,
+            );
+            const prunedRecords = records.filter(
+                (record) => !hasCompletedSet(record),
+            );
+            const retainedRecords = records.filter(hasCompletedSet);
+            const prunedExerciseDefinitionIds = prunedRecords.map(
+                (record) => record.exerciseDefinitionId,
+            );
+            const retainedExerciseDefinitionIds = retainedRecords.map(
+                (record) => record.exerciseDefinitionId,
+            );
+            const sessionCreatedDefinitionIds =
+                getSessionCreatedUserExerciseDefinitionIds(
+                    prunedExerciseDefinitionIds,
+                    session.startedAtMs,
+                    endedAtMs,
+                );
+
+            prunedRecords.forEach((record) => {
+                gymExerciseRecordRepository.deleteRecord(record.id);
+            });
+
             gymSessionRepository.update({
                 id: session.id,
                 status: 'completed',
@@ -600,11 +643,15 @@ export const createGymSessionService = ({
                 updatedAtMs: nowMs,
             });
             exerciseDefinitionStatsRepository.rebuildForExerciseDefinitionIds({
-                exerciseDefinitionIds: gymExerciseRecordRepository
-                    .getBySessionId(session.id)
-                    .map((record) => record.exerciseDefinitionId),
+                exerciseDefinitionIds: [
+                    ...retainedExerciseDefinitionIds,
+                    ...prunedExerciseDefinitionIds,
+                ],
                 updatedAtMs: nowMs,
             });
+            exerciseDefinitionService.deleteUnreferencedUserExerciseDefinitions(
+                sessionCreatedDefinitionIds,
+            );
 
             return hydrateSessionRow(getSessionOrThrow(session.id));
         },
