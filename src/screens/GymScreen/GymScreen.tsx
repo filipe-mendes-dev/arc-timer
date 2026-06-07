@@ -242,15 +242,13 @@ const GymScreen = () => {
                             onPress={handleConfirmDiscard}
                         />
 
-                        <GuardedPressable
+                        <Button
+                            title={t('common.actions.cancel')}
+                            variant="ghost"
                             disabled={isFinishingSession}
-                            style={st.cancelButton}
                             onPress={() => setFinishModalVisible(false)}
-                        >
-                            <AppText variant="bodySmall" tone="muted">
-                                {t('common.actions.cancel')}
-                            </AppText>
-                        </GuardedPressable>
+                            style={st.cancelButton}
+                        />
                     </View>
                 </View>
             </Modal>

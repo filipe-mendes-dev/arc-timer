@@ -77,9 +77,7 @@ export const useStyles = createStyles((theme: AppTheme) =>
             gap: 10,
         },
         cancelButton: {
-            paddingVertical: 10,
-            alignItems: 'center',
-            marginBottom: -4,
+            marginBottom: -6,
         },
     }),
 );
