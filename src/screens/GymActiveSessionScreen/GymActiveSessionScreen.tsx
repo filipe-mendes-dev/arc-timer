@@ -2,6 +2,7 @@ import { View } from 'react-native';
 
 import { ListEmptyState } from '@src/components/layout/ListEmptyState';
 import { MainContainer } from '@src/components/layout/MainContainer/MainContainer';
+import { ScreenSection } from '@src/components/layout/ScreenSection/ScreenSection';
 import ConfirmDialog from '@src/components/modals/ConfirmDialog/ConfirmDialog';
 import { ErrorBanner } from '@src/components/ui/ErrorBanner/ErrorBanner';
 import { Separator } from 'src/components/ui/Separator/Separator';
@@ -36,6 +37,7 @@ const GymActiveSessionScreen = () => {
         setCount,
         setEndSessionModalVisible,
         setPendingRemoveRecord,
+        sourceGymPlan,
         startedAtLabel,
         t,
     } = useGymActiveSessionScreen();
@@ -52,6 +54,48 @@ const GymActiveSessionScreen = () => {
             </MainContainer>
         );
     }
+
+    const sourceSections = sourceGymPlan?.sections ?? [];
+    const firstSectionTitle = sourceSections[0]?.title?.trim();
+    const shouldGroupBySection =
+        sourceSections.length > 1 ||
+        (firstSectionTitle !== undefined && firstSectionTitle.length > 0);
+    const getExerciseName = (
+        record: (typeof activeSession.exerciseRecords)[number],
+    ): string => {
+        const recordIndex = activeSession.exerciseRecords.findIndex(
+            (item) => item.id === record.id,
+        );
+
+        return (
+            exerciseNameById.get(record.exerciseDefinitionId) ??
+            t('common.labels.exerciseWithIndex', {
+                index: recordIndex + 1,
+            })
+        );
+    };
+    const sectionRecordsById = new Map(
+        sourceSections.map((section) => {
+            const sourceExerciseIds = new Set(
+                section.exercises.map((exercise) => exercise.id),
+            );
+            const sectionRecords = activeSession.exerciseRecords.filter(
+                (record) =>
+                    record.sourceGymPlanExerciseId !== undefined &&
+                    sourceExerciseIds.has(record.sourceGymPlanExerciseId),
+            );
+
+            return [section.id, sectionRecords];
+        }),
+    );
+    const sectionedRecordIds = new Set(
+        Array.from(sectionRecordsById.values()).flatMap((records) =>
+            records.map((record) => record.id),
+        ),
+    );
+    const unsectionedRecords = activeSession.exerciseRecords.filter(
+        (record) => !sectionedRecordIds.has(record.id),
+    );
 
     return (
         <>
@@ -70,22 +114,71 @@ const GymActiveSessionScreen = () => {
                     onClose={handleCloseError}
                 />
                 <View style={st.exerciseList}>
-                    {activeSession.exerciseRecords.map((record, index) => (
-                        <GymExerciseCard
-                            key={record.id}
-                            record={record}
-                            exerciseName={
-                                exerciseNameById.get(
-                                    record.exerciseDefinitionId,
-                                ) ??
-                                t('common.labels.exerciseWithIndex', {
-                                    index: index + 1,
-                                })
+                    {shouldGroupBySection &&
+                        sourceSections.map((section, sectionIndex) => {
+                            const sectionRecords =
+                                sectionRecordsById.get(section.id) ?? [];
+
+                            if (sectionRecords.length === 0) return null;
+
+                            const trimmedTitle = section.title?.trim();
+                            let title = t('gymPlanDetails.sectionFallback', {
+                                index: sectionIndex + 1,
+                            });
+
+                            if (
+                                trimmedTitle !== undefined &&
+                                trimmedTitle.length > 0
+                            ) {
+                                title = trimmedTitle;
                             }
-                            onPress={() => handleOpenExercise(record.id)}
-                            onRemove={() => setPendingRemoveRecord(record)}
-                        />
-                    ))}
+
+                            return (
+                                <ScreenSection
+                                    key={section.id}
+                                    title={title}
+                                    gap={8}
+                                >
+                                    {sectionRecords.map((record) => (
+                                        <GymExerciseCard
+                                            key={record.id}
+                                            record={record}
+                                            exerciseName={getExerciseName(
+                                                record,
+                                            )}
+                                            onPress={() =>
+                                                handleOpenExercise(record.id)
+                                            }
+                                            onRemove={() =>
+                                                setPendingRemoveRecord(record)
+                                            }
+                                        />
+                                    ))}
+                                </ScreenSection>
+                            );
+                        })}
+
+                    {shouldGroupBySection &&
+                        unsectionedRecords.map((record) => (
+                            <GymExerciseCard
+                                key={record.id}
+                                record={record}
+                                exerciseName={getExerciseName(record)}
+                                onPress={() => handleOpenExercise(record.id)}
+                                onRemove={() => setPendingRemoveRecord(record)}
+                            />
+                        ))}
+
+                    {!shouldGroupBySection &&
+                        activeSession.exerciseRecords.map((record) => (
+                            <GymExerciseCard
+                                key={record.id}
+                                record={record}
+                                exerciseName={getExerciseName(record)}
+                                onPress={() => handleOpenExercise(record.id)}
+                                onRemove={() => setPendingRemoveRecord(record)}
+                            />
+                        ))}
 
                     {exerciseRecordCount === 0 && (
                         <ListEmptyState
