@@ -107,15 +107,6 @@ const GymExerciseAddScreen = () => {
     return (
         <MainContainer title={t('gymActiveSession.addExerciseModal.title')}>
             <View style={st.content}>
-                <ErrorBanner
-                    message={
-                        addGymExerciseRecord.error
-                            ? t('gymActiveSession.errors.addExerciseFailed')
-                            : ''
-                    }
-                    onClose={() => addGymExerciseRecord.reset()}
-                />
-
                 <View style={st.formCard}>
                     <View style={st.textContainer}>
                         <AppText variant="title3">
@@ -144,14 +135,26 @@ const GymExerciseAddScreen = () => {
                     />
 
                     <View style={st.actions}>
-                        <Button
-                            title={t(
-                                'gymActiveSession.addExerciseModal.create',
-                            )}
-                            variant="primary"
-                            loading={addGymExerciseRecord.isPending}
-                            onPress={handleCreate}
-                        />
+                        <View>
+                            <ErrorBanner
+                                message={
+                                    addGymExerciseRecord.error
+                                        ? t(
+                                              'gymActiveSession.errors.addExerciseFailed',
+                                          )
+                                        : ''
+                                }
+                                onClose={() => addGymExerciseRecord.reset()}
+                            />
+                            <Button
+                                title={t(
+                                    'gymActiveSession.addExerciseModal.create',
+                                )}
+                                variant="primary"
+                                loading={addGymExerciseRecord.isPending}
+                                onPress={handleCreate}
+                            />
+                        </View>
 
                         <Button
                             title={t('common.actions.cancel')}
