@@ -18,12 +18,12 @@ import {
     fieldsFromTrackingValue,
     formatMetric,
     formatRpe,
-    formatWeight,
     targetSetFromDefinition,
     type ExerciseDefinitionMetricItem,
     type ExerciseDefinitionTargetValue,
     type ExerciseDefinitionTrackingFields,
 } from '../ExerciseDefinitionDetailsScreen.helpers';
+import { formatWeight } from 'src/helpers/gymExerciseRecord.helpers';
 
 interface UseExerciseDefinitionDefaultFieldsParams {
     definition?: ExerciseDefinition | null;

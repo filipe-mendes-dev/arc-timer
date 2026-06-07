@@ -10,9 +10,9 @@ import {
 
 import {
     formatMetric,
-    formatWeight,
     type ExerciseDefinitionStatItem,
 } from '../ExerciseDefinitionDetailsScreen.helpers';
+import { formatWeight } from 'src/helpers/gymExerciseRecord.helpers';
 
 interface UseExerciseDefinitionDetailsScreenResult {
     deleteError: string | undefined;

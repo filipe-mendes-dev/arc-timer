@@ -11,8 +11,8 @@ import type {
     SetDraft,
     TrackingFields,
 } from '../../GymExerciseDataScreen.types';
-import { formatDurationMinutes } from '../../GymExerciseDataScreen.helpers';
 import { useStyles } from './GymExerciseSetEditModal.styles';
+import { formatDurationMinutes } from 'src/helpers/gymExerciseRecord.helpers';
 
 interface GymExerciseSetEditModalProps {
     draft: SetDraft | null;
@@ -117,14 +117,11 @@ export const GymExerciseSetEditModal = ({
                                 min={0}
                                 step={5}
                                 formatValue={(value) =>
-                                    t(
-                                        'gymExerciseData.setDetails.duration',
-                                        {
-                                            value: formatDurationMinutes(
-                                                value * 60,
-                                            ),
-                                        },
-                                    )
+                                    t('gymExerciseData.setDetails.duration', {
+                                        value: formatDurationMinutes(
+                                            value * 60,
+                                        ),
+                                    })
                                 }
                             />
                         )}
@@ -157,7 +154,9 @@ export const GymExerciseSetEditModal = ({
 
                         {trackingFields.hasRpe && (
                             <Stepper
-                                label={t('exerciseDefinitions.trackingField.rpe')}
+                                label={t(
+                                    'exerciseDefinitions.trackingField.rpe',
+                                )}
                                 value={visibleDraft.rpeTenths / 10}
                                 onChange={(value) =>
                                     onChangeDraft({

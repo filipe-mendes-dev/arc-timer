@@ -11,9 +11,7 @@ import type {
     GymPlanExercise,
     GymPlanExerciseTargetSet,
 } from '@src/core/entities/gymPlan.interfaces';
-import {
-    getGymPlanExerciseTargetSets,
-} from '@src/core/gyms/gymPlanTargetSets';
+import { getGymPlanExerciseTargetSets } from '@src/core/gyms/gymPlanTargetSets';
 import { stripPlaceholderGymPlanExercises } from '@src/core/gyms/gymPlanDrafts';
 import {
     useFindOrCreateGymExerciseDefinitionByName,
@@ -24,7 +22,10 @@ import { useListSelection } from '@src/hooks/useListSelection';
 import { useGymPlanBuilderStore } from '@src/state/stores/useGymPlanBuilderStore';
 import { useTheme } from '@src/theme/ThemeProvider';
 
-import type { SetDraft, TrackingFields } from '../GymExerciseDataScreen/GymExerciseDataScreen.types';
+import type {
+    SetDraft,
+    TrackingFields,
+} from '../GymExerciseDataScreen/GymExerciseDataScreen.types';
 import {
     buildCommittedDraft,
     createNextTargetSet,
@@ -39,12 +40,12 @@ import {
     getTopBarConfig,
     getTopBarOptions,
     inferTrackingFieldsFromTargetSets,
-    initialTrackingFields,
     MAX_SUGGESTION_COUNT,
     removeTrackingFieldData,
     setHasTrackingFieldData,
     targetSetFromDraft,
 } from './GymPlanExerciseEditScreen.helpers';
+import { defaultTrackingFields } from 'src/helpers/exerciseDefinition.helpers';
 
 interface UseGymPlanExerciseEditScreenResult {
     cancelDeleteSets: () => void;
@@ -107,8 +108,9 @@ export const useGymPlanExerciseEditScreen =
         const [selectedExerciseDefinitionId, setSelectedExerciseDefinitionId] =
             useState<string | undefined>();
         const [hasEnteredNameInput, setHasEnteredNameInput] = useState(false);
-        const [trackingFields, setTrackingFields] =
-            useState<TrackingFields>(initialTrackingFields);
+        const [trackingFields, setTrackingFields] = useState<TrackingFields>(
+            defaultTrackingFields,
+        );
         const [isTrackingFieldsModalVisible, setTrackingFieldsModalVisible] =
             useState(false);
         const [editingDraft, setEditingDraft] = useState<SetDraft | null>(null);
@@ -176,13 +178,15 @@ export const useGymPlanExerciseEditScreen =
         ]);
         const fieldsWithData = useMemo(
             () =>
-                ([
-                    'hasReps',
-                    'hasWeight',
-                    'hasDurationSec',
-                    'hasDistanceMeters',
-                    'hasRpe',
-                ] as (keyof TrackingFields)[]).filter((field) =>
+                (
+                    [
+                        'hasReps',
+                        'hasWeight',
+                        'hasDurationSec',
+                        'hasDistanceMeters',
+                        'hasRpe',
+                    ] as (keyof TrackingFields)[]
+                ).filter((field) =>
                     targetSets.some((set) =>
                         setHasTrackingFieldData(set, field),
                     ),
@@ -205,7 +209,9 @@ export const useGymPlanExerciseEditScreen =
             );
             setHasEnteredNameInput(false);
             setTargetSets(nextTargetSets);
-            setTrackingFields(inferTrackingFieldsFromTargetSets(nextTargetSets));
+            setTrackingFields(
+                inferTrackingFieldsFromTargetSets(nextTargetSets),
+            );
         }, [lookup, savedExerciseName]);
 
         const goBack = (): void => {

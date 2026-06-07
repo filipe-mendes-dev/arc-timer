@@ -15,18 +15,23 @@ import {
 import { uid } from '@src/core/id';
 
 import {
-    DEFAULT_REPS,
     draftFromSet,
-    formatDistance,
-    formatDurationMinutes,
-    formatWeight,
     getPositiveValue,
-    getWeightGrams,
 } from '../GymExerciseDataScreen/GymExerciseDataScreen.helpers';
 import type {
     SetDraft,
     TrackingFields,
 } from '../GymExerciseDataScreen/GymExerciseDataScreen.types';
+import {
+    DEFAULT_REPS,
+    defaultTrackingFields,
+} from 'src/helpers/exerciseDefinition.helpers';
+import {
+    formatDistance,
+    formatDurationMinutes,
+    getWeightGrams,
+    gramsToKg,
+} from 'src/helpers/gymExerciseRecord.helpers';
 
 export interface ExerciseLookup {
     exercise: GymPlanExercise;
@@ -54,14 +59,6 @@ export interface TopBarOptionsActions {
 }
 
 export const MAX_SUGGESTION_COUNT = 6;
-
-export const initialTrackingFields: TrackingFields = {
-    hasDistanceMeters: false,
-    hasDurationSec: false,
-    hasReps: true,
-    hasRpe: false,
-    hasWeight: true,
-};
 
 export const trackingFieldsModalCopy = {
     description: 'gymExerciseData.defaults.description',
@@ -94,12 +91,10 @@ export const getExerciseTitle = (
 export const inferTrackingFieldsFromTargetSets = (
     sets: readonly GymPlanExerciseTargetSet[],
 ): TrackingFields => {
-    if (sets.length === 0) return initialTrackingFields;
+    if (sets.length === 0) return defaultTrackingFields;
 
     const trackingFields = {
-        hasDistanceMeters: sets.some(
-            (set) => set.distanceMeters !== undefined,
-        ),
+        hasDistanceMeters: sets.some((set) => set.distanceMeters !== undefined),
         hasDurationSec: sets.some((set) => set.durationSec !== undefined),
         hasReps: sets.some((set) => set.reps !== undefined),
         hasRpe: sets.some((set) => set.rpeTenths !== undefined),
@@ -113,7 +108,7 @@ export const inferTrackingFieldsFromTargetSets = (
         !trackingFields.hasRpe &&
         !trackingFields.hasWeight
     ) {
-        return initialTrackingFields;
+        return defaultTrackingFields;
     }
 
     return trackingFields;
@@ -170,7 +165,7 @@ export const getTargetSetDetails = (
     if (set.weightGrams !== undefined) {
         details.push(
             t('gymExerciseData.setDetails.weight', {
-                value: formatWeight(set.weightGrams),
+                value: gramsToKg(set.weightGrams),
             }),
         );
     }

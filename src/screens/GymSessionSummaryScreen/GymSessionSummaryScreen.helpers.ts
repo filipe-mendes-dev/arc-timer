@@ -12,6 +12,11 @@ import type {
     GymSessionMetric,
     SectionSummary,
 } from './GymSessionSummaryScreen.interfaces';
+import {
+    formatDistance,
+    formatDurationMinutes,
+    gramsToKg,
+} from 'src/helpers/gymExerciseRecord.helpers';
 
 export const getMetricTone = (
     metric: GymSessionMetric,
@@ -19,42 +24,6 @@ export const getMetricTone = (
     if (metric.isDimmed) return 'muted';
 
     return 'primary';
-};
-
-const formatWeight = (weightGrams: number): string => {
-    const weightKg = weightGrams / 1000;
-    return Number.isInteger(weightKg) ? `${weightKg}` : weightKg.toFixed(1);
-};
-
-const formatDistance = (distanceMeters: number): string => {
-    const distanceKm = distanceMeters / 1000;
-
-    if (Number.isInteger(distanceKm)) {
-        return `${distanceKm}`;
-    }
-
-    return distanceKm.toFixed(2);
-};
-
-const formatDurationMinutes = (durationSec: number): string => {
-    const durationMin = Math.round(durationSec / 60);
-
-    if (durationSec > 0 && durationMin < 1) {
-        return '1 min';
-    }
-
-    if (durationMin < 60) {
-        return `${durationMin} min`;
-    }
-
-    const hours = Math.floor(durationMin / 60);
-    const minutes = durationMin % 60;
-
-    if (minutes === 0) {
-        return `${hours} h`;
-    }
-
-    return `${hours} h ${minutes} min`;
 };
 
 const formatRpe = (rpeTenths: number): string => {
@@ -75,7 +44,7 @@ export const getSetDetails = (
     if (set.weightGrams !== undefined) {
         details.push(
             t('gymExerciseData.setDetails.weight', {
-                value: formatWeight(set.weightGrams),
+                value: gramsToKg(set.weightGrams),
             }),
         );
     }

@@ -13,8 +13,7 @@ import {
 } from '@src/core/entities/exerciseTrackingFields';
 import type { GymSessionListItem } from '@src/core/entities/gymSession.interfaces';
 
-export interface ExerciseDefinitionTrackingFields
-    extends ExerciseDefinitionTrackingFieldsValue {}
+export interface ExerciseDefinitionTrackingFields extends ExerciseDefinitionTrackingFieldsValue {}
 
 export interface ExerciseDefinitionMetricItem {
     field: ExerciseTrackingField;
@@ -28,8 +27,7 @@ export interface ExerciseDefinitionStatItem {
     value: string;
 }
 
-export interface ExerciseDefinitionTargetValue
-    extends ExerciseDefinitionTargetSetData {
+export interface ExerciseDefinitionTargetValue extends ExerciseDefinitionTargetSetData {
     field: ExerciseTrackingField;
 }
 
@@ -96,12 +94,6 @@ export const draftToRpeTenths = (value: string): number | undefined => {
     return Math.round(numericValue * 10);
 };
 
-export const formatWeight = (grams?: number): string | undefined => {
-    if (grams === undefined) return undefined;
-
-    return `${grams / 1000} kg`;
-};
-
 export const formatRpe = (rpeTenths?: number): string | undefined => {
     if (rpeTenths === undefined) return undefined;
 
@@ -140,9 +132,7 @@ export const getSourceIconName = (
 export const trackingFieldsFromDefinition = (
     definition: ExerciseDefinition,
 ): ExerciseDefinitionTrackingFields =>
-    trackingFieldValueFromFields(
-        definition.data?.defaultTrackingFields ?? [],
-    );
+    trackingFieldValueFromFields(definition.data?.defaultTrackingFields ?? []);
 
 export const fieldsFromTrackingValue = (
     trackingValue: ExerciseDefinitionTrackingFields,

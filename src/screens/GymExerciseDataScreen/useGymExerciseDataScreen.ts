@@ -13,15 +13,17 @@ import {
 import { useListSelection } from '@src/hooks/useListSelection';
 
 import {
-    DEFAULT_REPS,
-    DEFAULT_WEIGHT_KG,
     draftFromSet,
     getPositiveValue,
     getSetDetails,
-    getWeightGrams,
     inferTrackingFieldsFromSets,
 } from './GymExerciseDataScreen.helpers';
 import type { SetDraft, TrackingFields } from './GymExerciseDataScreen.types';
+import {
+    DEFAULT_REPS,
+    DEFAULT_WEIGHT_KG,
+} from 'src/helpers/exerciseDefinition.helpers';
+import { getWeightGrams } from 'src/helpers/gymExerciseRecord.helpers';
 
 const getRecordIdParam = (recordId?: string | string[]): string | undefined => {
     if (Array.isArray(recordId)) {
@@ -118,9 +120,7 @@ const getFieldsWithData = (
     if (sets.some((set) => setHasTrackingFieldData(set, 'hasDurationSec'))) {
         fieldsWithData.push('hasDurationSec');
     }
-    if (
-        sets.some((set) => setHasTrackingFieldData(set, 'hasDistanceMeters'))
-    ) {
+    if (sets.some((set) => setHasTrackingFieldData(set, 'hasDistanceMeters'))) {
         fieldsWithData.push('hasDistanceMeters');
     }
     if (sets.some((set) => setHasTrackingFieldData(set, 'hasRpe'))) {
@@ -146,8 +146,9 @@ export const useGymExerciseDataScreen = () => {
     const { data: definition } = useExerciseDefinition(
         record?.exerciseDefinitionId,
     );
-    const [trackingFields, setTrackingFields] =
-        useState<TrackingFields>(() => inferTrackingFieldsFromSets(sets));
+    const [trackingFields, setTrackingFields] = useState<TrackingFields>(() =>
+        inferTrackingFieldsFromSets(sets),
+    );
     const [isTrackingFieldsModalVisible, setTrackingFieldsModalVisible] =
         useState(false);
     const [editingDraft, setEditingDraft] = useState<SetDraft | null>(null);
