@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ActionModal } from '@src/components/modals/ActionModal';
+import { exerciseTrackingFieldDefinitions } from '@src/core/entities/exerciseTrackingFields';
 import {
     OptionPills,
     type OptionPillsOption,
@@ -9,13 +10,11 @@ import {
 
 import type {
     TrackingFieldsModalCopy,
-    TrackingFieldsModalField,
     TrackingFieldsValue,
 } from './TrackingFieldsModal.types';
 
 interface TrackingFieldsModalProps<FieldValues extends TrackingFieldsValue> {
     copy: TrackingFieldsModalCopy;
-    fields: readonly TrackingFieldsModalField<FieldValues>[];
     fieldsWithData: readonly (keyof FieldValues)[];
     isSaving: boolean;
     value: FieldValues | null;
@@ -35,7 +34,6 @@ const getFieldsWithDataToRemove = <FieldValues extends TrackingFieldsValue>(
 
 export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
     copy,
-    fields,
     fieldsWithData,
     isSaving,
     value,
@@ -53,7 +51,7 @@ export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
     const hasFieldsWithDataToRemove = fieldsWithDataToRemove.length > 0;
     const fieldNames = fieldsWithDataToRemove
         .map((field) => {
-            const matchingField = fields.find(
+            const matchingField = exerciseTrackingFieldDefinitions.find(
                 (definition) => definition.key === field,
             );
 
@@ -81,13 +79,13 @@ export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
 
     const trackingFieldOptions: OptionPillsOption<
         Extract<keyof FieldValues, string>
-    >[] = fields.map((field) => ({
-        value: field.key,
+    >[] = exerciseTrackingFieldDefinitions.map((field) => ({
+        value: field.key as Extract<keyof FieldValues, string>,
         label: t(field.labelKey),
     }));
-    const selectedTrackingFields = fields
+    const selectedTrackingFields = exerciseTrackingFieldDefinitions
         .filter((field) => draftValue[field.key] === true)
-        .map((field) => field.key);
+        .map((field) => field.key as Extract<keyof FieldValues, string>);
 
     return (
         <ActionModal
