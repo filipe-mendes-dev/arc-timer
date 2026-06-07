@@ -63,7 +63,10 @@ export const useGymScreen = () => {
 
     const handleConfirmFinish = () => {
         finishGymSession.mutate(undefined, {
-            onSuccess: () => setFinishModalVisible(false),
+            onSuccess: (session) => {
+                setFinishModalVisible(false);
+                router.push(`/gymHistory/${session.id}`);
+            },
         });
     };
 
@@ -94,13 +97,12 @@ export const useGymScreen = () => {
     return {
         activeSession,
         activeSessionSetCount,
-        discardGymSession,
         errorMessage,
-        finishGymSession,
         handleCloseError,
         handleConfirmDiscard,
         handleConfirmFinish,
         handleStartSession,
+        isDiscardingSession: discardGymSession.isPending,
         isFinishModalVisible,
         isFinishingSession,
         router,
