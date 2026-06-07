@@ -473,6 +473,7 @@ export const ptPT: I18nResource = {
             hasDistanceMeters: 'Distância',
             hasDurationSec: 'Duração',
             hasReps: 'Repetições',
+            hasRpe: 'RPE',
             hasWeight: 'Peso',
         },
         defaults: {
@@ -773,11 +774,41 @@ export const ptPT: I18nResource = {
         searchEmptyDescription: 'Experimenta outro nome de exercício.',
         notFound: 'Exercício não encontrado.',
         overview: 'Visão geral',
+        defaults: 'Campos predefinidos',
+        statsTitle: 'Estatísticas do exercício',
+        notes: 'Notas',
+        emptyValue: 'Sem valor',
+        emptyDefaultsTitle: 'Sem campos predefinidos',
+        emptyDefaultsDescription:
+            'Escolhe os campos com que este exercício deve começar.',
+        emptyStatsTitle: 'Sem estatísticas',
+        emptyStatsDescription:
+            'Completa sessões de ginásio para criar recordes pessoais.',
+        emptyRecentSessionsTitle: 'Sem sessões recentes',
+        emptyRecentSessionsDescription:
+            'As sessões concluídas com este exercício aparecem aqui.',
         fields: {
             name: 'Nome',
             namePlaceholder: 'ex.: Flexões',
             availability: 'Disponibilidade',
             source: 'Origem',
+            trackingFields: 'Campos registados',
+            defaultReps: 'Repetições predefinidas',
+            defaultWeight: 'Peso predefinido',
+            defaultDuration: 'Duração predefinida',
+            defaultDistance: 'Distância predefinida',
+            defaultRpe: 'RPE predefinido',
+            weightPr: 'Recorde de peso',
+            distancePr: 'Recorde de distância',
+            lastCompletedSession: 'Última sessão',
+            recentSessions: 'Sessões recentes',
+        },
+        trackingField: {
+            reps: 'Repetições',
+            weight: 'Peso',
+            duration: 'Duração',
+            distance: 'Distância',
+            rpe: 'RPE',
         },
         source: {
             system: 'Sistema',
@@ -794,6 +825,41 @@ export const ptPT: I18nResource = {
             subtitle: 'Mantém o catálogo de exercícios claro e reutilizável.',
             create: 'Criar',
             save: 'Guardar',
+        },
+        trackingModal: {
+            title: 'Predefinições de registo',
+            subtitle:
+                'Escolhe os campos que este exercício deve usar por defeito.',
+            removeDefaultAndSave: 'Remover valores e guardar',
+            removeDefaultWarning:
+                'Guardar vai limpar os valores predefinidos para: {{fields}}.',
+        },
+        defaultValueModal: {
+            title: 'Definir {{field}}',
+            description:
+                'Deixa em branco quando não houver um valor predefinido.',
+        },
+        nameModal: {
+            title: 'Editar nome',
+            description: 'Renomeia este exercício no teu catálogo.',
+        },
+        availabilityModal: {
+            title: 'Editar disponibilidade',
+            description: 'Escolhe onde este exercício pode ser usado.',
+        },
+        confirmRemove: {
+            title: 'Apagar exercício?',
+            message:
+                'Este exercício será removido se ainda não estiver a ser usado.',
+            confirm: 'Apagar exercício',
+        },
+        confirmRemoveBulk: {
+            title_one: 'Apagar {{count}} exercício?',
+            title_other: 'Apagar {{count}} exercícios?',
+            message_one:
+                'O exercício selecionado será removido se ainda não estiver a ser usado.',
+            message_other:
+                'Os exercícios selecionados serão removidos se ainda não estiverem a ser usados.',
         },
         validation: {
             nameRequired: 'O nome do exercício é obrigatório.',
@@ -812,6 +878,7 @@ export const ptPT: I18nResource = {
                 'Este exercício está a ser usado num plano de ginásio e não pode ser definido apenas para treino.',
             saveFailed:
                 'Não foi possível guardar o exercício. Verifica os detalhes e tenta novamente.',
+            deleteFailed: 'Não foi possível apagar o exercício.',
         },
     },
     workoutSummary: {

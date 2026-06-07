@@ -431,6 +431,7 @@ export interface I18nResource {
             hasDistanceMeters: string;
             hasDurationSec: string;
             hasReps: string;
+            hasRpe: string;
             hasWeight: string;
         };
         defaults: {
@@ -713,11 +714,38 @@ export interface I18nResource {
         searchEmptyDescription: string;
         notFound: string;
         overview: string;
+        defaults: string;
+        statsTitle: string;
+        notes: string;
+        emptyValue: string;
+        emptyDefaultsTitle: string;
+        emptyDefaultsDescription: string;
+        emptyStatsTitle: string;
+        emptyStatsDescription: string;
+        emptyRecentSessionsTitle: string;
+        emptyRecentSessionsDescription: string;
         fields: {
             name: string;
             namePlaceholder: string;
             availability: string;
             source: string;
+            trackingFields: string;
+            defaultReps: string;
+            defaultWeight: string;
+            defaultDuration: string;
+            defaultDistance: string;
+            defaultRpe: string;
+            weightPr: string;
+            distancePr: string;
+            lastCompletedSession: string;
+            recentSessions: string;
+        };
+        trackingField: {
+            reps: string;
+            weight: string;
+            duration: string;
+            distance: string;
+            rpe: string;
         };
         source: {
             system: string;
@@ -735,6 +763,35 @@ export interface I18nResource {
             create: string;
             save: string;
         };
+        trackingModal: {
+            title: string;
+            subtitle: string;
+            removeDefaultAndSave: string;
+            removeDefaultWarning: string;
+        };
+        defaultValueModal: {
+            title: string;
+            description: string;
+        };
+        nameModal: {
+            title: string;
+            description: string;
+        };
+        availabilityModal: {
+            title: string;
+            description: string;
+        };
+        confirmRemove: {
+            title: string;
+            message: string;
+            confirm: string;
+        };
+        confirmRemoveBulk: {
+            title_one: string;
+            title_other: string;
+            message_one: string;
+            message_other: string;
+        };
         validation: {
             nameRequired: string;
             duplicateName: string;
@@ -745,6 +802,7 @@ export interface I18nResource {
             mergeWorkoutOnlyConflict: string;
             workoutOnlyRestricted: string;
             saveFailed: string;
+            deleteFailed: string;
         };
     };
     workoutSummary: {

@@ -455,6 +455,7 @@ export const en: I18nResource = {
             hasDistanceMeters: 'Distance',
             hasDurationSec: 'Duration',
             hasReps: 'Reps',
+            hasRpe: 'RPE',
             hasWeight: 'Weight',
         },
         defaults: {
@@ -747,11 +748,41 @@ export const en: I18nResource = {
         searchEmptyDescription: 'Try a different exercise name.',
         notFound: 'Exercise not found.',
         overview: 'Overview',
+        defaults: 'Default Fields',
+        statsTitle: 'Exercise Stats',
+        notes: 'Notes',
+        emptyValue: 'Not set',
+        emptyDefaultsTitle: 'No default fields',
+        emptyDefaultsDescription:
+            'Choose the fields this exercise should start with.',
+        emptyStatsTitle: 'No stats yet',
+        emptyStatsDescription:
+            'Complete gym sessions to build personal records.',
+        emptyRecentSessionsTitle: 'No recent sessions',
+        emptyRecentSessionsDescription:
+            'Completed sessions with this exercise will appear here.',
         fields: {
             name: 'Name',
             namePlaceholder: 'e.g., Push-ups',
             availability: 'Availability',
             source: 'Source',
+            trackingFields: 'Tracking fields',
+            defaultReps: 'Default reps',
+            defaultWeight: 'Default weight',
+            defaultDuration: 'Default duration',
+            defaultDistance: 'Default distance',
+            defaultRpe: 'Default RPE',
+            weightPr: 'Weight PR',
+            distancePr: 'Distance PR',
+            lastCompletedSession: 'Last session',
+            recentSessions: 'Recent sessions',
+        },
+        trackingField: {
+            reps: 'Reps',
+            weight: 'Weight',
+            duration: 'Duration',
+            distance: 'Distance',
+            rpe: 'RPE',
         },
         source: {
             system: 'System',
@@ -769,6 +800,39 @@ export const en: I18nResource = {
             create: 'Create',
             save: 'Save',
         },
+        trackingModal: {
+            title: 'Tracking defaults',
+            subtitle:
+                'Choose which fields this exercise should use by default.',
+            removeDefaultAndSave: 'Remove defaults and save',
+            removeDefaultWarning:
+                'Saving will clear default values for: {{fields}}.',
+        },
+        defaultValueModal: {
+            title: 'Set {{field}}',
+            description: 'Leave this blank when there is no default value.',
+        },
+        nameModal: {
+            title: 'Edit name',
+            description: 'Rename this exercise across your catalog.',
+        },
+        availabilityModal: {
+            title: 'Edit availability',
+            description: 'Choose where this exercise can be used.',
+        },
+        confirmRemove: {
+            title: 'Delete exercise?',
+            message: 'This exercise will be removed if it is not in use.',
+            confirm: 'Delete exercise',
+        },
+        confirmRemoveBulk: {
+            title_one: 'Delete {{count}} exercise?',
+            title_other: 'Delete {{count}} exercises?',
+            message_one:
+                'The selected exercise will be removed if it is not in use.',
+            message_other:
+                'Selected exercises will be removed if they are not in use.',
+        },
         validation: {
             nameRequired: 'Exercise name is required.',
             duplicateName: 'An exercise with this name already exists.',
@@ -785,6 +849,7 @@ export const en: I18nResource = {
                 'This exercise is used in a gym plan and cannot be set to workout only.',
             saveFailed:
                 'Could not save exercise. Check the details and try again.',
+            deleteFailed: 'Could not delete exercise.',
         },
     },
     workoutSummary: {
