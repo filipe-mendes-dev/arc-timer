@@ -8,6 +8,8 @@ You are working in a React Native / Expo Router project (Arc Timer). Follow thes
 
 - Prefer **clarity and correctness** over speed.
 - Do **not** propose large refactors unless explicitly requested.
+- Keep changes as the smallest reasonable diff. Before adding helpers, view-model types, new translation keys, or new styles, check whether the request can be handled directly with existing components, existing data, and existing copy.
+- If a small-looking change needs more than ~20-30 lines, pause and explain why before continuing.
 - When code changes are needed, provide them **file-by-file**.
 - Do **not** create or update tests unless explicitly requested.
 - If **no changes** are needed for a file, reply exactly:
@@ -185,6 +187,7 @@ Allowed exception:
 
 - Don’t add new dependencies without a clear reason.
 - Don’t introduce complex abstractions if a simple approach is correct.
+- Don’t introduce abstractions or derived view models for presentational wrapping when an existing component can be used directly.
 - Don’t “clean up” unrelated code while doing a requested change.
 
 ---
