@@ -4,7 +4,6 @@ import type { GymSessionListItem } from '@src/core/entities/gymSession.interface
 import { ListEmptyState } from '@src/components/layout/ListEmptyState';
 import { ScreenSection } from '@src/components/layout/ScreenSection/ScreenSection';
 
-import { useExerciseDefinitionDetailsScreenStyles } from '../ExerciseDefinitionDetailsScreen.styles';
 import { RecentGymSessionRow } from './RecentGymSessionRow';
 
 interface RecentSessionsSectionProps {
@@ -17,7 +16,6 @@ export const RecentSessionsSection = ({
     onPressSession,
 }: RecentSessionsSectionProps) => {
     const { t } = useTranslation();
-    const st = useExerciseDefinitionDetailsScreenStyles();
 
     return (
         <ScreenSection
