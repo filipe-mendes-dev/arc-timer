@@ -18,6 +18,14 @@ export const useStyles = createStyles((theme: AppTheme) =>
         subheading: {},
         gridContainer: { gap: 14 },
 
+        sessionTypeModal: {
+            backgroundColor: theme.palette.background.primary,
+            borderWidth: 0,
+        },
+        sessionTypeTiles: {
+            gap: 14,
+        },
+
         grid: {
             flexDirection: 'row',
             gap: 14,

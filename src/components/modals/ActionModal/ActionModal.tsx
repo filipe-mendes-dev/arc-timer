@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { View } from 'react-native';
+import { View, type StyleProp, type ViewStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Modal } from '@src/components/modals/Modal';
@@ -27,10 +27,12 @@ export interface ActionModalErrorConfig {
 
 export interface ActionModalProps {
     children?: ReactNode;
+    containerStyle?: StyleProp<ViewStyle>;
     description?: string;
     error?: ActionModalErrorConfig;
     primaryAction?: ActionModalButtonConfig;
     secondaryAction?: ActionModalButtonConfig;
+    style?: StyleProp<ViewStyle>;
     title?: string;
     visible: boolean;
     onClose: () => void;
@@ -38,10 +40,12 @@ export interface ActionModalProps {
 
 export const ActionModal = ({
     children,
+    containerStyle,
     description,
     error,
     primaryAction,
     secondaryAction,
+    style,
     title,
     visible,
     onClose,
@@ -56,8 +60,8 @@ export const ActionModal = ({
         <Modal
             visible={visible}
             onRequestClose={onClose}
-            containerStyle={st.container}
-            contentStyle={st.content}
+            containerStyle={[st.container, containerStyle]}
+            contentStyle={[st.content, style]}
         >
             {hasText && (
                 <View style={st.text}>

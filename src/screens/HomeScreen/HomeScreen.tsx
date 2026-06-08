@@ -17,7 +17,6 @@ import {
 } from '@src/data/gymSessions';
 import { useRecentTrainingSessions } from '@src/data/trainingSessions';
 import { ScreenSection } from '@src/components/layout/ScreenSection/ScreenSection';
-import { ActionModal } from '@src/components/modals/ActionModal';
 import { TrainingSessionListItem } from '../HistoryScreen/components/TrainingSessionListItem';
 import { AppLogo } from '@src/components/ui/AppLogo/AppLogo';
 import { useTranslation } from 'react-i18next';
@@ -29,6 +28,7 @@ import type {
 import { useState } from 'react';
 import { GymActiveSessionEndModal } from '../GymActiveSessionScreen/components/GymActiveSessionEndModal';
 import { Separator } from 'src/components/ui/Separator/Separator';
+import { ActionModal } from '@src/components/modals/ActionModal';
 
 const getSessionRoute = (
     kind: TrainingSessionKind,
@@ -253,19 +253,27 @@ const HomeScreen = () => {
 
             <ActionModal
                 visible={isSessionTypeModalVisible}
+                style={st.sessionTypeModal}
                 title={t('home.sessionTypeModal.title')}
                 description={t('home.sessionTypeModal.description')}
-                primaryAction={{
-                    title: t('home.actions.startHiitWorkout'),
-                    onPress: handleStartWorkoutSession,
-                }}
-                secondaryAction={{
-                    title: t('home.actions.startGymSession'),
-                    variant: 'secondary',
-                    onPress: handleStartGymSession,
-                }}
                 onClose={() => setSessionTypeModalVisible(false)}
-            />
+            >
+                <View style={st.sessionTypeTiles}>
+                    <HomeActionTile
+                        title={t('home.actions.startHiitWorkout')}
+                        icon="play"
+                        variant="primary"
+                        onPress={handleStartWorkoutSession}
+                    />
+
+                    <HomeActionTile
+                        title={t('home.actions.startGymSession')}
+                        icon="pulse-outline"
+                        variant="secondary"
+                        onPress={handleStartGymSession}
+                    />
+                </View>
+            </ActionModal>
         </MainContainer>
     );
 };
