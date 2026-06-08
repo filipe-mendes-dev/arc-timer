@@ -8,6 +8,7 @@ import { SearchField } from '@src/components/ui/SearchField/SearchField';
 import { Button } from '@src/components/ui/Button/Button';
 import { ListEmptyState } from '@src/components/layout/ListEmptyState';
 import ConfirmDialog from '@src/components/modals/ConfirmDialog/ConfirmDialog';
+import { ActionModal } from '@src/components/modals/ActionModal';
 import { ExerciseDefinitionCard } from './components/ExerciseDefinitionCard/ExerciseDefinitionCard';
 import { ExerciseDefinitionFormModal } from './components/ExerciseDefinitionFormModal/ExerciseDefinitionFormModal';
 import { useExerciseDefinitionsScreenStyles } from './ExerciseDefinitionsScreen.styles';
@@ -98,16 +99,29 @@ const ExerciseDefinitionsScreen = () => {
                     </View>
                 }
                 stickyHeaderIndices={[0]}
-                renderItem={({ item }) => (
-                    <ExerciseDefinitionCard
-                        item={item}
-                        onPress={() => list.goToExerciseDefinition(item.id)}
-                        onRemove={() => selection.requestRemoval(item.id)}
-                        isSelectMode={selection.isSelectMode}
-                        isSelected={selection.isSelected(item.id)}
-                        onSelect={() => selection.toggleItem(item.id)}
-                    />
-                )}
+                renderItem={({ item }) => {
+                    const isSelectionLocked =
+                        selection.isSelectMode && !item.canDelete;
+                    const onLockedPress = () =>
+                        selection.requestLockedInfo(item.deleteBlockReason);
+                    let onRemove: (() => void) | undefined;
+                    if (item.canDelete) {
+                        onRemove = () => selection.requestRemoval(item.id);
+                    }
+
+                    return (
+                        <ExerciseDefinitionCard
+                            item={item}
+                            onPress={() => list.goToExerciseDefinition(item.id)}
+                            onRemove={onRemove}
+                            isSelectMode={selection.isSelectMode}
+                            isSelectionLocked={isSelectionLocked}
+                            isSelected={selection.isSelected(item.id)}
+                            onSelect={() => selection.toggleItem(item.id)}
+                            onLockedPress={onLockedPress}
+                        />
+                    );
+                }}
                 ListEmptyComponent={
                     <ExerciseDefinitionsEmptyState
                         hasSearch={list.hasSearch}
@@ -132,6 +146,17 @@ const ExerciseDefinitionsScreen = () => {
                 destructive
                 onConfirm={selection.confirmRemoval}
                 onCancel={selection.cancelRemoval}
+            />
+
+            <ActionModal
+                visible={selection.isLockedInfoVisible}
+                title={selection.lockedInfoTitle}
+                description={selection.lockedInfoMessage}
+                primaryAction={{
+                    title: t('common.actions.done'),
+                    onPress: selection.closeLockedInfo,
+                }}
+                onClose={selection.closeLockedInfo}
             />
         </MainContainer>
     );

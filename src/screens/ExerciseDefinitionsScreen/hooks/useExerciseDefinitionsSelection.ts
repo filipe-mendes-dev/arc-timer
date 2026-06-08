@@ -5,18 +5,29 @@ import type {
     TopBarDirectAction,
     TopBarOption,
 } from '@src/components/navigation/TopBar/TopBar.interfaces';
-import { useDeleteExerciseDefinition } from '@src/data/exerciseDefinitions';
+import type { ExerciseDefinitionDeleteBlockReason } from '@src/core/entities/exerciseDefinition.interfaces';
+import {
+    isExerciseDefinitionError,
+    useDeleteExerciseDefinition,
+} from '@src/data/exerciseDefinitions';
 import { useListSelection } from '@src/hooks/useListSelection';
 import { useTheme } from '@src/theme/ThemeProvider';
 
 interface UseExerciseDefinitionsSelectionResult {
     cancelRemoval: () => void;
+    closeLockedInfo: () => void;
     confirmMessage: string;
-    confirmRemoval: () => void;
+    confirmRemoval: () => Promise<void>;
     confirmTitle: string;
     hasPendingRemoval: boolean;
+    isLockedInfoVisible: boolean;
     isSelectMode: boolean;
     isSelected: (id: string) => boolean;
+    lockedInfoMessage: string;
+    lockedInfoTitle: string;
+    requestLockedInfo: (
+        reason: ExerciseDefinitionDeleteBlockReason | undefined,
+    ) => void;
     requestRemoval: (id: string) => void;
     screenTitle: string;
     toggleItem: (id: string) => void;
@@ -33,6 +44,10 @@ export const useExerciseDefinitionsSelection =
         const [pendingRemovalIds, setPendingRemovalIds] = useState<string[]>(
             [],
         );
+        const [removalError, setRemovalError] = useState<string | undefined>();
+        const [lockedInfoReason, setLockedInfoReason] = useState<
+            ExerciseDefinitionDeleteBlockReason | undefined
+        >();
         const {
             enterSelectMode,
             exitSelectMode,
@@ -44,32 +59,60 @@ export const useExerciseDefinitionsSelection =
             toggleItem,
         } = useListSelection();
 
-        const requestRemoval = useCallback((id: string) => {
-            setPendingRemovalIds([id]);
-        }, []);
+        const requestRemoval = useCallback(
+            (id: string) => {
+                setRemovalError(undefined);
+                setPendingRemovalIds([id]);
+            },
+            [],
+        );
 
         const requestSelectedRemoval = useCallback(() => {
+            setRemovalError(undefined);
             setPendingRemovalIds([...selectedIds]);
         }, [selectedIds]);
 
-        const confirmRemoval = useCallback(() => {
-            for (const id of pendingRemovalIds) {
-                deleteExerciseDefinition.mutate(id);
-            }
+        const confirmRemoval = useCallback(async () => {
+            try {
+                setRemovalError(undefined);
+                for (const id of pendingRemovalIds) {
+                    await deleteExerciseDefinition.mutateAsync(id);
+                }
 
-            setPendingRemovalIds([]);
-            if (isSelectMode) {
-                exitSelectMode();
+                setPendingRemovalIds([]);
+                if (isSelectMode) {
+                    exitSelectMode();
+                }
+            } catch (e) {
+                if (isExerciseDefinitionError(e)) {
+                    setRemovalError(t(e.message));
+                    return;
+                }
+
+                setRemovalError(t('exerciseDefinitions.validation.deleteFailed'));
             }
         }, [
             deleteExerciseDefinition,
             exitSelectMode,
             isSelectMode,
             pendingRemovalIds,
+            t,
         ]);
 
         const cancelRemoval = useCallback(() => {
+            setRemovalError(undefined);
             setPendingRemovalIds([]);
+        }, []);
+
+        const requestLockedInfo = useCallback(
+            (reason: ExerciseDefinitionDeleteBlockReason | undefined) => {
+                setLockedInfoReason(reason ?? 'referenced');
+            },
+            [],
+        );
+
+        const closeLockedInfo = useCallback(() => {
+            setLockedInfoReason(undefined);
         }, []);
 
         const topBarOptions = useMemo<readonly TopBarOption[]>(
@@ -108,25 +151,41 @@ export const useExerciseDefinitionsSelection =
         }
 
         let confirmTitle = t('exerciseDefinitions.confirmRemove.title');
-        let confirmMessage = t('exerciseDefinitions.confirmRemove.message');
+        let confirmMessage =
+            removalError ?? t('exerciseDefinitions.confirmRemove.message');
 
         if (pendingRemovalIds.length !== 1) {
             confirmTitle = t('exerciseDefinitions.confirmRemoveBulk.title', {
                 count: pendingRemovalIds.length,
             });
-            confirmMessage = t('exerciseDefinitions.confirmRemoveBulk.message', {
-                count: pendingRemovalIds.length,
-            });
+            confirmMessage =
+                removalError ??
+                t('exerciseDefinitions.confirmRemoveBulk.message', {
+                    count: pendingRemovalIds.length,
+                });
+        }
+
+        const lockedInfoTitle = t('exerciseDefinitions.deleteUnavailable.title');
+        let lockedInfoMessage = t(
+            'exerciseDefinitions.deleteUnavailable.referenced',
+        );
+        if (lockedInfoReason === 'system') {
+            lockedInfoMessage = t('exerciseDefinitions.deleteUnavailable.system');
         }
 
         return {
             cancelRemoval,
+            closeLockedInfo,
             confirmMessage,
             confirmRemoval,
             confirmTitle,
             hasPendingRemoval: pendingRemovalIds.length > 0,
+            isLockedInfoVisible: !!lockedInfoReason,
             isSelectMode,
             isSelected,
+            lockedInfoMessage,
+            lockedInfoTitle,
+            requestLockedInfo,
             requestRemoval,
             screenTitle,
             toggleItem,
