@@ -124,6 +124,10 @@ export const createExerciseDefinitionService = ({
         });
     };
 
+    const hasGymExerciseReferences = (id: string): boolean =>
+        exerciseDefinitionRepository.hasGymPlanExerciseReferences(id) ||
+        exerciseDefinitionRepository.hasGymSessionExerciseReferences(id);
+
     const promoteSystemDefinitionToUser = (
         definition: ExerciseDefinition,
         availability?: ExerciseDefinitionAvailability,
@@ -143,9 +147,7 @@ export const createExerciseDefinitionService = ({
         if (
             availability === 'workout' &&
             definition.availability !== 'workout' &&
-            exerciseDefinitionRepository.hasGymPlanExerciseReferences(
-                definition.id,
-            )
+            hasGymExerciseReferences(definition.id)
         ) {
             throw createExerciseDefinitionError(
                 exerciseDefinitionErrors.workoutOnlyRestricted,
@@ -441,7 +443,7 @@ export const createExerciseDefinitionService = ({
             if (
                 availability === 'workout' &&
                 existing.availability !== 'workout' &&
-                exerciseDefinitionRepository.hasGymPlanExerciseReferences(id)
+                hasGymExerciseReferences(id)
             ) {
                 throw createExerciseDefinitionError(
                     exerciseDefinitionErrors.workoutOnlyRestricted,
