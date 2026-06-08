@@ -35,5 +35,14 @@ export const useStyles = createStyles((theme: AppTheme) =>
             gap: theme.layout.listItem.gap,
             paddingBottom: theme.insets.bottom,
         },
-    })
+
+        activeSessionActions: {
+            flexDirection: 'row',
+            gap: theme.layout.grid.gap,
+        },
+        activeSessionActionItem: {
+            flex: 1,
+            minWidth: 0,
+        },
+    }),
 );

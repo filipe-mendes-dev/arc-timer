@@ -29,7 +29,7 @@ const DrawerLayout = () => {
             <Drawer.Screen name="index" options={{ title: t('drawer.home') }} />
             <Drawer.Screen
                 name="workouts/index"
-                options={{ title: t('drawer.workouts') }}
+                options={{ title: t('drawer.hiit') }}
             />
             <Drawer.Screen
                 name="gym/index"

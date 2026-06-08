@@ -7,12 +7,34 @@ import { HomeActionTile } from './components/HomeActionTile/HomeActionTile';
 import { useStyles } from './HomeScreen.styles';
 import { useTheme } from '@src/theme/ThemeProvider';
 import { useWorkoutDraftStore } from '@src/state/stores/useWorkoutDraftStore';
-import { useRecentWorkoutSessions } from '@src/data/workoutSessions';
+import {
+    useActiveGymSession,
+    useDiscardGymSession,
+    useFinishGymSession,
+    useStartGymSession,
+} from '@src/data/gymSessions';
+import { useRecentTrainingSessions } from '@src/data/trainingSessions';
 import { ScreenSection } from '@src/components/layout/ScreenSection/ScreenSection';
-import SessionListItem from '../HistoryScreen/components/SessionListitem/SessionListItem';
+import { TrainingSessionListItem } from '../HistoryScreen/components/TrainingSessionListItem';
 import { AppLogo } from '@src/components/ui/AppLogo/AppLogo';
 import { useTranslation } from 'react-i18next';
 import { useSystemBackHandler } from '@src/hooks/navigation/useSystemBackHandler';
+import type {
+    TrainingSessionKind,
+    TrainingSessionListItem as TrainingSessionListItemEntity,
+} from '@src/core/entities/trainingSession.interfaces';
+import { useState } from 'react';
+import { GymActiveSessionEndModal } from '../GymActiveSessionScreen/components/GymActiveSessionEndModal';
+import { Separator } from 'src/components/ui/Separator/Separator';
+
+const getSessionRoute = (
+    kind: TrainingSessionKind,
+    sessionId: string,
+): `/history/${string}` | `/gymHistory/${string}` => {
+    if (kind === 'hiit') return `/history/${sessionId}`;
+
+    return `/gymHistory/${sessionId}`;
+};
 
 const HomeScreen = () => {
     const { t } = useTranslation();
@@ -20,15 +42,59 @@ const HomeScreen = () => {
     const { theme } = useTheme();
     const st = useStyles();
 
+    const [isGymSessionModalVisible, setEndGymSessionModalVisible] =
+        useState(false);
+
     useSystemBackHandler({
         onSystemBack: () => true,
         isGestureBackDisabled: true,
     });
 
-    const { data: recent = [] } = useRecentWorkoutSessions(5);
+    const { data: activeGymSession } = useActiveGymSession();
+    const discardGymSession = useDiscardGymSession();
+    const finishGymSession = useFinishGymSession();
+    const startGymSession = useStartGymSession();
+    const { data: recent = [] } = useRecentTrainingSessions(5);
 
-    const onOpenSession = (sessionId: string) => {
-        router.push(`/history/${sessionId}`);
+    const onOpenSession = (session: TrainingSessionListItemEntity) => {
+        router.push(getSessionRoute(session.kind, session.id));
+    };
+
+    const startQuickHiitWorkout = () => {
+        useWorkoutDraftStore.getState().startDraftQuick();
+
+        const firstBlock = useWorkoutDraftStore.getState().draft?.blocks[0];
+        if (!firstBlock) return;
+
+        router.push(`/workouts/edit-block?blockId=${firstBlock.id}&quick=1`);
+    };
+
+    const startOrResumeGymSession = () => {
+        if (activeGymSession) {
+            router.push('/gymSession');
+            return;
+        }
+
+        startGymSession.mutate(undefined, {
+            onSuccess: () => router.push('/gymSession'),
+        });
+    };
+
+    const handleConfirmFinish = () => {
+        finishGymSession.mutate(undefined, {
+            onSuccess: (session) => {
+                setEndGymSessionModalVisible(false);
+                router.push(`/gymHistory/${session.id}`);
+            },
+        });
+    };
+
+    const handleConfirmDiscard = () => {
+        if (!activeGymSession) return;
+
+        discardGymSession.mutate(activeGymSession.id, {
+            onSuccess: () => setEndGymSessionModalVisible(false),
+        });
     };
 
     return (
@@ -54,31 +120,58 @@ const HomeScreen = () => {
                 </View>
             </View>
 
-            {/* Primary action */}
             <View style={st.gridContainer}>
+                {activeGymSession && (
+                    <>
+                        <View style={st.activeSessionActions}>
+                            <View style={st.activeSessionActionItem}>
+                                <HomeActionTile
+                                    title={t('gym.actions.resumeSession')}
+                                    icon="pulse-outline"
+                                    variant="secondary"
+                                    onPress={() => router.push('/gymSession')}
+                                />
+                            </View>
+
+                            <View style={st.activeSessionActionItem}>
+                                <HomeActionTile
+                                    title={t('gym.actions.finishSession')}
+                                    icon="checkmark-circle-outline"
+                                    variant="secondary"
+                                    onPress={() =>
+                                        setEndGymSessionModalVisible(true)
+                                    }
+                                />
+                            </View>
+                        </View>
+                        <Separator height={1} />
+                    </>
+                )}
+
                 <HomeActionTile
-                    title={t('home.quickWorkout')}
+                    title={t('home.actions.startHiitWorkout')}
                     subtitle={t('home.startImmediately')}
                     icon="play"
                     variant="primary"
-                    onPress={() => {
-                        useWorkoutDraftStore.getState().startDraftQuick();
-
-                        const b0 =
-                            useWorkoutDraftStore.getState().draft?.blocks[0];
-                        if (!b0) return;
-
-                        router.push(
-                            `/workouts/edit-block?blockId=${b0.id}&quick=1`
-                        );
-                    }}
+                    onPress={startQuickHiitWorkout}
                 />
 
-                {/* Secondary actions */}
+                {!activeGymSession && (
+                    <HomeActionTile
+                        title={t('home.actions.startGymSession')}
+                        subtitle={t('gym.actions.startNewSessionSubtitle')}
+                        icon="pulse-outline"
+                        variant="primary"
+                        onPress={startOrResumeGymSession}
+                    />
+                )}
+
+                <Separator height={1} />
+
                 <View style={st.grid}>
                     <View style={st.gridItem}>
                         <HomeActionTile
-                            title={t('drawer.workouts')}
+                            title={t('home.actions.savedHiitWorkouts')}
                             icon="barbell-outline"
                             onPress={() => router.push('/workouts')}
                         />
@@ -86,24 +179,24 @@ const HomeScreen = () => {
 
                     <View style={st.gridItem}>
                         <HomeActionTile
-                            title={t('drawer.history')}
-                            icon="time-outline"
-                            onPress={() => router.push('/history')}
+                            title={t('home.actions.gymPlans')}
+                            icon="fitness-outline"
+                            onPress={() => router.push('/gymPlans')}
                         />
                     </View>
                 </View>
             </View>
 
-            <ScreenSection title={t('home.recentWorkouts')} flex>
+            <ScreenSection title={t('home.recentSessions')} flex>
                 <FlatList
                     data={recent}
-                    keyExtractor={(s) => s.id}
+                    keyExtractor={(s) => `${s.kind}:${s.id}`}
                     contentContainerStyle={st.listContent}
                     style={st.list}
                     renderItem={({ item }) => (
-                        <SessionListItem
+                        <TrainingSessionListItem
                             session={item}
-                            onPress={() => onOpenSession(item.id)}
+                            onPress={() => onOpenSession(item)}
                         />
                     )}
                     ListEmptyComponent={
@@ -113,6 +206,17 @@ const HomeScreen = () => {
                     }
                 />
             </ScreenSection>
+
+            <GymActiveSessionEndModal
+                visible={isGymSessionModalVisible}
+                isDiscardingSession={discardGymSession.isPending}
+                isFinishingSession={
+                    finishGymSession.isPending || discardGymSession.isPending
+                }
+                onCancel={() => setEndGymSessionModalVisible(false)}
+                onComplete={handleConfirmFinish}
+                onDiscard={handleConfirmDiscard}
+            />
         </MainContainer>
     );
 };
