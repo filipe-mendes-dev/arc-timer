@@ -8,6 +8,7 @@ import { dbServices } from '@src/db/dbServices';
 
 import { exerciseDefinitionKeys } from '../exerciseDefinitions/exerciseDefinitionKeys';
 import { gymPlanKeys } from './gymPlanKeys';
+import { gymSessionKeys } from '../gymSessions';
 
 const invalidateGymPlanQueries = async (
     queryClient: ReturnType<typeof useQueryClient>,
@@ -125,6 +126,9 @@ export const useDeleteGymPlan = () => {
                 invalidateGymPlanQueries(queryClient),
                 queryClient.invalidateQueries({
                     queryKey: exerciseDefinitionKeys.all,
+                }),
+                queryClient.invalidateQueries({
+                    queryKey: gymSessionKeys.all,
                 }),
             ]);
         },
