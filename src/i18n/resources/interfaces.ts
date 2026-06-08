@@ -792,6 +792,11 @@ export interface I18nResource {
             message_one: string;
             message_other: string;
         };
+        deleteUnavailable: {
+            title: string;
+            referenced: string;
+            system: string;
+        };
         validation: {
             nameRequired: string;
             duplicateName: string;

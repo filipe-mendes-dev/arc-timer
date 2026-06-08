@@ -861,6 +861,13 @@ export const ptPT: I18nResource = {
             message_other:
                 'Os exercícios selecionados serão removidos se ainda não estiverem a ser usados.',
         },
+        deleteUnavailable: {
+            title: 'O exercício não pode ser selecionado',
+            referenced:
+                'Este exercício é usado em treinos, planos de ginásio ou histórico de ginásio, por isso não pode ser apagado.',
+            system:
+                'Os exercícios do sistema vêm incluídos na app e não podem ser apagados.',
+        },
         validation: {
             nameRequired: 'O nome do exercício é obrigatório.',
             duplicateName: 'Já existe um exercício com este nome.',

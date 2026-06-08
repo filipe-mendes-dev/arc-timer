@@ -833,6 +833,12 @@ export const en: I18nResource = {
             message_other:
                 'Selected exercises will be removed if they are not in use.',
         },
+        deleteUnavailable: {
+            title: 'Exercise cannot be selected',
+            referenced:
+                'This exercise is used in workouts, gym plans, or gym history, so it cannot be deleted.',
+            system: 'System exercises are built in and cannot be deleted.',
+        },
         validation: {
             nameRequired: 'Exercise name is required.',
             duplicateName: 'An exercise with this name already exists.',
