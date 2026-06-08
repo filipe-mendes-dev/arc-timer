@@ -5,6 +5,7 @@ import type { Workout } from '@src/core/entities/workout.interfaces';
 import type { WorkoutSessionStats } from '@src/core/entities/workoutSession.interfaces';
 
 import { workoutSessionKeys } from './workoutSessionKeys';
+import { trainingSessionKeys } from '../trainingSessions/trainingSessionKeys';
 
 export interface AddWorkoutSessionArgs {
     versionId?: string;
@@ -44,9 +45,14 @@ export const useAddWorkoutSession = () => {
             });
         },
         onSuccess: async () => {
-            await queryClient.invalidateQueries({
-                queryKey: workoutSessionKeys.all,
-            });
+            await Promise.all([
+                queryClient.invalidateQueries({
+                    queryKey: workoutSessionKeys.all,
+                }),
+                queryClient.invalidateQueries({
+                    queryKey: trainingSessionKeys.all,
+                }),
+            ]);
         },
     });
 };
@@ -63,9 +69,14 @@ export const useRemoveWorkoutSession = () => {
             queryClient.removeQueries({
                 queryKey: workoutSessionKeys.detail(id),
             });
-            await queryClient.invalidateQueries({
-                queryKey: workoutSessionKeys.all,
-            });
+            await Promise.all([
+                queryClient.invalidateQueries({
+                    queryKey: workoutSessionKeys.all,
+                }),
+                queryClient.invalidateQueries({
+                    queryKey: trainingSessionKeys.all,
+                }),
+            ]);
         },
     });
 };
@@ -81,9 +92,14 @@ export const useClearWorkoutSessions = () => {
             queryClient.removeQueries({
                 queryKey: workoutSessionKeys.all,
             });
-            await queryClient.invalidateQueries({
-                queryKey: workoutSessionKeys.all,
-            });
+            await Promise.all([
+                queryClient.invalidateQueries({
+                    queryKey: workoutSessionKeys.all,
+                }),
+                queryClient.invalidateQueries({
+                    queryKey: trainingSessionKeys.all,
+                }),
+            ]);
         },
     });
 };

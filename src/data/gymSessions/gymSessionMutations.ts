@@ -11,6 +11,7 @@ import type {
 
 import { exerciseDefinitionKeys } from '../exerciseDefinitions/exerciseDefinitionKeys';
 import { gymPlanKeys } from '../gymPlans/gymPlanKeys';
+import { trainingSessionKeys } from '../trainingSessions/trainingSessionKeys';
 import { gymSessionKeys } from './gymSessionKeys';
 
 export interface AddGymExerciseRecordByNameInput
@@ -23,6 +24,9 @@ const invalidateGymSessionQueries = async (
 ): Promise<void> => {
     await queryClient.invalidateQueries({
         queryKey: gymSessionKeys.all,
+    });
+    await queryClient.invalidateQueries({
+        queryKey: trainingSessionKeys.all,
     });
 };
 
