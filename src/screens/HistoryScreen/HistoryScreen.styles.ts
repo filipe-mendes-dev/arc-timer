@@ -4,9 +4,7 @@ import type { AppTheme } from '@src/theme/theme';
 
 export const useStyles = createStyles((theme: AppTheme) =>
     StyleSheet.create({
-        headerRow: {
-            flexDirection: 'row',
-            alignItems: 'center',
+        headerContainer: {
             gap: 8,
             marginBottom: 6,
         },

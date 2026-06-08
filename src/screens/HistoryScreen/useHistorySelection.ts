@@ -5,9 +5,16 @@ import type {
     TopBarDirectAction,
     TopBarOption,
 } from '@src/components/navigation/TopBar/TopBar.interfaces';
+import type { TrainingSessionKind } from '@src/core/entities/trainingSession.interfaces';
+import { useDeleteGymSession } from '@src/data/gymSessions';
 import { useRemoveWorkoutSession } from '@src/data/workoutSessions';
 import { useListSelection } from '@src/hooks/useListSelection';
 import { useTheme } from '@src/theme/ThemeProvider';
+
+interface SelectedTrainingSession {
+    id: string;
+    kind: TrainingSessionKind;
+}
 
 interface UseHistorySelectionResult {
     screenTitle: string;
@@ -24,10 +31,28 @@ interface UseHistorySelectionResult {
     cancelRemoval: () => void;
 }
 
+const parseSelectedTrainingSession = (
+    value: string,
+): SelectedTrainingSession | null => {
+    const separatorIndex = value.indexOf(':');
+    if (separatorIndex <= 0) return null;
+
+    const kind = value.slice(0, separatorIndex);
+    const id = value.slice(separatorIndex + 1);
+    if (id.length === 0) return null;
+
+    if (kind === 'hiit' || kind === 'gym') {
+        return { id, kind };
+    }
+
+    return null;
+};
+
 export const useHistorySelection = (): UseHistorySelectionResult => {
     const { t } = useTranslation();
     const { theme } = useTheme();
     const removeWorkoutSession = useRemoveWorkoutSession();
+    const deleteGymSession = useDeleteGymSession();
     const [pendingRemovalIds, setPendingRemovalIds] = useState<string[]>([]);
 
     const {
@@ -46,15 +71,31 @@ export const useHistorySelection = (): UseHistorySelectionResult => {
     }, [selectedIds]);
 
     const confirmRemoval = useCallback(() => {
-        for (const id of pendingRemovalIds) {
-            removeWorkoutSession.mutate(id);
+        for (const pendingRemovalId of pendingRemovalIds) {
+            const selectedSession =
+                parseSelectedTrainingSession(pendingRemovalId);
+            if (!selectedSession) continue;
+
+            if (selectedSession.kind === 'hiit') {
+                removeWorkoutSession.mutate(selectedSession.id);
+            }
+
+            if (selectedSession.kind === 'gym') {
+                deleteGymSession.mutate(selectedSession.id);
+            }
         }
 
         setPendingRemovalIds([]);
         if (isSelectMode) {
             exitSelectMode();
         }
-    }, [exitSelectMode, isSelectMode, pendingRemovalIds, removeWorkoutSession]);
+    }, [
+        deleteGymSession,
+        exitSelectMode,
+        isSelectMode,
+        pendingRemovalIds,
+        removeWorkoutSession,
+    ]);
 
     const cancelRemoval = useCallback(() => {
         setPendingRemovalIds([]);

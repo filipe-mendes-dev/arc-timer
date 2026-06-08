@@ -3,18 +3,37 @@ import { FlatList, View } from 'react-native';
 import { useRouter } from 'expo-router';
 
 import { MainContainer } from '@src/components/layout/MainContainer/MainContainer';
-import { Button } from '@src/components/ui/Button/Button';
 import ConfirmDialog from '@src/components/modals/ConfirmDialog/ConfirmDialog';
-import {
-    useClearWorkoutSessions,
-    useWorkoutSessions,
-} from '@src/data/workoutSessions';
+import type { TrainingSessionKind } from '@src/core/entities/trainingSession.interfaces';
+import { useTrainingSessionListItems } from '@src/data/trainingSessions';
 import { useStyles } from './HistoryScreen.styles';
-import SessionListItem from './components/SessionListitem/SessionListItem';
+import { TrainingSessionListItem } from './components/TrainingSessionListItem';
 import { SearchField } from '@src/components/ui/SearchField/SearchField';
 import { useTranslation } from 'react-i18next';
 import { ListEmptyState } from '@src/components/layout/ListEmptyState';
 import { useHistorySelection } from './useHistorySelection';
+
+type HistoryFilterKind = TrainingSessionKind | 'all';
+type HistoryFilterKey = 'kind';
+
+interface HistoryFilterOption {
+    value: HistoryFilterKind;
+    label: string;
+}
+
+const getSessionKey = (
+    kind: TrainingSessionKind,
+    sessionId: string,
+): string => `${kind}:${sessionId}`;
+
+const getSessionRoute = (
+    kind: TrainingSessionKind,
+    sessionId: string,
+): `/history/${string}` | `/gymHistory/${string}` => {
+    if (kind === 'hiit') return `/history/${sessionId}`;
+
+    return `/gymHistory/${sessionId}`;
+};
 
 const HistoryScreen = () => {
     const { t } = useTranslation();
@@ -22,20 +41,28 @@ const HistoryScreen = () => {
     const st = useStyles();
 
     const [search, setSearch] = useState('');
-    const { data: sessions = [] } = useWorkoutSessions();
-    const clearWorkoutSessions = useClearWorkoutSessions();
+    const [selectedKind, setSelectedKind] =
+        useState<HistoryFilterKind>('all');
+    let queryKind: TrainingSessionKind | undefined;
+    if (selectedKind !== 'all') {
+        queryKind = selectedKind;
+    }
 
-    const [confirmClear, setConfirmClear] = useState(false);
+    const { data: sessions = [] } = useTrainingSessionListItems({
+        kind: queryKind,
+        limit: 100,
+    });
 
     const data = useMemo(() => {
         const searchTerm = search.trim().toLowerCase();
 
         if (!searchTerm) return sessions;
-        return sessions.filter((session) =>
-            session.workoutSnapshot.name.toLowerCase().includes(searchTerm),
-        );
+        return sessions.filter((session) => {
+            return session.searchText.toLowerCase().includes(searchTerm);
+        });
     }, [search, sessions]);
     const hasSearch = search.trim().length > 0;
+    const hasAnySessions = sessions.length > 0;
 
     const {
         screenTitle,
@@ -52,6 +79,22 @@ const HistoryScreen = () => {
         cancelRemoval,
     } = useHistorySelection();
 
+    const filterOptions: HistoryFilterOption[] = [
+        { value: 'all', label: t('history.filters.all') },
+        { value: 'hiit', label: t('history.filters.hiit') },
+        { value: 'gym', label: t('history.filters.gym') },
+    ];
+
+    let emptyTitle = t('history.emptyTitle');
+    let emptyDescription = t('history.emptyDescription');
+    if (hasSearch) {
+        emptyTitle = t('history.searchEmptyTitle');
+        emptyDescription = t('history.searchEmptyDescription');
+    } else if (!hasAnySessions && selectedKind !== 'all') {
+        emptyTitle = t('history.filterEmptyTitle');
+        emptyDescription = t('history.filterEmptyDescription');
+    }
+
     return (
         <MainContainer
             title={screenTitle}
@@ -63,65 +106,59 @@ const HistoryScreen = () => {
         >
             <FlatList
                 data={data}
-                keyExtractor={(s) => s.id}
+                keyExtractor={(s) => getSessionKey(s.kind, s.id)}
                 style={st.list}
                 contentContainerStyle={st.listContent}
                 ListHeaderComponent={
-                    <View style={st.headerRow}>
-                        <SearchField
+                    <View style={st.headerContainer}>
+                        <SearchField<HistoryFilterKey, HistoryFilterKind>
                             value={search}
                             onChangeText={setSearch}
                             fullWidth
                             placeholder={t('history.searchPlaceholder')}
+                            filters={{
+                                applyLabel: t('history.filters.apply'),
+                                clearLabel: t('history.filters.clear'),
+                                defaultValues: { kind: 'all' },
+                                sections: [
+                                    {
+                                        key: 'kind',
+                                        title: t(
+                                            'history.filters.sessionType',
+                                        ),
+                                        options: filterOptions,
+                                    },
+                                ],
+                                title: t('history.filters.title'),
+                                values: { kind: selectedKind },
+                                onApply: (values) =>
+                                    setSelectedKind(values.kind ?? 'all'),
+                            }}
                         />
-                        {!isSelectMode && (
-                            <Button
-                                title={t('history.clear')}
-                                variant="secondary"
-                                onPress={() => setConfirmClear(true)}
-                                disabled={sessions.length === 0}
-                            />
-                        )}
                     </View>
                 }
                 stickyHeaderIndices={[0]}
                 renderItem={({ item }) => (
-                    <SessionListItem
+                    <TrainingSessionListItem
                         session={item}
-                        onPress={() => router.push(`/history/${item.id}`)}
+                        onPress={() =>
+                            router.push(getSessionRoute(item.kind, item.id))
+                        }
                         isSelectMode={isSelectMode}
-                        isSelected={isSelected(item.id)}
-                        onSelect={() => toggleItem(item.id)}
+                        isSelected={isSelected(
+                            getSessionKey(item.kind, item.id),
+                        )}
+                        onSelect={() =>
+                            toggleItem(getSessionKey(item.kind, item.id))
+                        }
                     />
                 )}
                 ListEmptyComponent={
                     <ListEmptyState
-                        title={
-                            hasSearch
-                                ? t('history.searchEmptyTitle')
-                                : t('history.emptyTitle')
-                        }
-                        description={
-                            hasSearch
-                                ? t('history.searchEmptyDescription')
-                                : t('history.emptyDescription')
-                        }
+                        title={emptyTitle}
+                        description={emptyDescription}
                     />
                 }
-            />
-
-            <ConfirmDialog
-                visible={confirmClear}
-                title={t('history.clearConfirm.title')}
-                message={t('history.clearConfirm.message')}
-                confirmLabel={t('history.clearConfirm.confirm')}
-                cancelLabel={t('history.clearConfirm.cancel')}
-                destructive
-                onConfirm={() => {
-                    clearWorkoutSessions.mutate();
-                    setConfirmClear(false);
-                }}
-                onCancel={() => setConfirmClear(false)}
             />
 
             <ConfirmDialog
