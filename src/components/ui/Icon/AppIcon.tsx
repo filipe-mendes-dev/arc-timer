@@ -114,6 +114,11 @@ const ICON_MAP = {
         name: 'chevron-back',
         defaultSize: 22,
     },
+    forwardCircle: {
+        lib: 'ion',
+        name: 'arrow-forward-circle-outline',
+        defaultSize: 16,
+    },
     menu: {
         lib: 'ion',
         name: 'menu',
