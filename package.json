@@ -32,6 +32,7 @@
         "android:release:aab": "npm run guard:prod-variant && cd android && ./gradlew bundleRelease",
         "android:install:release": "adb install -r android/app/build/outputs/apk/release/app-release.apk",
         "assets:classic": "node scripts/generate-classic-assets.js",
+        "i18n:keys": "node scripts/generate-i18n-keys.js",
         "cleaner": "node scripts/cleaner.js",
         "cleaner:hard": "node scripts/cleaner.js --hard"
     },

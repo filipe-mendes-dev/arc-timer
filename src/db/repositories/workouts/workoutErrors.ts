@@ -14,10 +14,17 @@ export const workoutErrors = {
 export type WorkoutErrorCode =
     (typeof workoutErrors)[keyof typeof workoutErrors]['code'];
 
-export interface WorkoutError extends AppError<WorkoutErrorCode> {}
+export type WorkoutErrorMessage =
+    (typeof workoutErrors)[keyof typeof workoutErrors]['message'];
+
+export interface WorkoutError extends AppError<WorkoutErrorCode> {
+    readonly message: WorkoutErrorMessage;
+}
 
 export interface WorkoutErrorDefinition
-    extends AppErrorDefinition<WorkoutErrorCode> {}
+    extends AppErrorDefinition<WorkoutErrorCode> {
+    readonly message: WorkoutErrorMessage;
+}
 
 const workoutErrorCodes = Object.values(workoutErrors).map(
     (definition) => definition.code,
@@ -26,7 +33,10 @@ const workoutErrorCodes = Object.values(workoutErrors).map(
 export const createWorkoutError = (
     definition: WorkoutErrorDefinition,
 ): WorkoutError =>
-    Object.assign(new Error(definition.message), { code: definition.code });
+    Object.assign(new Error(definition.message), {
+        code: definition.code,
+        message: definition.message,
+    });
 
 export const isWorkoutError = (e: unknown): e is WorkoutError =>
     isAppErrorCode(e, workoutErrorCodes);

@@ -1,10 +1,11 @@
-import 'react-i18next';
+import 'i18next';
 
 import type { I18nResource } from './resources/interfaces';
 
-declare module 'react-i18next' {
+declare module 'i18next' {
     interface CustomTypeOptions {
         defaultNS: 'translation';
+        returnNull: false;
         resources: {
             translation: I18nResource;
         };
