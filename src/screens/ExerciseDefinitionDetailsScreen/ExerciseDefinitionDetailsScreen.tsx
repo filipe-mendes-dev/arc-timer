@@ -14,6 +14,7 @@ import { ExerciseDefinitionAvailabilityModal } from './components/ExerciseDefini
 import { ExerciseDefinitionDefaultFieldsSection } from './components/ExerciseDefinitionDefaultFieldsSection';
 import { ExerciseDefinitionNameModal } from './components/ExerciseDefinitionNameModal';
 import { ExerciseDefinitionOverviewSection } from './components/ExerciseDefinitionOverviewSection';
+import { ExerciseDefinitionReferencesSection } from './components/ExerciseDefinitionReferencesSection';
 import { ExerciseDefinitionStatsSection } from './components/ExerciseDefinitionStatsSection';
 import { RecentSessionsSection } from './components/RecentSessionsSection';
 import { trackingFieldsModalCopy } from './ExerciseDefinitionDetailsScreen.helpers';
@@ -91,6 +92,11 @@ const ExerciseDefinitionDetailsScreen = () => {
                     onPressName={screen.openNameModal}
                 />
 
+                <ExerciseDefinitionReferencesSection
+                    references={screen.definition.references}
+                    onPressReference={screen.goToReference}
+                />
+
                 <ExerciseDefinitionDefaultFieldsSection
                     items={defaultFields.defaultMetricItems}
                     onPressField={defaultFields.openDefaultValueModal}
@@ -101,11 +107,8 @@ const ExerciseDefinitionDetailsScreen = () => {
                 />
 
                 <RecentSessionsSection
-                    sessions={
-                        screen.definition.stats?.recentCompletedGymSessions ??
-                        []
-                    }
-                    onPressSession={screen.goToGymSession}
+                    sessions={screen.definition.recentSessions ?? []}
+                    onPressSession={screen.goToRecentSession}
                 />
             </MainContainer>
 

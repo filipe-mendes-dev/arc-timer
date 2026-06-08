@@ -90,6 +90,8 @@ export interface CreateExerciseDefinitionServiceArgs {
     exerciseDefinitionStatsRepository: ExerciseDefinitionStatsRepository;
 }
 
+const RECENT_TRAINING_SESSION_LIMIT = 5;
+
 export const createExerciseDefinitionService = ({
     clock = systemClock,
     exerciseDefinitionDataRepository,
@@ -359,8 +361,20 @@ export const createExerciseDefinitionService = ({
             return updatedTarget;
         },
 
-        getById: (id: string): ExerciseDefinition | null =>
-            exerciseDefinitionRepository.getById(id),
+        getById: (id: string): ExerciseDefinition | null => {
+            const definition = exerciseDefinitionRepository.getById(id);
+            if (!definition) return null;
+
+            return {
+                ...definition,
+                references: exerciseDefinitionRepository.getReferences(id),
+                recentSessions:
+                    exerciseDefinitionRepository.getRecentTrainingSessions(
+                        id,
+                        RECENT_TRAINING_SESSION_LIMIT,
+                    ),
+            };
+        },
 
         getByNormalizedName: (
             normalizedName: string,

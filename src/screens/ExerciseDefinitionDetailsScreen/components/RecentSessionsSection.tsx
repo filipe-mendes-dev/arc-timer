@@ -1,14 +1,13 @@
 import { useTranslation } from 'react-i18next';
 
-import type { GymSessionListItem } from '@src/core/entities/gymSession.interfaces';
-import { ListEmptyState } from '@src/components/layout/ListEmptyState';
+import type { ExerciseDefinitionRecentSessionItem } from '@src/core/entities/exerciseDefinition.interfaces';
 import { ScreenSection } from '@src/components/layout/ScreenSection/ScreenSection';
 
-import { RecentGymSessionRow } from './RecentGymSessionRow';
+import { RecentTrainingSessionRow } from './RecentTrainingSessionRow';
 
 interface RecentSessionsSectionProps {
-    sessions: readonly GymSessionListItem[];
-    onPressSession: (sessionId: string) => void;
+    sessions: readonly ExerciseDefinitionRecentSessionItem[];
+    onPressSession: (session: ExerciseDefinitionRecentSessionItem) => void;
 }
 
 export const RecentSessionsSection = ({
@@ -17,25 +16,18 @@ export const RecentSessionsSection = ({
 }: RecentSessionsSectionProps) => {
     const { t } = useTranslation();
 
+    if (sessions.length === 0) return null;
+
     return (
         <ScreenSection
             title={t('exerciseDefinitions.fields.recentSessions')}
             topSpacing="medium"
         >
-            {sessions.length === 0 && (
-                <ListEmptyState
-                    title={t('exerciseDefinitions.emptyRecentSessionsTitle')}
-                    description={t(
-                        'exerciseDefinitions.emptyRecentSessionsDescription',
-                    )}
-                />
-            )}
-
             {sessions.map((session) => (
-                <RecentGymSessionRow
-                    key={session.id}
+                <RecentTrainingSessionRow
+                    key={`${session.kind}:${session.id}`}
                     session={session}
-                    onPress={() => onPressSession(session.id)}
+                    onPress={() => onPressSession(session)}
                 />
             ))}
         </ScreenSection>

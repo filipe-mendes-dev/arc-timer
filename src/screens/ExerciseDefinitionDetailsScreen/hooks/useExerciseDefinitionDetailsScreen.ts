@@ -7,6 +7,10 @@ import {
     useDeleteExerciseDefinition,
     useExerciseDefinition,
 } from '@src/data/exerciseDefinitions';
+import type {
+    ExerciseDefinitionRecentSessionItem,
+    ExerciseDefinitionReferenceItem,
+} from '@src/core/entities/exerciseDefinition.interfaces';
 
 import {
     formatMetric,
@@ -28,7 +32,8 @@ interface UseExerciseDefinitionDetailsScreenResult {
     closeNameModal: () => void;
     confirmDelete: () => Promise<void>;
     goBack: () => void;
-    goToGymSession: (sessionId: string) => void;
+    goToReference: (reference: ExerciseDefinitionReferenceItem) => void;
+    goToRecentSession: (session: ExerciseDefinitionRecentSessionItem) => void;
     openAvailabilityModal: () => void;
     openDeleteDialog: () => void;
     openNameModal: () => void;
@@ -81,6 +86,28 @@ export const useExerciseDefinitionDetailsScreen =
             setIsDeleteDialogVisible(false);
         };
 
+        const goToReference = (
+            reference: ExerciseDefinitionReferenceItem,
+        ): void => {
+            if (reference.kind === 'gymPlan') {
+                router.push(`/gymPlans/${reference.id}`);
+                return;
+            }
+
+            router.push(`/workouts/${reference.id}`);
+        };
+
+        const goToRecentSession = (
+            session: ExerciseDefinitionRecentSessionItem,
+        ): void => {
+            if (session.kind === 'gym') {
+                router.push(`/gymHistory/${session.id}`);
+                return;
+            }
+
+            router.push(`/history/${session.id}`);
+        };
+
         const confirmDelete = async (): Promise<void> => {
             if (!definition) return;
 
@@ -116,8 +143,8 @@ export const useExerciseDefinitionDetailsScreen =
             closeNameModal: () => setIsNameModalVisible(false),
             confirmDelete,
             goBack: () => router.back(),
-            goToGymSession: (sessionId: string) =>
-                router.push(`/gymHistory/${sessionId}`),
+            goToReference,
+            goToRecentSession,
             openAvailabilityModal: () => setIsAvailabilityModalVisible(true),
             openDeleteDialog: () => setIsDeleteDialogVisible(true),
             openNameModal: () => setIsNameModalVisible(true),

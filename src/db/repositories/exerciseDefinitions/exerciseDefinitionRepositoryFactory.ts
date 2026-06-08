@@ -1,4 +1,4 @@
-import { and, asc, eq, exists, like, or } from 'drizzle-orm';
+import { and, asc, eq, exists, like, ne, or } from 'drizzle-orm';
 import type { BaseSQLiteDatabase } from 'drizzle-orm/sqlite-core';
 
 import type {
@@ -6,6 +6,10 @@ import type {
     ExerciseDefinitionAvailability,
     ExerciseDefinitionDeleteBlockReason,
     ExerciseDefinitionListItem,
+    ExerciseDefinitionRecentSessionItem,
+    ExerciseDefinitionReferenceItem,
+    ExerciseDefinitionReferenceKind,
+    ExerciseDefinitionReferences,
     ExerciseDefinitionSource,
 } from '@src/core/entities/exerciseDefinition.interfaces';
 import { normalizeExerciseName } from '@src/core/exercises/normalizeExerciseName';
@@ -13,8 +17,15 @@ import { normalizeExerciseName } from '@src/core/exercises/normalizeExerciseName
 import {
     exerciseDefinitionsTable,
     gymExerciseRecordsTable,
+    gymSessionsTable,
+    gymPlanSectionsTable,
     gymPlanExercisesTable,
+    gymPlansTable,
+    workoutBlocksTable,
     workoutExercisesTable,
+    workoutSessionsTable,
+    workoutVersionsTable,
+    workoutsTable,
 } from '../../schema';
 import {
     createExerciseDefinitionError,
@@ -41,6 +52,11 @@ interface ExerciseDefinitionBaseListItem {
     availability: ExerciseDefinitionAvailability;
     createdAtMs: number;
     updatedAtMs: number;
+}
+
+interface ExerciseDefinitionRecentSessionRow
+    extends ExerciseDefinitionRecentSessionItem {
+    startedAtMs: number;
 }
 
 export interface CreateExerciseDefinitionInput {
@@ -87,6 +103,11 @@ export interface ExerciseDefinitionRepository {
     getAll: () => ExerciseDefinitionListItem[];
     getById: (id: string) => ExerciseDefinition | null;
     getByNormalizedName: (normalizedName: string) => ExerciseDefinition | null;
+    getReferences: (id: string) => ExerciseDefinitionReferences;
+    getRecentTrainingSessions: (
+        id: string,
+        limit: number,
+    ) => ExerciseDefinitionRecentSessionItem[];
     hasGymSessionExerciseReferences: (id: string) => boolean;
     hasGymPlanExerciseReferences: (id: string) => boolean;
     hasWorkoutExerciseReferences: (id: string) => boolean;
@@ -204,6 +225,56 @@ export const createExerciseDefinitionRepository = ({
         };
     };
 
+    const getReferenceKey = (item: ExerciseDefinitionReferenceItem): string =>
+        `${item.kind}:${item.id}`;
+
+    const toReferenceItems = (
+        items: { id: string; name: string }[],
+        kind: ExerciseDefinitionReferenceKind,
+    ): ExerciseDefinitionReferenceItem[] =>
+        items.map((item) => ({
+            ...item,
+            kind,
+        }));
+
+    const uniqueReferenceItems = (
+        items: ExerciseDefinitionReferenceItem[],
+    ): ExerciseDefinitionReferenceItem[] => {
+        const itemById = new Map<string, ExerciseDefinitionReferenceItem>();
+
+        items.forEach((item) => {
+            itemById.set(getReferenceKey(item), item);
+        });
+
+        return Array.from(itemById.values()).sort((left, right) =>
+            left.name.localeCompare(right.name),
+        );
+    };
+
+    const normalizeRecentSessionLimit = (limit: number): number =>
+        Number.isInteger(limit) && limit > 0 ? limit : 5;
+
+    const getTrainingSessionKey = (
+        item: ExerciseDefinitionRecentSessionRow,
+    ): string =>
+        `${item.kind}:${item.id}`;
+
+    const uniqueTrainingSessionItems = (
+        items: ExerciseDefinitionRecentSessionRow[],
+        limit: number,
+    ): ExerciseDefinitionRecentSessionItem[] => {
+        const itemByKey = new Map<string, ExerciseDefinitionRecentSessionRow>();
+
+        items.forEach((item) => {
+            itemByKey.set(getTrainingSessionKey(item), item);
+        });
+
+        return Array.from(itemByKey.values())
+            .sort((left, right) => right.startedAtMs - left.startedAtMs)
+            .slice(0, normalizeRecentSessionLimit(limit))
+            .map(({ id, kind, title }) => ({ id, kind, title }));
+    };
+
     const repository: ExerciseDefinitionRepository = {
         create: (
             input: CreateExerciseDefinitionInput,
@@ -269,6 +340,147 @@ export const createExerciseDefinitionRepository = ({
                       exerciseDefinitionStatsRepository,
                   )
                 : null;
+        },
+
+        getReferences: (id: string): ExerciseDefinitionReferences => {
+            const workoutReferences = db
+                .select({
+                    id: workoutsTable.id,
+                    name: workoutsTable.name,
+                })
+                .from(workoutExercisesTable)
+                .innerJoin(
+                    workoutBlocksTable,
+                    eq(workoutExercisesTable.blockId, workoutBlocksTable.id),
+                )
+                .innerJoin(
+                    workoutsTable,
+                    eq(
+                        workoutBlocksTable.workoutVersionId,
+                        workoutsTable.currentVersionId,
+                    ),
+                )
+                .where(eq(workoutExercisesTable.exerciseDefinitionId, id))
+                .orderBy(asc(workoutsTable.name))
+                .all();
+
+            const gymPlanReferences = db
+                .select({
+                    id: gymPlansTable.id,
+                    name: gymPlansTable.name,
+                })
+                .from(gymPlanExercisesTable)
+                .innerJoin(
+                    gymPlanSectionsTable,
+                    eq(
+                        gymPlanExercisesTable.gymPlanSectionId,
+                        gymPlanSectionsTable.id,
+                    ),
+                )
+                .innerJoin(
+                    gymPlansTable,
+                    eq(gymPlanSectionsTable.gymPlanId, gymPlansTable.id),
+                )
+                .where(
+                    and(
+                        eq(gymPlanExercisesTable.exerciseDefinitionId, id),
+                        ne(gymPlansTable.status, 'draft'),
+                    ),
+                )
+                .orderBy(asc(gymPlansTable.name))
+                .all();
+
+            const references = [
+                ...toReferenceItems(workoutReferences, 'workout'),
+                ...toReferenceItems(gymPlanReferences, 'gymPlan'),
+            ];
+
+            return {
+                items: uniqueReferenceItems(references),
+            };
+        },
+
+        getRecentTrainingSessions: (
+            id: string,
+            limit: number,
+        ): ExerciseDefinitionRecentSessionItem[] => {
+            const gymRows = db
+                .select({
+                    id: gymSessionsTable.id,
+                    startedAtMs: gymSessionsTable.startedAtMs,
+                    sourceGymPlanName: gymPlansTable.name,
+                })
+                .from(gymExerciseRecordsTable)
+                .innerJoin(
+                    gymSessionsTable,
+                    eq(
+                        gymExerciseRecordsTable.gymSessionId,
+                        gymSessionsTable.id,
+                    ),
+                )
+                .leftJoin(
+                    gymPlansTable,
+                    eq(gymSessionsTable.sourceGymPlanId, gymPlansTable.id),
+                )
+                .where(
+                    and(
+                        eq(gymExerciseRecordsTable.exerciseDefinitionId, id),
+                        eq(gymSessionsTable.status, 'completed'),
+                    ),
+                )
+                .all();
+            const gymItems: ExerciseDefinitionRecentSessionRow[] = gymRows.map(
+                (row) => {
+                    const title = row.sourceGymPlanName ?? '';
+
+                    return {
+                        id: row.id,
+                        kind: 'gym',
+                        title,
+                        startedAtMs: row.startedAtMs,
+                    };
+                },
+            );
+
+            const hiitRows = db
+                .select({
+                    id: workoutSessionsTable.id,
+                    startedAtMs: workoutSessionsTable.startedAtMs,
+                    workoutName: workoutVersionsTable.name,
+                })
+                .from(workoutSessionsTable)
+                .innerJoin(
+                    workoutBlocksTable,
+                    eq(
+                        workoutSessionsTable.workoutVersionId,
+                        workoutBlocksTable.workoutVersionId,
+                    ),
+                )
+                .innerJoin(
+                    workoutExercisesTable,
+                    eq(workoutBlocksTable.id, workoutExercisesTable.blockId),
+                )
+                .innerJoin(
+                    workoutVersionsTable,
+                    eq(
+                        workoutSessionsTable.workoutVersionId,
+                        workoutVersionsTable.id,
+                    ),
+                )
+                .where(eq(workoutExercisesTable.exerciseDefinitionId, id))
+                .all();
+            const hiitItems: ExerciseDefinitionRecentSessionRow[] =
+                hiitRows.map((row) => ({
+                    id: row.id,
+                    kind: 'hiit',
+                    title: row.workoutName,
+                    startedAtMs: row.startedAtMs,
+                }));
+
+            return uniqueTrainingSessionItems(
+                [...gymItems, ...hiitItems],
+                limit,
+            );
         },
 
         hasGymSessionExerciseReferences: (id: string): boolean => {

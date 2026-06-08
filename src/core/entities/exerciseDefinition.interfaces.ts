@@ -1,11 +1,14 @@
 import type { UUID } from './common.interfaces';
 import type { GymSessionListItem } from './gymSession.interfaces';
+import type { TrainingSessionKind } from './trainingSession.interfaces';
 
 export type ExerciseDefinitionSource = 'system' | 'user';
 
 export type ExerciseDefinitionAvailability = 'both' | 'workout' | 'gym';
 
 export type ExerciseDefinitionDeleteBlockReason = 'system' | 'referenced';
+
+export type ExerciseDefinitionReferenceKind = 'gymPlan' | 'workout';
 
 export type ExerciseTrackingField =
     | 'reps'
@@ -24,6 +27,22 @@ export interface ExerciseDefinitionListItem {
     deleteBlockReason?: ExerciseDefinitionDeleteBlockReason;
     createdAtMs: number;
     updatedAtMs: number;
+}
+
+export interface ExerciseDefinitionReferenceItem {
+    id: UUID;
+    kind: ExerciseDefinitionReferenceKind;
+    name: string;
+}
+
+export interface ExerciseDefinitionReferences {
+    items: ExerciseDefinitionReferenceItem[];
+}
+
+export interface ExerciseDefinitionRecentSessionItem {
+    id: UUID;
+    kind: TrainingSessionKind;
+    title: string;
 }
 
 export interface ExerciseDefinitionTargetSetData {
@@ -64,5 +83,7 @@ export interface ExerciseDefinitionStats {
 
 export interface ExerciseDefinition extends ExerciseDefinitionListItem {
     data?: ExerciseDefinitionData;
+    references?: ExerciseDefinitionReferences;
+    recentSessions?: ExerciseDefinitionRecentSessionItem[];
     stats?: ExerciseDefinitionStats;
 }
