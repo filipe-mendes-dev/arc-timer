@@ -40,6 +40,7 @@ export const ptPT: I18nResource = {
     },
     drawer: {
         home: 'Início',
+        hiit: 'HIIT',
         workouts: 'Treinos',
         gym: 'Ginásio',
         exercises: 'Exercícios',
@@ -59,10 +60,23 @@ export const ptPT: I18nResource = {
         title: 'Início',
         welcome: 'Bem-vindo',
         subtitle: 'Começa já o teu treino.',
-        quickWorkout: 'Treino rápido',
-        startImmediately: 'Começar imediatamente',
-        recentWorkouts: 'Treinos recentes',
+        quickAccess: 'Acesso rápido',
+        quickSession: 'Sessão rápida',
+        startImmediately: 'Começar treino imediatamente',
+        recentSessions: 'Sessões recentes',
         noSessionsYet: 'Ainda não existem sessões.',
+        sessionTypeModal: {
+            title: 'Escolhe uma sessão',
+            description: 'Inicia um treino HIIT ou uma sessão de ginásio.',
+        },
+        actions: {
+            continueGymSession: 'Continuar sessão de ginásio',
+            gymPlans: 'Planos de ginásio',
+            savedHiitWorkouts: 'Treinos HIIT',
+            seeAllSessions: 'Ver todas',
+            startGymSession: 'Iniciar sessão de ginásio',
+            startHiitWorkout: 'Iniciar treino HIIT',
+        },
     },
     gym: {
         title: 'Ginásio',
@@ -86,7 +100,7 @@ export const ptPT: I18nResource = {
         finishSessionModal: {
             title: 'Terminar sessão?',
             message:
-                'Conclui esta sessão para a guardar no histórico, ou descarta-a sem manter progresso.',
+                'Conclui a sessão para guardar no histórico ou descarta-a sem manter registo.',
             complete: 'Concluir',
             discard: 'Descartar',
         },
@@ -103,13 +117,13 @@ export const ptPT: I18nResource = {
             exerciseDefinitionNotFound: 'O exercício não foi encontrado.',
             exerciseDefinitionNotGymAvailable:
                 'Este exercício não pode ser usado em sessões de ginásio.',
-            exerciseRecordNotFound: 'O registo do exercício não foi encontrado.',
+            exerciseRecordNotFound:
+                'O registo do exercício não foi encontrado.',
             exerciseRecordNotInActiveSession:
                 'O registo do exercício não pertence à sessão ativa.',
             exerciseNameRequired: 'O nome do exercício é obrigatório.',
             exerciseSetNotFound: 'A série do exercício não foi encontrada.',
-            gymPlanArchived:
-                'Planos arquivados não podem iniciar uma sessão.',
+            gymPlanArchived: 'Planos arquivados não podem iniciar uma sessão.',
             gymPlanNotFound: 'O plano de ginásio não foi encontrado.',
             invalidGymExerciseRecordTimeRange:
                 'O registo do exercício não pode terminar antes de começar.',
@@ -223,8 +237,7 @@ export const ptPT: I18nResource = {
                 'A partilha não está disponível neste dispositivo.',
             writeFailed:
                 'Não foi possível preparar este plano de ginásio para partilha.',
-            failed:
-                'Não foi possível partilhar este plano de ginásio. Tenta novamente.',
+            failed: 'Não foi possível partilhar este plano de ginásio. Tenta novamente.',
         },
         errors: {
             actionFailed:
@@ -351,6 +364,9 @@ export const ptPT: I18nResource = {
             inProgress: 'Em curso',
             live: 'Ao vivo',
         },
+        sections: {
+            addedExercises: 'Exercícios adicionados',
+        },
         actions: {
             addExercise: 'Adicionar exercício',
             backToGym: 'Voltar ao Ginásio',
@@ -427,8 +443,7 @@ export const ptPT: I18nResource = {
                 'O plano original não está disponível. Repetir irá recriar a estrutura desta sessão.',
         },
         errors: {
-            runAgainFailed:
-                'Não foi possível iniciar esta sessão novamente.',
+            runAgainFailed: 'Não foi possível iniciar esta sessão novamente.',
         },
         status: {
             incomplete: 'Não terminada',
@@ -520,12 +535,28 @@ export const ptPT: I18nResource = {
     },
     history: {
         title: 'Histórico',
-        searchPlaceholder: 'Pesquisar treinos',
+        searchPlaceholder: 'Pesquisar sessões',
         clear: 'Limpar',
         emptyTitle: 'Ainda não existem sessões',
-        emptyDescription: 'Executa um treino e ele aparecerá aqui.',
+        emptyDescription:
+            'Conclui uma sessão HIIT ou de ginásio e ela aparecerá aqui.',
+        filterEmptyTitle: 'Sem sessões neste filtro',
+        filterEmptyDescription: 'Experimenta outro tipo de sessão.',
         searchEmptyTitle: 'Nenhuma sessão encontrada',
-        searchEmptyDescription: 'Experimenta outro nome de treino.',
+        searchEmptyDescription: 'Experimenta outro nome de sessão.',
+        filters: {
+            all: 'Todas',
+            apply: 'Aplicar',
+            clear: 'Limpar filtros',
+            hiit: 'HIIT',
+            gym: 'Ginásio',
+            sessionType: 'Tipo de sessão',
+            title: 'Filtros',
+        },
+        kind: {
+            hiit: 'HIIT',
+            gym: 'Ginásio',
+        },
         clearConfirm: {
             title: 'Limpar histórico',
             message: 'Todas as sessões serão eliminadas.',
@@ -847,6 +878,11 @@ export const ptPT: I18nResource = {
             title: 'Editar disponibilidade',
             description: 'Escolhe onde este exercício pode ser usado.',
         },
+        references: {
+            title: 'Referências',
+            workout: 'Treino',
+            gymPlan: 'Plano de ginásio',
+        },
         confirmRemove: {
             title: 'Apagar exercício?',
             message:
@@ -865,8 +901,7 @@ export const ptPT: I18nResource = {
             title: 'O exercício não pode ser selecionado',
             referenced:
                 'Este exercício é usado em treinos, planos de ginásio ou histórico de ginásio, por isso não pode ser apagado.',
-            system:
-                'Os exercícios do sistema vêm incluídos na app e não podem ser apagados.',
+            system: 'Os exercícios do sistema vêm incluídos na app e não podem ser apagados.',
         },
         validation: {
             nameRequired: 'O nome do exercício é obrigatório.',

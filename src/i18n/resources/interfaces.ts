@@ -39,6 +39,7 @@ export interface I18nResource {
     };
     drawer: {
         home: string;
+        hiit: string;
         workouts: string;
         gym: string;
         exercises: string;
@@ -57,10 +58,23 @@ export interface I18nResource {
         title: string;
         welcome: string;
         subtitle: string;
-        quickWorkout: string;
+        quickAccess: string;
+        quickSession: string;
         startImmediately: string;
-        recentWorkouts: string;
+        recentSessions: string;
         noSessionsYet: string;
+        sessionTypeModal: {
+            title: string;
+            description: string;
+        };
+        actions: {
+            continueGymSession: string;
+            gymPlans: string;
+            savedHiitWorkouts: string;
+            seeAllSessions: string;
+            startGymSession: string;
+            startHiitWorkout: string;
+        };
     };
     gym: {
         title: string;
@@ -321,6 +335,9 @@ export interface I18nResource {
             inProgress: string;
             live: string;
         };
+        sections: {
+            addedExercises: string;
+        };
         actions: {
             addExercise: string;
             backToGym: string;
@@ -477,8 +494,23 @@ export interface I18nResource {
         clear: string;
         emptyTitle: string;
         emptyDescription: string;
+        filterEmptyTitle: string;
+        filterEmptyDescription: string;
         searchEmptyTitle: string;
         searchEmptyDescription: string;
+        filters: {
+            all: string;
+            apply: string;
+            clear: string;
+            gym: string;
+            hiit: string;
+            sessionType: string;
+            title: string;
+        };
+        kind: {
+            gym: string;
+            hiit: string;
+        };
         clearConfirm: {
             title: string;
             message: string;
@@ -780,6 +812,11 @@ export interface I18nResource {
         availabilityModal: {
             title: string;
             description: string;
+        };
+        references: {
+            title: string;
+            workout: string;
+            gymPlan: string;
         };
         confirmRemove: {
             title: string;

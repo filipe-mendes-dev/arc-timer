@@ -40,6 +40,7 @@ export const en: I18nResource = {
     },
     drawer: {
         home: 'Home',
+        hiit: 'HIIT',
         workouts: 'Workouts',
         gym: 'Gym',
         exercises: 'Exercises',
@@ -59,10 +60,23 @@ export const en: I18nResource = {
         title: 'Home',
         welcome: 'Welcome',
         subtitle: 'Get started with your training.',
-        quickWorkout: 'Quick Workout',
-        startImmediately: 'Start immediately',
-        recentWorkouts: 'Recent Workouts',
+        quickAccess: 'Quick access',
+        quickSession: 'Quick Session',
+        startImmediately: 'Start training immediately',
+        recentSessions: 'Recent Sessions',
         noSessionsYet: 'No sessions yet.',
+        sessionTypeModal: {
+            title: 'Choose a session',
+            description: 'Start a HIIT workout or a gym session.',
+        },
+        actions: {
+            continueGymSession: 'Continue Gym Session',
+            gymPlans: 'Gym Plans',
+            savedHiitWorkouts: 'HIIT Workouts',
+            seeAllSessions: 'See all',
+            startGymSession: 'Start Gym Session',
+            startHiitWorkout: 'Start HIIT Workout',
+        },
     },
     gym: {
         title: 'Gym',
@@ -74,7 +88,7 @@ export const en: I18nResource = {
             startNewSession: 'Quick session',
             startNewSessionSubtitle: 'Start from an empty gym log',
             resumeSession: 'Resume session',
-            finishSession: 'Finish session',
+            finishSession: 'End session',
             history: 'Session history',
             historySubtitle: 'Review completed gym sessions',
             plans: 'Gym plans',
@@ -83,9 +97,9 @@ export const en: I18nResource = {
             sessionInProgressSubtitle: 'Finish it before starting another',
         },
         finishSessionModal: {
-            title: 'Finish session?',
+            title: 'End session?',
             message:
-                'Complete this session to save it to history, or discard it without keeping progress.',
+                'Complete session to save it to history or discard it without keeping record.',
             complete: 'Complete',
             discard: 'Discard',
         },
@@ -143,8 +157,7 @@ export const en: I18nResource = {
             errors: {
                 invalidExtension:
                     'That file is not an ARC Timer gym plan (.arcgymplan).',
-                invalidKind:
-                    'That file is not an ARC Timer gym plan export.',
+                invalidKind: 'That file is not an ARC Timer gym plan export.',
                 invalidShape:
                     'That file looks like an ARC Timer export, but it is missing data.',
                 parseFailed: 'The file is corrupted or not valid JSON.',
@@ -339,6 +352,9 @@ export const en: I18nResource = {
             inProgress: 'In progress',
             live: 'Live',
         },
+        sections: {
+            addedExercises: 'Added exercises',
+        },
         actions: {
             addExercise: 'Add exercise',
             backToGym: 'Back to Gym',
@@ -348,7 +364,7 @@ export const en: I18nResource = {
             removeExercise: 'Remove',
         },
         finishConfirm: {
-            title: 'Finish session?',
+            title: 'End session?',
             message: 'This will save the gym session to your history.',
         },
         discardConfirm: {
@@ -499,12 +515,28 @@ export const en: I18nResource = {
     },
     history: {
         title: 'History',
-        searchPlaceholder: 'Search workouts',
+        searchPlaceholder: 'Search sessions',
         clear: 'Clear',
         emptyTitle: 'No sessions yet',
-        emptyDescription: 'Run a workout and it will appear here.',
+        emptyDescription:
+            'Complete a HIIT or Gym session and it will appear here.',
+        filterEmptyTitle: 'No sessions for this filter',
+        filterEmptyDescription: 'Try another session type.',
         searchEmptyTitle: 'No sessions found',
-        searchEmptyDescription: 'Try a different workout name.',
+        searchEmptyDescription: 'Try a different session name.',
+        filters: {
+            all: 'All',
+            apply: 'Apply',
+            clear: 'Clear filters',
+            hiit: 'HIIT',
+            gym: 'Gym',
+            sessionType: 'Session type',
+            title: 'Filters',
+        },
+        kind: {
+            hiit: 'HIIT',
+            gym: 'Gym',
+        },
         clearConfirm: {
             title: 'Clear history',
             message: 'All workout sessions will be deleted.',
@@ -819,6 +851,11 @@ export const en: I18nResource = {
         availabilityModal: {
             title: 'Edit availability',
             description: 'Choose where this exercise can be used.',
+        },
+        references: {
+            title: 'References',
+            workout: 'Workout',
+            gymPlan: 'Gym plan',
         },
         confirmRemove: {
             title: 'Delete exercise?',
