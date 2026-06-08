@@ -23,7 +23,7 @@ export const useActionModalStyles = createStyles((theme: AppTheme) =>
             gap: 6,
         },
         errorCollapse: {
-            paddingBottom: theme.layout.modal.padding,
+            paddingBottom: 12,
         },
         secondaryButton: {
             marginBottom: -6,

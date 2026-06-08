@@ -50,8 +50,7 @@ export const ActionModal = ({
     const st = useActionModalStyles();
     const hasText = !!title || !!description;
     const errorMessage = error?.message.trim() ?? '';
-    const hasError = errorMessage.length > 0;
-    const hasActions = hasError || !!primaryAction || !!secondaryAction;
+    const hasActions = !!error || !!primaryAction || !!secondaryAction;
 
     return (
         <Modal
@@ -75,8 +74,8 @@ export const ActionModal = ({
             {children}
 
             {hasActions && (
-                <View style={st.actions}>
-                    {error && hasError && (
+                <View>
+                    {error && (
                         <ErrorBanner
                             message={errorMessage}
                             isDismissible={error.isDismissible}
@@ -85,33 +84,34 @@ export const ActionModal = ({
                             collapseContentStyle={st.errorCollapse}
                         />
                     )}
+                    <View style={st.actions}>
+                        {!!primaryAction && (
+                            <Button
+                                title={
+                                    primaryAction.title ??
+                                    t('common.actions.save')
+                                }
+                                variant={primaryAction.variant ?? 'primary'}
+                                loading={primaryAction.loading}
+                                disabled={primaryAction.disabled}
+                                onPress={primaryAction.onPress}
+                            />
+                        )}
 
-                    {!!primaryAction && (
-                        <Button
-                            title={
-                                primaryAction.title ??
-                                t('common.actions.save')
-                            }
-                            variant={primaryAction.variant ?? 'primary'}
-                            loading={primaryAction.loading}
-                            disabled={primaryAction.disabled}
-                            onPress={primaryAction.onPress}
-                        />
-                    )}
-
-                    {!!secondaryAction && (
-                        <Button
-                            title={
-                                secondaryAction.title ??
-                                t('common.actions.cancel')
-                            }
-                            variant={secondaryAction.variant ?? 'ghost'}
-                            loading={secondaryAction.loading}
-                            disabled={secondaryAction.disabled}
-                            onPress={secondaryAction.onPress}
-                            style={st.secondaryButton}
-                        />
-                    )}
+                        {!!secondaryAction && (
+                            <Button
+                                title={
+                                    secondaryAction.title ??
+                                    t('common.actions.cancel')
+                                }
+                                variant={secondaryAction.variant ?? 'ghost'}
+                                loading={secondaryAction.loading}
+                                disabled={secondaryAction.disabled}
+                                onPress={secondaryAction.onPress}
+                                style={st.secondaryButton}
+                            />
+                        )}
+                    </View>
                 </View>
             )}
         </Modal>
