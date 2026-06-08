@@ -5,7 +5,7 @@ import type { AppTheme } from '@src/theme/theme';
 export const useConfirmDialogStyles = createStyles((theme: AppTheme) =>
     StyleSheet.create({
         modalContainer: {
-            padding: 20,
+            padding: theme.layout.modal.padding,
         },
         modalContent: {
             backgroundColor: theme.palette.background.card,
@@ -38,5 +38,5 @@ export const useConfirmDialogStyles = createStyles((theme: AppTheme) =>
         button: {
             flex: 1,
         },
-    })
+    }),
 );

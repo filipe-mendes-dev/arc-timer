@@ -13,8 +13,8 @@ export const useActionModalStyles = createStyles((theme: AppTheme) =>
             borderRadius: theme.layout.card.borderRadius,
             borderWidth: theme.layout.card.borderWidth,
             borderColor: theme.palette.border.subtle,
-            padding: theme.layout.card.padding,
-            gap: 12,
+            padding: theme.layout.screen.padding,
+            gap: 14,
         },
         text: {
             gap: 6,
