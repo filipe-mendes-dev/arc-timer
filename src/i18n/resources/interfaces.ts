@@ -68,7 +68,6 @@ export interface I18nResource {
             description: string;
         };
         actions: {
-            continueGymSession: string;
             gymPlans: string;
             savedHiitWorkouts: string;
             seeAllSessions: string;
@@ -91,8 +90,6 @@ export interface I18nResource {
             historySubtitle: string;
             plans: string;
             plansSubtitle: string;
-            sessionInProgress: string;
-            sessionInProgressSubtitle: string;
         };
         finishSessionModal: {
             title: string;
@@ -288,7 +285,6 @@ export interface I18nResource {
             nameRequired: string;
             sectionRequired: string;
             sectionExerciseRequired: string;
-            placeholderExerciseRequired: string;
             saveFailed: string;
         };
         discardConfirm: {
@@ -529,8 +525,8 @@ export interface I18nResource {
         notFound: string;
         workoutSessionFallback: string;
         endedAt: string;
-        byBlock: string;
-        noCompletedBlocks: string;
+        exercises: string;
+        noExercises: string;
         blockStats: {
             sets: string;
             exercises: string;

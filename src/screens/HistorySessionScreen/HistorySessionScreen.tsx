@@ -426,7 +426,7 @@ const HistorySessionScreen = () => {
                 </ScreenSection>
 
                 <ScreenSection
-                    title={t('historySession.byBlock')}
+                    title={t('historySession.exercises')}
                     topSpacing="large"
                     gap={theme.layout.listItem.gap}
                 >
@@ -442,7 +442,7 @@ const HistorySessionScreen = () => {
                         ))
                     ) : (
                         <AppText variant="bodySmall" tone="muted">
-                            {t('historySession.noCompletedBlocks')}
+                            {t('historySession.noExercises')}
                         </AppText>
                     )}
                 </ScreenSection>

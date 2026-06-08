@@ -1,5 +1,7 @@
 import type { I18nResource } from './interfaces';
 
+const exerciseNameRequired = 'Exercise name required.';
+
 export const en: I18nResource = {
     common: {
         actions: {
@@ -61,40 +63,37 @@ export const en: I18nResource = {
         welcome: 'Welcome',
         subtitle: 'Get started with your training.',
         quickAccess: 'Quick access',
-        quickSession: 'Quick Session',
+        quickSession: 'Quick session',
         startImmediately: 'Start training immediately',
-        recentSessions: 'Recent Sessions',
+        recentSessions: 'Recent sessions',
         noSessionsYet: 'No sessions yet.',
         sessionTypeModal: {
             title: 'Choose a session',
             description: 'Start a HIIT workout or a gym session.',
         },
         actions: {
-            continueGymSession: 'Continue Gym Session',
-            gymPlans: 'Gym Plans',
-            savedHiitWorkouts: 'HIIT Workouts',
+            gymPlans: 'Gym plans',
+            savedHiitWorkouts: 'HIIT workouts',
             seeAllSessions: 'See all',
-            startGymSession: 'Start Gym Session',
-            startHiitWorkout: 'Start HIIT Workout',
+            startGymSession: 'Start gym session',
+            startHiitWorkout: 'Start HIIT workout',
         },
     },
     gym: {
         title: 'Gym',
         heading: 'Gym session',
-        subtitle: 'Track strength work outside timed workouts.',
+        subtitle: 'Track your progress in the gym.',
         currentSession: 'Current session',
         sessionStats: 'Session stats',
         actions: {
             startNewSession: 'Quick session',
-            startNewSessionSubtitle: 'Start from an empty gym log',
+            startNewSessionSubtitle: 'Create your session as you go',
             resumeSession: 'Resume session',
             finishSession: 'End session',
             history: 'Session history',
-            historySubtitle: 'Review completed gym sessions',
+            historySubtitle: 'View previous gym sessions',
             plans: 'Gym plans',
-            plansSubtitle: 'Build reusable strength templates',
-            sessionInProgress: 'Session in progress',
-            sessionInProgressSubtitle: 'Finish it before starting another',
+            plansSubtitle: 'Reusable gym session templates',
         },
         finishSessionModal: {
             title: 'End session?',
@@ -118,7 +117,7 @@ export const en: I18nResource = {
             exerciseRecordNotFound: 'Exercise record was not found.',
             exerciseRecordNotInActiveSession:
                 'Exercise record is not in the active session.',
-            exerciseNameRequired: 'Exercise name is required.',
+            exerciseNameRequired,
             exerciseSetNotFound: 'Exercise set was not found.',
             gymPlanArchived: 'Archived plans cannot start a session.',
             gymPlanNotFound: 'Gym plan was not found.',
@@ -135,22 +134,22 @@ export const en: I18nResource = {
         },
     },
     gymPlans: {
-        title: 'Gym Plans',
+        title: 'Gym plans',
         searchPlaceholder: 'Search gym plans',
-        emptyTitle: 'No Gym Plans Yet',
+        emptyTitle: 'No gym plans yet',
         emptyDescription: 'Create a reusable plan for your gym sessions.',
-        searchEmptyTitle: 'No Plans Found',
+        searchEmptyTitle: 'No plans found',
         searchEmptyDescription: 'Try a different plan name.',
         actions: {
-            createPlan: '+ Create Plan',
-            new: '+ New',
+            createPlan: 'Create plan',
+            new: 'New',
         },
         modal: {
-            title: 'New Gym Plan',
+            title: 'New gym plan',
             subtitle: 'Choose how you want to start:',
-            createNew: 'Create New',
-            importFromFile: 'Import From File',
-            resumeDraft: 'Resume Draft',
+            createNew: 'Create new',
+            importFromFile: 'Import from file',
+            resumeDraft: 'Resume draft',
             cancel: 'Cancel',
         },
         import: {
@@ -166,13 +165,13 @@ export const en: I18nResource = {
             },
         },
         confirmRemove: {
-            title: 'Delete Gym Plan?',
+            title: 'Delete gym plan?',
             message: 'This gym plan will be permanently deleted.',
             confirm: 'Delete',
         },
         confirmRemoveBulk: {
-            title_one: 'Delete {{count}} Gym Plan?',
-            title_other: 'Delete {{count}} Gym Plans?',
+            title_one: 'Delete {{count}} gym plan?',
+            title_other: 'Delete {{count}} gym plans?',
             message_one: 'This selected gym plan will be permanently deleted.',
             message_other:
                 'The {{count}} selected gym plans will be permanently deleted.',
@@ -197,8 +196,8 @@ export const en: I18nResource = {
         exerciseFallback: 'Exercise',
         noTargets: 'No targets',
         favorite: 'Favorite',
-        hint: 'You can run this gym plan now or edit it before your next session.',
-        exportGymPlan: 'Share gym plan',
+        hint: 'Edit plan or start your session.',
+        exportGymPlan: 'Export gym plan',
         metrics: {
             sections: 'Sections',
             exercises: 'Exercises',
@@ -236,7 +235,7 @@ export const en: I18nResource = {
         },
     },
     gymPlanBuilder: {
-        title: 'New Plan',
+        title: 'New plan',
         draftMissing: 'No draft plan found.',
         sectionFallback: 'Section {{index}}',
         exerciseFallback: 'Exercise',
@@ -254,11 +253,11 @@ export const en: I18nResource = {
         },
         fields: {
             name: 'Plan name',
-            namePlaceholder: 'e.g., Push day',
+            namePlaceholder: 'e.g., Leg day',
             description: 'Description',
             descriptionPlaceholder: 'Optional notes for this plan',
             sectionTitle: 'Section title',
-            targetWeightKg: 'Weight kg',
+            targetWeightKg: 'Weight (kg)',
             notes: 'Notes',
         },
         actions: {
@@ -286,7 +285,7 @@ export const en: I18nResource = {
             title: 'Tracking fields',
         },
         sectionEditor: {
-            exercises: 'Exercise List',
+            exercises: 'Exercise list',
             notFound: 'Plan section not found.',
             tapExerciseToEdit: 'Tap an exercise to edit.',
             title: 'Section details',
@@ -299,12 +298,10 @@ export const en: I18nResource = {
             weightKg: '{{value}} kg',
         },
         validation: {
-            nameRequired: 'Plan name is required.',
+            nameRequired: 'Plan name required.',
             sectionRequired: 'Add at least one section.',
             sectionExerciseRequired:
                 'Section {{index}} needs at least one exercise.',
-            placeholderExerciseRequired:
-                'Choose an exercise for every item in section {{index}}.',
             saveFailed: 'Could not save this draft. Try again.',
         },
         discardConfirm: {
@@ -326,13 +323,13 @@ export const en: I18nResource = {
         notFound: 'Planned exercise not found.',
         exerciseName: 'Exercise name',
         exerciseNamePlaceholder: 'e.g., Leg Press',
-        newExerciseTitle: 'New Exercise',
+        newExerciseTitle: 'New exercise',
         exerciseFallback: 'Exercise',
         targets: 'Set targets',
         notes: 'Notes',
         hint: 'Changes are saved to the draft plan automatically.',
         errors: {
-            nameRequired: 'Exercise name is required.',
+            nameRequired: exerciseNameRequired,
             saveFailed: 'Could not save this exercise. Try again.',
         },
     },
@@ -381,7 +378,7 @@ export const en: I18nResource = {
             create: 'Create',
             name: 'Name',
             namePlaceholder: 'e.g., Bench press',
-            nameRequired: 'Exercise name is required.',
+            nameRequired: exerciseNameRequired,
             subtitle: 'Use a saved exercise or type a new one.',
             title: 'Add exercise',
         },
@@ -413,7 +410,7 @@ export const en: I18nResource = {
         title: 'Gym session',
         notFound: 'Gym session not found',
         endedAt: 'Ended {{time}}',
-        completedSets: 'Done sets',
+        completedSets: 'Completed sets',
         exercises: 'Exercises',
         noExercises: 'No exercises in this session',
         notes: 'Notes',
@@ -439,8 +436,8 @@ export const en: I18nResource = {
         },
     },
     gymExerciseData: {
-        title: 'Exercise Data',
-        exerciseSets: 'Exercise Sets',
+        title: 'Exercise data',
+        exerciseSets: 'Exercise sets',
         overview: 'Overview',
         exercise: 'Exercise',
         exerciseFallback: 'Exercise',
@@ -530,7 +527,7 @@ export const en: I18nResource = {
             clear: 'Clear filters',
             hiit: 'HIIT',
             gym: 'Gym',
-            sessionType: 'Session type',
+            sessionType: 'Session type:',
             title: 'Filters',
         },
         kind: {
@@ -556,8 +553,8 @@ export const en: I18nResource = {
         notFound: 'Session not found',
         workoutSessionFallback: 'Workout session',
         endedAt: 'Ended {{time}}',
-        byBlock: 'By block',
-        noCompletedBlocks: 'No completed blocks in this session',
+        exercises: 'Exercises',
+        noExercises: 'No exercises in this session',
         blockStats: {
             sets: 'Sets:',
             exercises: 'Exercises:',
@@ -598,15 +595,15 @@ export const en: I18nResource = {
     },
     editWorkout: {
         title: {
-            edit: 'Edit Workout',
-            create: 'New Workout',
+            edit: 'Edit workout',
+            create: 'New workout',
         },
         fields: {
             name: 'Name',
             namePlaceholder: 'e.g., Conditioning A',
         },
         defaults: {
-            newWorkout: 'New Workout',
+            newWorkout: 'New workout',
         },
         sections: {
             blocks: 'Blocks',
@@ -615,19 +612,18 @@ export const en: I18nResource = {
             tapBlockToEdit: 'Tap a block to edit its details.',
         },
         actions: {
-            addBlock: '＋ Add Block',
+            addBlock: 'Add block',
             cancel: 'Cancel',
             save: 'Save',
             create: 'Create',
         },
         validation: {
-            nameRequired: 'Workout name is required.',
+            nameRequired: 'Workout name required.',
             addBlock: 'Add at least one block.',
-            exerciseNamesRequired: 'Exercises must have defined names.',
+            exerciseNamesRequired: 'Exercise names required.',
             saveFailed:
                 'Could not save workout. Check the details and try again.',
-            unnamedExercises:
-                'Exercises must have defined names before saving.',
+            unnamedExercises: 'Exercise names required.',
         },
         removeBlock: {
             title: 'Remove block',
@@ -639,8 +635,8 @@ export const en: I18nResource = {
     },
     editBlock: {
         title: {
-            edit: 'Edit Block',
-            quick: 'Quick Workout',
+            edit: 'Edit block',
+            quick: 'Quick workout',
         },
         notFound: 'Block not found.',
         sections: {
@@ -661,10 +657,10 @@ export const en: I18nResource = {
             secondsShort: 's',
         },
         actions: {
-            addExercise: '＋ Add Exercise',
+            addExercise: 'Add exercise',
             cancel: 'Cancel',
-            startWorkout: 'Start Workout',
-            saveBlock: 'Save Block',
+            startWorkout: 'Start workout',
+            saveBlock: 'Save block',
         },
         removeExercise: {
             title: 'Remove exercise',
@@ -673,11 +669,10 @@ export const en: I18nResource = {
             cancel: 'Cancel',
         },
         validation: {
-            setsMin: 'Block must have at least one set.',
+            setsMin: 'Add at least one set.',
             exercisesMin: 'Add at least one exercise.',
-            exerciseNameRequired: 'Exercise name is required before saving.',
-            exerciseDurationMin:
-                'Exercise {{index}}: duration must be > 0 seconds.',
+            exerciseNameRequired,
+            exerciseDurationMin: 'Exercise {{index}}: duration must be > 0s.',
             exerciseRepsMin: 'Exercise {{index}}: reps must be > 0.',
         },
     },
@@ -722,11 +717,11 @@ export const en: I18nResource = {
     workouts: {
         title: 'Workouts',
         searchPlaceholder: 'Search workouts',
-        newButton: '＋ New',
-        createButton: '＋ Create workout',
+        newButton: 'New',
+        createButton: 'Create workout',
         defaults: {
-            quickWorkoutName: 'Quick Workout',
-            quickBlockTitle: 'Quick Block',
+            quickWorkoutName: 'Quick workout',
+            quickBlockTitle: 'Quick block',
         },
         emptyTitle: 'No workouts yet',
         emptyDescription: 'Create your first workout to get started.',
@@ -772,16 +767,16 @@ export const en: I18nResource = {
         title: 'Exercises',
         detailsTitle: 'Exercise',
         searchPlaceholder: 'Search exercises',
-        newButton: '＋ New',
-        createButton: '＋ Create exercise',
+        newButton: 'New',
+        createButton: 'Create exercise',
         emptyTitle: 'No exercises yet',
         emptyDescription: 'Create your first exercise to build your catalog.',
         searchEmptyTitle: 'No exercises found',
         searchEmptyDescription: 'Try a different exercise name.',
         notFound: 'Exercise not found.',
         overview: 'Overview',
-        defaults: 'Default Fields',
-        statsTitle: 'Exercise Stats',
+        defaults: 'Default fields',
+        statsTitle: 'Exercise stats',
         notes: 'Notes',
         emptyValue: 'Not set',
         emptyDefaultsTitle: 'No default fields',
@@ -821,7 +816,7 @@ export const en: I18nResource = {
             user: 'Custom',
         },
         availability: {
-            both: 'Workout + Gym',
+            both: 'Workout + gym',
             workout: 'Workout',
             gym: 'Gym',
         },
@@ -877,7 +872,7 @@ export const en: I18nResource = {
             system: 'System exercises are built in and cannot be deleted.',
         },
         validation: {
-            nameRequired: 'Exercise name is required.',
+            nameRequired: exerciseNameRequired,
             duplicateName: 'An exercise with this name already exists.',
             deleteReferenced:
                 'This exercise is still used and cannot be deleted.',
@@ -907,7 +902,7 @@ export const en: I18nResource = {
             estimatedTime: 'Estimated time',
         },
         blocksSection: 'Blocks',
-        hint: 'You can edit this workout or start it now.',
+        hint: 'Edit workout or start your session.',
         exportWorkout: 'Export workout',
         actions: {
             edit: 'Edit',
@@ -936,13 +931,13 @@ export const en: I18nResource = {
             completeTitle: 'Workout complete',
         },
         section: {
-            nextBlock: 'Next Block:',
+            nextBlock: 'Next block:',
             exercise: 'Exercise',
             next: 'Next',
         },
         confirmEnd: {
             title: 'End workout?',
-            message: 'Your progress will be saved in the summary.',
+            message: 'Your progress will be saved.',
             confirm: 'End workout',
             cancel: 'Keep going',
         },

@@ -1,5 +1,7 @@
 import type { I18nResource } from './interfaces';
 
+const exerciseNameRequired = 'Nome do exercício obrigatório.';
+
 export const ptPT: I18nResource = {
     common: {
         actions: {
@@ -70,7 +72,6 @@ export const ptPT: I18nResource = {
             description: 'Inicia um treino HIIT ou uma sessão de ginásio.',
         },
         actions: {
-            continueGymSession: 'Continuar sessão de ginásio',
             gymPlans: 'Planos de ginásio',
             savedHiitWorkouts: 'Treinos HIIT',
             seeAllSessions: 'Ver todas',
@@ -81,21 +82,18 @@ export const ptPT: I18nResource = {
     gym: {
         title: 'Ginásio',
         heading: 'Sessão de ginásio',
-        subtitle: 'Regista trabalho de força fora dos treinos temporizados.',
+        subtitle: 'Regista o teu progresso no ginásio.',
         currentSession: 'Sessão atual',
         sessionStats: 'Dados da sessão',
         actions: {
             startNewSession: 'Sessão rápida',
-            startNewSessionSubtitle:
-                'Começar a partir de um registo de ginásio vazio',
+            startNewSessionSubtitle: 'Cria a sessão à medida que treinas',
             resumeSession: 'Retomar sessão',
             finishSession: 'Terminar sessão',
             history: 'Histórico de sessões',
-            historySubtitle: 'Revê sessões de ginásio concluídas',
+            historySubtitle: 'Ver sessões anteriores',
             plans: 'Planos de ginásio',
-            plansSubtitle: 'Cria modelos de força reutilizáveis',
-            sessionInProgress: 'Sessão em curso',
-            sessionInProgressSubtitle: 'Termina-a antes de iniciar outra',
+            plansSubtitle: 'Modelos de sessão reutilizáveis',
         },
         finishSessionModal: {
             title: 'Terminar sessão?',
@@ -121,7 +119,7 @@ export const ptPT: I18nResource = {
                 'O registo do exercício não foi encontrado.',
             exerciseRecordNotInActiveSession:
                 'O registo do exercício não pertence à sessão ativa.',
-            exerciseNameRequired: 'O nome do exercício é obrigatório.',
+            exerciseNameRequired,
             exerciseSetNotFound: 'A série do exercício não foi encontrada.',
             gymPlanArchived: 'Planos arquivados não podem iniciar uma sessão.',
             gymPlanNotFound: 'O plano de ginásio não foi encontrado.',
@@ -146,8 +144,8 @@ export const ptPT: I18nResource = {
         searchEmptyTitle: 'Nenhum plano encontrado',
         searchEmptyDescription: 'Experimenta outro nome de plano.',
         actions: {
-            createPlan: '+ Criar plano',
-            new: '+ Novo',
+            createPlan: 'Criar plano',
+            new: 'Novo',
         },
         modal: {
             title: 'Novo plano de ginásio',
@@ -203,8 +201,8 @@ export const ptPT: I18nResource = {
         exerciseFallback: 'Exercício',
         noTargets: 'Sem objetivos',
         favorite: 'Favorito',
-        hint: 'Podes iniciar este plano agora ou editá-lo antes da próxima sessão.',
-        exportGymPlan: 'Partilhar plano de ginásio',
+        hint: 'Edita este plano ou inicia a tua sessão.',
+        exportGymPlan: 'Exportar plano de ginásio',
         metrics: {
             sections: 'Secções',
             exercises: 'Exercícios',
@@ -245,7 +243,7 @@ export const ptPT: I18nResource = {
         },
     },
     gymPlanBuilder: {
-        title: 'Novo Plano',
+        title: 'Novo plano',
         draftMissing: 'Nenhum rascunho de plano encontrado.',
         sectionFallback: 'Secção {{index}}',
         exerciseFallback: 'Exercício',
@@ -263,7 +261,7 @@ export const ptPT: I18nResource = {
         },
         fields: {
             name: 'Nome do plano',
-            namePlaceholder: 'ex.: Dia de empurrar',
+            namePlaceholder: 'ex.: Dia de perna',
             description: 'Descrição',
             descriptionPlaceholder: 'Notas opcionais para este plano',
             sectionTitle: 'Título da secção',
@@ -308,12 +306,10 @@ export const ptPT: I18nResource = {
             weightKg: '{{value}} kg',
         },
         validation: {
-            nameRequired: 'O nome do plano é obrigatório.',
+            nameRequired: 'Nome do plano obrigatório.',
             sectionRequired: 'Adiciona pelo menos uma secção.',
             sectionExerciseRequired:
                 'A secção {{index}} precisa de pelo menos um exercício.',
-            placeholderExerciseRequired:
-                'Escolhe um exercício para cada item na secção {{index}}.',
             saveFailed:
                 'Não foi possível guardar este rascunho. Tenta novamente.',
         },
@@ -342,7 +338,7 @@ export const ptPT: I18nResource = {
         notes: 'Notas',
         hint: 'As alterações são guardadas automaticamente no rascunho.',
         errors: {
-            nameRequired: 'O nome do exercício é obrigatório.',
+            nameRequired: exerciseNameRequired,
             saveFailed:
                 'Não foi possível guardar este exercício. Tenta novamente.',
         },
@@ -369,7 +365,7 @@ export const ptPT: I18nResource = {
         },
         actions: {
             addExercise: 'Adicionar exercício',
-            backToGym: 'Voltar ao Ginásio',
+            backToGym: 'Voltar ao ginásio',
             discard: 'Descartar',
             end: 'Terminar',
             finish: 'Terminar',
@@ -393,7 +389,7 @@ export const ptPT: I18nResource = {
             create: 'Criar',
             name: 'Nome',
             namePlaceholder: 'ex.: Supino',
-            nameRequired: 'O nome do exercício é obrigatório.',
+            nameRequired: exerciseNameRequired,
             subtitle: 'Usa um exercício guardado ou escreve um novo.',
             title: 'Adicionar exercício',
         },
@@ -550,7 +546,7 @@ export const ptPT: I18nResource = {
             clear: 'Limpar filtros',
             hiit: 'HIIT',
             gym: 'Ginásio',
-            sessionType: 'Tipo de sessão',
+            sessionType: 'Tipo de sessão:',
             title: 'Filtros',
         },
         kind: {
@@ -576,8 +572,8 @@ export const ptPT: I18nResource = {
         notFound: 'Sessão não encontrada',
         workoutSessionFallback: 'Sessão de treino',
         endedAt: 'Terminou {{time}}',
-        byBlock: 'Por bloco',
-        noCompletedBlocks: 'Sem blocos concluídos nesta sessão',
+        exercises: 'Exercícios',
+        noExercises: 'Sem exercícios nesta sessão',
         blockStats: {
             sets: 'Séries:',
             exercises: 'Exercícios:',
@@ -637,19 +633,18 @@ export const ptPT: I18nResource = {
             tapBlockToEdit: 'Toca num bloco para editar os detalhes.',
         },
         actions: {
-            addBlock: '＋ Adicionar bloco',
+            addBlock: 'Adicionar bloco',
             cancel: 'Cancelar',
             save: 'Guardar',
             create: 'Criar',
         },
         validation: {
-            nameRequired: 'O nome do treino é obrigatório.',
+            nameRequired: 'Nome do treino obrigatório.',
             addBlock: 'Adiciona pelo menos um bloco.',
-            exerciseNamesRequired: 'Exercícios devem ter nomes definidos.',
+            exerciseNamesRequired: 'Nomes dos exercícios obrigatórios.',
             saveFailed:
                 'Não foi possível guardar o treino. Verifica os detalhes e tenta novamente.',
-            unnamedExercises:
-                'Os exercícios precisam de nomes definidos antes de guardar.',
+            unnamedExercises: 'Nomes dos exercícios obrigatórios.',
         },
         removeBlock: {
             title: 'Remover bloco',
@@ -682,7 +677,7 @@ export const ptPT: I18nResource = {
             secondsShort: 's',
         },
         actions: {
-            addExercise: '＋ Adicionar exercício',
+            addExercise: 'Adicionar exercício',
             cancel: 'Cancelar',
             startWorkout: 'Iniciar treino',
             saveBlock: 'Guardar bloco',
@@ -694,14 +689,11 @@ export const ptPT: I18nResource = {
             cancel: 'Cancelar',
         },
         validation: {
-            setsMin: 'O bloco tem de ter pelo menos uma série.',
+            setsMin: 'Adiciona pelo menos uma série.',
             exercisesMin: 'Adiciona pelo menos um exercício.',
-            exerciseNameRequired:
-                'O nome do exercício é obrigatório antes de guardar.',
-            exerciseDurationMin:
-                'Exercício {{index}}: a duração tem de ser > 0 segundos.',
-            exerciseRepsMin:
-                'Exercício {{index}}: as repetições têm de ser > 0.',
+            exerciseNameRequired,
+            exerciseDurationMin: 'Exercício {{index}}: duração > 0s.',
+            exerciseRepsMin: 'Exercício {{index}}: repetições > 0.',
         },
     },
     settings: {
@@ -745,8 +737,8 @@ export const ptPT: I18nResource = {
     workouts: {
         title: 'Treinos',
         searchPlaceholder: 'Pesquisar treinos',
-        newButton: '＋ Novo',
-        createButton: '＋ Criar treino',
+        newButton: 'Novo',
+        createButton: 'Criar treino',
         defaults: {
             quickWorkoutName: 'Treino rápido',
             quickBlockTitle: 'Bloco rápido',
@@ -796,8 +788,8 @@ export const ptPT: I18nResource = {
         title: 'Exercícios',
         detailsTitle: 'Exercício',
         searchPlaceholder: 'Pesquisar exercícios',
-        newButton: '＋ Novo',
-        createButton: '＋ Criar exercício',
+        newButton: 'Novo',
+        createButton: 'Criar exercício',
         emptyTitle: 'Ainda não existem exercícios',
         emptyDescription:
             'Cria o teu primeiro exercício para construir o catálogo.',
@@ -846,7 +838,7 @@ export const ptPT: I18nResource = {
             user: 'Personalizado',
         },
         availability: {
-            both: 'Treino + Ginásio',
+            both: 'Treino + ginásio',
             workout: 'Treino',
             gym: 'Ginásio',
         },
@@ -904,7 +896,7 @@ export const ptPT: I18nResource = {
             system: 'Os exercícios do sistema vêm incluídos na app e não podem ser apagados.',
         },
         validation: {
-            nameRequired: 'O nome do exercício é obrigatório.',
+            nameRequired: exerciseNameRequired,
             duplicateName: 'Já existe um exercício com este nome.',
             deleteReferenced:
                 'Este exercício ainda está a ser usado e não pode ser apagado.',
@@ -935,7 +927,7 @@ export const ptPT: I18nResource = {
             estimatedTime: 'Tempo estimado',
         },
         blocksSection: 'Blocos',
-        hint: 'Podes editar este treino ou iniciá-lo agora.',
+        hint: 'Edita este treino ou inicia a tua sessão.',
         exportWorkout: 'Exportar treino',
         actions: {
             edit: 'Editar',
@@ -972,7 +964,7 @@ export const ptPT: I18nResource = {
         },
         confirmEnd: {
             title: 'Terminar treino?',
-            message: 'O teu progresso será guardado no resumo.',
+            message: 'O teu progresso será guardado.',
             confirm: 'Terminar treino',
             cancel: 'Continuar',
         },
