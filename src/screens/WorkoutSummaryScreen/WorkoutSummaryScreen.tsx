@@ -13,9 +13,9 @@ import { ErrorBanner } from '@src/components/ui/ErrorBanner/ErrorBanner';
 import { CircleIconButton } from '@src/components/ui/CircleIconButton/CircleIconButton';
 import GuardedPressable from '@src/components/ui/GuardedPressable/GuardedPressable';
 import ConfirmDialog from '@src/components/modals/ConfirmDialog/ConfirmDialog';
+import { WorkoutBlockItem } from '@src/screens/EditWorkoutScreen/components/WorkoutBlockItem/WorkoutBlockItem';
 import { useTheme } from '@src/theme/ThemeProvider';
 
-import { WorkoutSummaryBlockItem } from './components/WorkoutSummaryBlockItem/WorkoutSummaryBlockItem';
 import { useWorkoutSummaryStyles } from './WorkoutSummaryScreen.styles';
 import { useWorkoutSummaryScreen } from './useWorkoutSummaryScreen';
 
@@ -175,7 +175,7 @@ const WorkoutSummaryScreen = () => {
                     gap={theme.layout.listItem.gap}
                 >
                     {workout.blocks.map((block, index) => (
-                        <WorkoutSummaryBlockItem
+                        <WorkoutBlockItem
                             key={block.id}
                             index={index}
                             block={block}

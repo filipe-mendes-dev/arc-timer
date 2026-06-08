@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 type WorkoutBlockItemProps = {
     index: number;
     block: WorkoutBlock;
+    onExercisePress?: (exerciseDefinitionId: string) => void;
     onPress?: (id: string) => void;
     onRemove?: (id: string) => void;
     expanded?: boolean;
@@ -25,6 +26,7 @@ type WorkoutBlockItemProps = {
 export const WorkoutBlockItem = ({
     index,
     block,
+    onExercisePress,
     onPress,
     onRemove,
     expanded = false,
@@ -85,6 +87,13 @@ export const WorkoutBlockItem = ({
     };
 
     const handlePress = onPress ? () => onPress(block.id) : undefined;
+    const getExercisePressHandler = (
+        exerciseDefinitionId?: string,
+    ): (() => void) | undefined => {
+        if (!exerciseDefinitionId || !onExercisePress) return undefined;
+
+        return () => onExercisePress(exerciseDefinitionId);
+    };
 
     const actionStrip = onRemove
         ? {
@@ -162,12 +171,17 @@ export const WorkoutBlockItem = ({
                                     ex.mode,
                                     ex.value,
                                 );
+                                const handleExercisePress =
+                                    getExercisePressHandler(
+                                        ex.exerciseDefinitionId,
+                                    );
 
                                 return (
                                     <IndexedListItem
                                         key={ex.id}
                                         index={i}
                                         mainContent={mainContent}
+                                        onPress={handleExercisePress}
                                         secondaryContent={secondaryContent}
                                     />
                                 );

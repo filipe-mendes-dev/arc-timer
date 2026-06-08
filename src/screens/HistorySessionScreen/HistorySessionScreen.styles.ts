@@ -60,25 +60,6 @@ export const useHistorySessionStyles = createStyles((_theme: AppTheme) =>
             flexShrink: 1,
         },
 
-        // Block cards
-        blockCard: {
-            gap: 8,
-        },
-        blockStatsRow: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 12,
-            flexWrap: 'wrap',
-        },
-        blockStatItem: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 4,
-        },
-        blockStatLabel: {
-            marginRight: 2,
-        },
-
         // Actions section
         actionsContainer: {
             gap: 8,
