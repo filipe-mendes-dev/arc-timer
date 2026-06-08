@@ -60,6 +60,10 @@ const HomeScreen = () => {
     const finishGymSession = useFinishGymSession();
     const startGymSession = useStartGymSession();
     const { data: recent = [] } = useRecentTrainingSessions(5);
+    const hasCompletedGymSessionSet =
+        activeGymSession?.exerciseRecords.some((record) =>
+            record.sets.some((set) => set.completedAtMs !== undefined),
+        ) ?? false;
 
     const onOpenSession = (session: TrainingSessionListItemEntity) => {
         router.push(getSessionRoute(session.kind, session.id));
@@ -242,6 +246,7 @@ const HomeScreen = () => {
 
             <GymActiveSessionEndModal
                 visible={isGymSessionModalVisible}
+                hasCompletedSet={hasCompletedGymSessionSet}
                 isDiscardingSession={discardGymSession.isPending}
                 isFinishingSession={
                     finishGymSession.isPending || discardGymSession.isPending

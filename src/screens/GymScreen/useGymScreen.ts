@@ -93,11 +93,16 @@ export const useGymScreen = () => {
             (total, record) => total + record.sets.length,
             0,
         ) ?? 0;
+    const hasActiveSessionCompletedSet =
+        activeSession?.exerciseRecords.some((record) =>
+            record.sets.some((set) => set.completedAtMs !== undefined),
+        ) ?? false;
 
     return {
         activeSession,
         activeSessionSetCount,
         errorMessage,
+        hasActiveSessionCompletedSet,
         handleCloseError,
         handleConfirmDiscard,
         handleConfirmFinish,
