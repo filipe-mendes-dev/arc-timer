@@ -77,8 +77,7 @@ const WorkoutSummaryScreen = () => {
                                 variant="bodySmall"
                                 style={[
                                     st.favoriteLabel,
-                                    screen.isFavorite &&
-                                        st.favoriteLabelActive,
+                                    screen.isFavorite && st.favoriteLabelActive,
                                 ]}
                             >
                                 {t('workoutSummary.favorite')}
@@ -171,7 +170,7 @@ const WorkoutSummaryScreen = () => {
 
                 <ScreenSection
                     title={t('workoutSummary.blocksSection')}
-                    topSpacing="large"
+                    topSpacing="medium"
                     gap={theme.layout.listItem.gap}
                 >
                     {workout.blocks.map((block, index) => (
