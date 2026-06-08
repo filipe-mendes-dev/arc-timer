@@ -38,11 +38,18 @@ export const exerciseDefinitionErrors = {
 export type ExerciseDefinitionErrorCode =
     (typeof exerciseDefinitionErrors)[keyof typeof exerciseDefinitionErrors]['code'];
 
+export type ExerciseDefinitionErrorMessage =
+    (typeof exerciseDefinitionErrors)[keyof typeof exerciseDefinitionErrors]['message'];
+
 export interface ExerciseDefinitionError
-    extends AppError<ExerciseDefinitionErrorCode> {}
+    extends AppError<ExerciseDefinitionErrorCode> {
+    readonly message: ExerciseDefinitionErrorMessage;
+}
 
 export interface ExerciseDefinitionErrorDefinition
-    extends AppErrorDefinition<ExerciseDefinitionErrorCode> {}
+    extends AppErrorDefinition<ExerciseDefinitionErrorCode> {
+    readonly message: ExerciseDefinitionErrorMessage;
+}
 
 const exerciseDefinitionErrorCodes = Object.values(
     exerciseDefinitionErrors,
@@ -50,9 +57,9 @@ const exerciseDefinitionErrorCodes = Object.values(
 
 export const createExerciseDefinitionError = (
     definition: ExerciseDefinitionErrorDefinition,
-    message: string = definition.message,
+    message: ExerciseDefinitionErrorMessage = definition.message,
 ): ExerciseDefinitionError =>
-    Object.assign(new Error(message), { code: definition.code });
+    Object.assign(new Error(message), { code: definition.code, message });
 
 export const isExerciseDefinitionError = (
     e: unknown,

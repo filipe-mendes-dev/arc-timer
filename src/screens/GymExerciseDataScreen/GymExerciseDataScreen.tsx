@@ -1,7 +1,10 @@
 import { FlatList, View } from 'react-native';
 
 import { ListEmptyState } from '@src/components/layout/ListEmptyState';
-import { TrackingFieldsModal } from '@src/components/gym/TrackingFieldsModal';
+import {
+    TrackingFieldsModal,
+    type TrackingFieldsModalCopy,
+} from '@src/components/gym/TrackingFieldsModal';
 import { ScreenShell } from '@src/components/layout/ScreenShell';
 import ConfirmDialog from '@src/components/modals/ConfirmDialog/ConfirmDialog';
 import { DropdownPortalProvider } from '@src/components/ui/Dropdown/DropdownPortal';
@@ -15,7 +18,7 @@ import GymExerciseSetLine from './components/GymExerciseSetLine/GymExerciseSetLi
 import { useStyles } from './GymExerciseDataScreen.styles';
 import { useGymExerciseDataScreen } from './useGymExerciseDataScreen';
 
-const trackingFieldsModalCopy = {
+const trackingFieldsModalCopy: TrackingFieldsModalCopy = {
     description: 'gymExerciseData.defaults.description',
     removeDataAndSave: 'gymExerciseData.defaults.removeDataAndSave',
     removeDataWarning: 'gymExerciseData.defaults.removeDataWarning',
@@ -132,9 +135,7 @@ const GymExerciseDataScreen = () => {
                     visible={screen.pendingDeleteSets.length > 0}
                     title={screen.deleteConfirmTitle}
                     message={screen.deleteConfirmMessage}
-                    confirmLabel={screen.t(
-                        'gymExerciseData.actions.deleteSet',
-                    )}
+                    confirmLabel={screen.t('gymExerciseData.actions.deleteSet')}
                     cancelLabel={screen.t('common.actions.cancel')}
                     destructive
                     onConfirm={screen.handleConfirmDeleteSets}

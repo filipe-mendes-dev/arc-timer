@@ -9,6 +9,7 @@ import type {
 import GuardedPressable from '@src/components/ui/GuardedPressable/GuardedPressable';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { useTheme } from '@src/theme/ThemeProvider';
+import type { I18nKey } from '@src/i18n/i18nKey';
 
 import { useExerciseDefinitionDetailsScreenStyles } from '../ExerciseDefinitionDetailsScreen.styles';
 
@@ -19,7 +20,7 @@ interface ExerciseDefinitionReferenceRowProps {
 
 const referenceLabelKeyByKind: Record<
     ExerciseDefinitionReferenceKind,
-    string
+    I18nKey
 > = {
     gymPlan: 'exerciseDefinitions.references.gymPlan',
     workout: 'exerciseDefinitions.references.workout',

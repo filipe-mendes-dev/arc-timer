@@ -78,16 +78,26 @@ export const gymErrors = {
 export type GymErrorCode =
     (typeof gymErrors)[keyof typeof gymErrors]['code'];
 
-export interface GymError extends AppError<GymErrorCode> {}
+export type GymErrorMessage =
+    (typeof gymErrors)[keyof typeof gymErrors]['message'];
 
-export interface GymErrorDefinition extends AppErrorDefinition<GymErrorCode> {}
+export interface GymError extends AppError<GymErrorCode> {
+    readonly message: GymErrorMessage;
+}
+
+export interface GymErrorDefinition extends AppErrorDefinition<GymErrorCode> {
+    readonly message: GymErrorMessage;
+}
 
 const gymErrorCodes = Object.values(gymErrors).map(
     (definition) => definition.code,
 );
 
 export const createGymError = (definition: GymErrorDefinition): GymError =>
-    Object.assign(new Error(definition.message), { code: definition.code });
+    Object.assign(new Error(definition.message), {
+        code: definition.code,
+        message: definition.message,
+    });
 
 export const isGymError = (e: unknown): e is GymError =>
     isAppErrorCode(e, gymErrorCodes);

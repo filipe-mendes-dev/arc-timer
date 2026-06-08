@@ -1,6 +1,7 @@
 import type { TFunction } from 'i18next';
 import type { RefObject } from 'react';
 
+import type { TrackingFieldsModalCopy } from '@src/components/gym/TrackingFieldsModal';
 import type { TopBarOption } from '@src/components/navigation/TopBar/TopBar.interfaces';
 import type {
     GymPlan,
@@ -60,7 +61,7 @@ export interface TopBarOptionsActions {
 
 export const MAX_SUGGESTION_COUNT = 6;
 
-export const trackingFieldsModalCopy = {
+export const trackingFieldsModalCopy: TrackingFieldsModalCopy = {
     description: 'gymExerciseData.defaults.description',
     removeDataAndSave: 'gymExerciseData.defaults.removeDataAndSave',
     removeDataWarning: 'gymExerciseData.defaults.removeDataWarning',

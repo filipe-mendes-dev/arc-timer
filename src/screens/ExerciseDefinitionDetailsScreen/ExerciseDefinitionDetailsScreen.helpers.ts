@@ -6,24 +6,26 @@ import type {
     ExerciseDefinitionTargetSetData,
     ExerciseTrackingField,
 } from '@src/core/entities/exerciseDefinition.interfaces';
+import type { TrackingFieldsModalCopy } from '@src/components/gym/TrackingFieldsModal';
 import {
     fieldsFromTrackingFieldValue,
     trackingFieldValueFromFields,
     type ExerciseDefinitionTrackingFieldsValue,
 } from '@src/core/entities/exerciseTrackingFields';
 import type { GymSessionListItem } from '@src/core/entities/gymSession.interfaces';
+import type { I18nKey } from '@src/i18n/i18nKey';
 
 export interface ExerciseDefinitionTrackingFields extends ExerciseDefinitionTrackingFieldsValue {}
 
 export interface ExerciseDefinitionMetricItem {
     field: ExerciseTrackingField;
-    labelKey: string;
+    labelKey: I18nKey;
     value: string;
 }
 
 export interface ExerciseDefinitionStatItem {
     id: string;
-    labelKey: string;
+    labelKey: I18nKey;
     value: string;
 }
 
@@ -42,7 +44,7 @@ export const availabilityLabelKeyByAvailability = {
     workout: 'exerciseDefinitions.availability.workout',
 } as const;
 
-export const trackingFieldsModalCopy = {
+export const trackingFieldsModalCopy: TrackingFieldsModalCopy = {
     description: 'exerciseDefinitions.trackingModal.subtitle',
     removeDataAndSave: 'exerciseDefinitions.trackingModal.removeDefaultAndSave',
     removeDataWarning: 'exerciseDefinitions.trackingModal.removeDefaultWarning',

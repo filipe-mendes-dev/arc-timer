@@ -46,6 +46,11 @@ interface UseGymPlanDetailsScreenResult {
     toggleFavoritePlan: () => void;
 }
 
+type GymPlanExportErrorKey =
+    | 'gymPlanDetails.export.failed'
+    | 'gymPlanDetails.export.sharingUnavailable'
+    | 'gymPlanDetails.export.writeFailed';
+
 export const useGymPlanDetailsScreen = (): UseGymPlanDetailsScreenResult => {
     const { t } = useTranslation();
     const router = useRouter();
@@ -62,7 +67,8 @@ export const useGymPlanDetailsScreen = (): UseGymPlanDetailsScreenResult => {
     const restoreGymPlan = useRestoreGymPlan();
     const deleteGymPlan = useDeleteGymPlan();
     const [isDeleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
-    const [exportErrorKey, setExportErrorKey] = useState<string | null>(null);
+    const [exportErrorKey, setExportErrorKey] =
+        useState<GymPlanExportErrorKey | null>(null);
     const [isExporting, setExporting] = useState(false);
 
     const definitionNameById = useMemo(

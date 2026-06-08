@@ -1,4 +1,5 @@
 import type { ExerciseTrackingField } from './exerciseDefinition.interfaces';
+import type { I18nKey } from '@src/i18n/i18nKey';
 
 export interface GymExerciseTrackingFieldsValue {
     hasDistanceMeters: boolean;
@@ -22,7 +23,7 @@ export interface ExerciseTrackingFieldDefinition<
 > {
     field: ExerciseTrackingField;
     key: Key;
-    labelKey: string;
+    labelKey: I18nKey;
 }
 
 export const exerciseTrackingFieldDefinitions: ExerciseTrackingFieldDefinition[] =
@@ -71,7 +72,7 @@ export const trackingFieldKeyByField: Record<
 
 export const trackingFieldLabelKeyByField: Record<
     ExerciseTrackingField,
-    string
+    I18nKey
 > = {
     reps: 'exerciseDefinitions.trackingField.reps',
     weight: 'exerciseDefinitions.trackingField.weight',

@@ -1,8 +1,10 @@
+import type { I18nKey } from '@src/i18n/i18nKey';
+
 export type { TrackingFieldsValue } from '@src/core/entities/exerciseTrackingFields';
 
 export interface TrackingFieldsModalCopy {
-    description: string;
-    removeDataAndSave: string;
-    removeDataWarning: string;
-    title: string;
+    description: I18nKey;
+    removeDataAndSave: I18nKey;
+    removeDataWarning: I18nKey;
+    title: I18nKey;
 }

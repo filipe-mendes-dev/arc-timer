@@ -6,6 +6,7 @@ import type { GymExerciseRecordSet } from '@src/core/entities/gymSession.interfa
 import { useGymExerciseDefinitions } from '@src/data/exerciseDefinitions';
 import { useGymPlan } from '@src/data/gymPlans';
 import {
+    isGymError,
     useDeleteGymSession,
     useGymSession,
     useStartGymSessionFromSessionSnapshot,
@@ -36,9 +37,9 @@ export const useGymSessionSummaryScreen = () => {
         sourceGymPlan?.status === 'active' ? sourceGymPlan.id : undefined;
     const canOpenSourceGymPlan = sourceGymPlanId !== undefined;
     const isStartingSession = startSessionFromSnapshot.isPending;
-    const actionErrorMessage = t(
-        startSessionFromSnapshot.error?.message ?? '',
-    );
+    const actionErrorMessage = isGymError(startSessionFromSnapshot.error)
+        ? t(startSessionFromSnapshot.error.message)
+        : '';
     const exerciseNameById = new Map(
         exerciseDefinitions.map((definition) => [
             definition.id,
