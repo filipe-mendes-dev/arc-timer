@@ -1,5 +1,6 @@
 import { View } from 'react-native';
 
+import GuardedPressable from '@src/components/ui/GuardedPressable/GuardedPressable';
 import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import type { IconId } from '@src/components/ui/Icon/AppIcon';
 import { AppText } from '@src/components/ui/Typography/AppText';
@@ -11,6 +12,7 @@ interface IndexedListItemProps {
     iconName?: IconId;
     index?: number;
     mainContent: string;
+    onPress?: () => void;
     secondaryContent?: string;
 }
 
@@ -18,15 +20,15 @@ export const IndexedListItem = ({
     iconName,
     index,
     mainContent,
+    onPress,
     secondaryContent,
 }: IndexedListItemProps) => {
     const { theme } = useTheme();
     const st = useStyles();
     const hasIcon = iconName !== undefined;
     const hasIndex = index !== undefined;
-
-    return (
-        <View style={st.item}>
+    const content = (
+        <>
             {(hasIcon || hasIndex) && (
                 <View style={st.leadingBubble}>
                     {hasIcon && (
@@ -56,6 +58,24 @@ export const IndexedListItem = ({
                     </AppText>
                 )}
             </View>
+        </>
+    );
+
+    if (onPress) {
+        return (
+            <GuardedPressable
+                accessibilityRole="button"
+                onPress={onPress}
+                style={st.item}
+            >
+                {content}
+            </GuardedPressable>
+        );
+    }
+
+    return (
+        <View style={st.item}>
+            {content}
         </View>
     );
 };

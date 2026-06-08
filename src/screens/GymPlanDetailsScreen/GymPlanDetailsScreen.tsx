@@ -174,6 +174,9 @@ const GymPlanDetailsScreen = () => {
                             copyScope="details"
                             definitionNameById={screen.definitionNameById}
                             index={sectionIndex}
+                            onExercisePress={
+                                screen.handleOpenExerciseDefinition
+                            }
                             section={section}
                         />
                     ))}

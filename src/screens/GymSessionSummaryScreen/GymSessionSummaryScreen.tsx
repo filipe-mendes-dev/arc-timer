@@ -26,6 +26,7 @@ const GymSessionSummaryScreen = () => {
         exerciseSummaries,
         getSetDetails,
         handleDeleteSession,
+        handleOpenExerciseDefinition,
         handleOpenGymPlan,
         handleRunAgain,
         isDeleteConfirmVisible,
@@ -193,6 +194,7 @@ const GymSessionSummaryScreen = () => {
                             key={section.id}
                             section={section}
                             getSetDetails={getSetDetails}
+                            onExercisePress={handleOpenExerciseDefinition}
                         />
                     ))}
 

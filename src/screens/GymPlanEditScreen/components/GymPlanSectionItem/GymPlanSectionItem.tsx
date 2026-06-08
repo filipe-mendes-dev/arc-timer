@@ -27,6 +27,7 @@ interface GymPlanSectionItemProps {
     definitionNameById: ReadonlyMap<string, string>;
     index: number;
     isWiggling?: boolean;
+    onExercisePress?: (exerciseDefinitionId: string) => void;
     onPress?: (sectionId: string) => void;
     onRemove?: (sectionId: string) => void;
     section: GymPlanSection;
@@ -37,6 +38,7 @@ export const GymPlanSectionItem = ({
     definitionNameById,
     index,
     isWiggling = false,
+    onExercisePress,
     onPress,
     onRemove,
     section,
@@ -67,6 +69,15 @@ export const GymPlanSectionItem = ({
         if (onPress) onPress(section.id);
         return;
     }, [onPress, section.id]);
+
+    const getExercisePressHandler = useCallback(
+        (exerciseDefinitionId: string): (() => void) | undefined => {
+            if (!onExercisePress) return undefined;
+
+            return () => onExercisePress(exerciseDefinitionId);
+        },
+        [onExercisePress],
+    );
 
     const measureKey = [
         section.id,
@@ -156,12 +167,17 @@ export const GymPlanSectionItem = ({
                                                 copyScope,
                                                 t,
                                             );
+                                        const handleExercisePress =
+                                            getExercisePressHandler(
+                                                exercise.exerciseDefinitionId,
+                                            );
 
                                         return (
                                             <IndexedListItem
                                                 key={exercise.id}
                                                 index={exerciseIndex}
                                                 mainContent={exerciseName}
+                                                onPress={handleExercisePress}
                                                 secondaryContent={
                                                     secondaryContent
                                                 }

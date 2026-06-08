@@ -41,6 +41,7 @@ interface UseGymPlanDetailsScreenResult {
     goBack: () => void;
     handleEditPlan: () => void;
     handleExport: () => Promise<void>;
+    handleOpenExerciseDefinition: (exerciseDefinitionId: string) => void;
     handleStartPlan: () => void;
     toggleFavoritePlan: () => void;
 }
@@ -105,6 +106,10 @@ export const useGymPlanDetailsScreen = (): UseGymPlanDetailsScreenResult => {
 
         startEditDraft(gymPlan);
         router.push('/gymPlans/edit');
+    };
+
+    const handleOpenExerciseDefinition = (exerciseDefinitionId: string) => {
+        router.push(`/exercise-definitions/${exerciseDefinitionId}`);
     };
 
     const handleExport = async () => {
@@ -221,6 +226,7 @@ export const useGymPlanDetailsScreen = (): UseGymPlanDetailsScreenResult => {
         goBack,
         handleEditPlan,
         handleExport,
+        handleOpenExerciseDefinition,
         handleStartPlan,
         toggleFavoritePlan,
     };
