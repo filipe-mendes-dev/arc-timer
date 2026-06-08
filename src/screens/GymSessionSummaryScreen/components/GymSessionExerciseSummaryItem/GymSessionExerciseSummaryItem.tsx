@@ -14,6 +14,7 @@ interface GymSessionExerciseSummaryItemProps {
     exercise: ExerciseSummary;
     getSetDetails: (set: GymExerciseRecordSet) => string;
     index: number;
+    onExercisePress: (exerciseDefinitionId: string) => void;
 }
 
 const getSetStatusIconId = (set: GymExerciseRecordSet): IconId => {
@@ -28,6 +29,7 @@ export const GymSessionExerciseSummaryItem = ({
     exercise,
     getSetDetails,
     index,
+    onExercisePress,
 }: GymSessionExerciseSummaryItemProps) => {
     const { t } = useTranslation();
     const { theme } = useTheme();
@@ -47,6 +49,9 @@ export const GymSessionExerciseSummaryItem = ({
             <IndexedListItem
                 index={index}
                 mainContent={exercise.exerciseName}
+                onPress={() =>
+                    onExercisePress(exercise.record.exerciseDefinitionId)
+                }
                 secondaryContent={t('common.units.set', {
                     count: completedSetCount,
                 })}

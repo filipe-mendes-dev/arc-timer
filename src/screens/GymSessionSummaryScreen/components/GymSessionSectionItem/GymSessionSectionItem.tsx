@@ -14,11 +14,13 @@ import { useStyles } from './GymSessionSectionItem.styles';
 
 interface GymSessionSectionItemProps {
     getSetDetails: (set: GymExerciseRecordSet) => string;
+    onExercisePress: (exerciseDefinitionId: string) => void;
     section: SectionSummary;
 }
 
 export const GymSessionSectionItem = ({
     getSetDetails,
+    onExercisePress,
     section,
 }: GymSessionSectionItemProps) => {
     const { t } = useTranslation();
@@ -77,6 +79,7 @@ export const GymSessionSectionItem = ({
                             exercise={exercise}
                             index={exerciseIndex}
                             getSetDetails={getSetDetails}
+                            onExercisePress={onExercisePress}
                         />
                     ))}
                 </View>
