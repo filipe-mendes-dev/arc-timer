@@ -925,6 +925,7 @@ export const en: I18nResource = {
         confirmEnd: {
             title: 'End workout?',
             message: 'Your progress will be saved.',
+            discardMessage: 'Your progress will be discarded.',
             confirm: 'End workout',
             cancel: 'Keep going',
         },

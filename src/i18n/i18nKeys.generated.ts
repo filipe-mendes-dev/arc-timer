@@ -892,6 +892,7 @@ export const i18nKeys = {
         confirmEnd: {
             title: 'run.confirmEnd.title',
             message: 'run.confirmEnd.message',
+            discardMessage: 'run.confirmEnd.discardMessage',
             confirm: 'run.confirmEnd.confirm',
             cancel: 'run.confirmEnd.cancel',
         },

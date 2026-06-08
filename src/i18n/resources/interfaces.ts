@@ -882,6 +882,7 @@ export interface I18nResource {
         confirmEnd: {
             title: string;
             message: string;
+            discardMessage: string;
             confirm: string;
             cancel: string;
         };

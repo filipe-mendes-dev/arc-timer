@@ -31,6 +31,8 @@ import { useSystemBackHandler } from '@src/hooks/navigation/useSystemBackHandler
 import { useTranslation } from 'react-i18next';
 import { RunLayoutProvider } from './context/RunLayoutContext';
 
+const MIN_SAVED_WORKOUT_WORK_SEC = 30;
+
 export const WorkoutRunScreen = () => {
     const { t } = useTranslation();
     useKeepAwake();
@@ -85,6 +87,9 @@ export const WorkoutRunScreen = () => {
         stats: runStats,
     } = useWorkoutRun({ plan, shouldAutoStart });
 
+    const shouldDiscardShortWorkout =
+        runStats.totalWorkSec < MIN_SAVED_WORKOUT_WORK_SEC;
+
     const isSoundEnabled = useSettingsStore((s) => s.isSoundEnabled);
 
     useStepBeeps({
@@ -110,8 +115,6 @@ export const WorkoutRunScreen = () => {
     const currentBlock = workout?.blocks[currentBlockIdx] ?? null;
 
     // --------  Session History Logic ---------
-    const MIN_SESSION_SEC = 0;
-
     const startedAtMsRef = useRef<number | null>(null);
 
     useEffect(() => {
@@ -134,11 +137,10 @@ export const WorkoutRunScreen = () => {
         const startedAtMs = startedAtMsRef.current;
         if (startedAtMs == null) return;
 
-        const endedAtMs = Date.now();
-        const totalSec = Math.round((endedAtMs - startedAtMs) / 1000);
-
-        if (totalSec < MIN_SESSION_SEC) return;
+        if (runStats.totalWorkSec < MIN_SAVED_WORKOUT_WORK_SEC) return;
         if (!workout) return;
+
+        const endedAtMs = Date.now();
 
         addWorkoutSession({
             versionId: useWorkoutRunStore.getState().sourceVersionId ?? undefined,
@@ -208,6 +210,14 @@ export const WorkoutRunScreen = () => {
         ? theme.palette.accent.primary
         : colorFor(phase, !!isSetRest);
     const phaseLabel = t(phaseLabelKeyFor(phase, !!isSetRest));
+    let endConfirmLabel = t('run.confirmEnd.confirm');
+    if (shouldDiscardShortWorkout) {
+        endConfirmLabel = t('gymActiveSession.actions.discard');
+    }
+    let endConfirmMessage = t('run.confirmEnd.message');
+    if (shouldDiscardShortWorkout) {
+        endConfirmMessage = t('run.confirmEnd.discardMessage');
+    }
 
     // ----- handlers --------
 
@@ -227,6 +237,11 @@ export const WorkoutRunScreen = () => {
 
     const handleConfirmEnd = () => {
         setEndConfirmVisible(false);
+        if (shouldDiscardShortWorkout) {
+            handleForceFinish();
+            handleDone();
+            return;
+        }
         handleForceFinish();
     };
 
@@ -297,8 +312,8 @@ export const WorkoutRunScreen = () => {
                 <ConfirmDialog
                     visible={endConfirmVisible}
                     title={t('run.confirmEnd.title')}
-                    message={t('run.confirmEnd.message')}
-                    confirmLabel={t('run.confirmEnd.confirm')}
+                    message={endConfirmMessage}
+                    confirmLabel={endConfirmLabel}
                     cancelLabel={t('run.confirmEnd.cancel')}
                     destructive
                     onConfirm={handleConfirmEnd}

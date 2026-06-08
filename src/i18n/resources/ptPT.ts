@@ -952,6 +952,7 @@ export const ptPT: I18nResource = {
         confirmEnd: {
             title: 'Terminar treino?',
             message: 'O teu progresso será guardado.',
+            discardMessage: 'O teu progresso será descartado.',
             confirm: 'Terminar treino',
             cancel: 'Continuar',
         },
