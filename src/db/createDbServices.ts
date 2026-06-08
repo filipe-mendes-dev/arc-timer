@@ -42,6 +42,10 @@ import {
     createGymPlanService,
     type GymPlanService,
 } from './services/gyms/gymPlanServiceFactory';
+import {
+    createTrainingSessionService,
+    type TrainingSessionService,
+} from './services/trainingSessions/trainingSessionServiceFactory';
 import type { ExerciseDefinitionService } from './services/exerciseDefinitions/exerciseDefinitionServiceFactory';
 import type { WorkoutRepository } from './repositories/workouts/workoutRepositoryFactory';
 import type { WorkoutSessionRepository } from './repositories/workoutSessions/workoutSessionRepositoryFactory';
@@ -60,6 +64,7 @@ export interface DbServices {
     gymPlanService: GymPlanService;
     gymSessionRepository: GymSessionRepository;
     gymSessionService: GymSessionService;
+    trainingSessionService: TrainingSessionService;
     workoutRepository: WorkoutRepository;
     workoutService: WorkoutService;
     workoutSessionRepository: WorkoutSessionRepository;
@@ -128,6 +133,10 @@ export const createDbServices = ({
         exerciseDefinitionService,
         gymPlanRepository,
     });
+    const trainingSessionService = createTrainingSessionService({
+        gymSessionService,
+        workoutSessionService,
+    });
 
     return {
         exerciseDefinitionDataRepository,
@@ -138,6 +147,7 @@ export const createDbServices = ({
         gymPlanService,
         gymSessionRepository,
         gymSessionService,
+        trainingSessionService,
         workoutRepository,
         workoutService,
         workoutSessionRepository,
