@@ -175,7 +175,7 @@ const HomeScreen = () => {
                         <HomeActionTile
                             title={t('home.actions.savedHiitWorkouts')}
                             icon="barbell-outline"
-                            onPress={() => router.push('/workouts')}
+                            onPress={() => router.navigate('/workouts')}
                         />
                     </View>
 
@@ -193,7 +193,7 @@ const HomeScreen = () => {
                 title={t('home.recentSessions')}
                 rightAccessory={
                     <GuardedPressable
-                        onPress={() => router.push('/history')}
+                        onPress={() => router.navigate('/history')}
                         style={st.recentSessionsButton}
                         hitSlop={8}
                     >

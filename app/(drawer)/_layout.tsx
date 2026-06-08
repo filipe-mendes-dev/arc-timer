@@ -14,6 +14,7 @@ const DrawerLayout = () => {
             screenOptions={{
                 headerShown: false,
                 drawerType: 'front',
+                lazy: false,
                 drawerStyle: {
                     backgroundColor: theme.palette.background.card,
                     width: 280,

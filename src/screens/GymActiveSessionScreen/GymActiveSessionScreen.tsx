@@ -96,6 +96,13 @@ const GymActiveSessionScreen = () => {
     const unsectionedRecords = activeSession.exerciseRecords.filter(
         (record) => !sectionedRecordIds.has(record.id),
     );
+    const hasVisiblePlanSections = Array.from(
+        sectionRecordsById.values(),
+    ).some((records) => records.length > 0);
+    const shouldRenderAddedExercisesSection =
+        shouldGroupBySection &&
+        hasVisiblePlanSections &&
+        unsectionedRecords.length > 0;
 
     return (
         <>
@@ -158,7 +165,31 @@ const GymActiveSessionScreen = () => {
                             );
                         })}
 
+                    {shouldRenderAddedExercisesSection && (
+                        <ScreenSection
+                            title={t(
+                                'gymActiveSession.sections.addedExercises',
+                            )}
+                            gap={8}
+                        >
+                            {unsectionedRecords.map((record) => (
+                                <GymExerciseCard
+                                    key={record.id}
+                                    record={record}
+                                    exerciseName={getExerciseName(record)}
+                                    onPress={() =>
+                                        handleOpenExercise(record.id)
+                                    }
+                                    onRemove={() =>
+                                        setPendingRemoveRecord(record)
+                                    }
+                                />
+                            ))}
+                        </ScreenSection>
+                    )}
+
                     {shouldGroupBySection &&
+                        !shouldRenderAddedExercisesSection &&
                         unsectionedRecords.map((record) => (
                             <GymExerciseCard
                                 key={record.id}

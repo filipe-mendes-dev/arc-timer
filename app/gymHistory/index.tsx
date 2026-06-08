@@ -1,3 +1,7 @@
-import GymHistoryScreen from '@src/screens/GymHistoryScreen/GymHistoryScreen';
+import { Redirect } from 'expo-router';
 
-export default GymHistoryScreen;
+const GymHistoryIndexRoute = () => (
+    <Redirect href={{ pathname: '/history', params: { kind: 'gym' } }} />
+);
+
+export default GymHistoryIndexRoute;

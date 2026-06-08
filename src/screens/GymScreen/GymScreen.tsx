@@ -191,7 +191,12 @@ const GymScreen = () => {
                     subtitle={t('gym.actions.historySubtitle')}
                     icon="time-outline"
                     variant="secondary"
-                    onPress={() => router.push('/gymHistory')}
+                    onPress={() =>
+                        router.navigate({
+                            pathname: '/history',
+                            params: { kind: 'gym' },
+                        })
+                    }
                 />
 
                 <ErrorBanner

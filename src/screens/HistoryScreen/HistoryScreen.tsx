@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FlatList, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { MainContainer } from '@src/components/layout/MainContainer/MainContainer';
 import ConfirmDialog from '@src/components/modals/ConfirmDialog/ConfirmDialog';
@@ -21,6 +21,18 @@ interface HistoryFilterOption {
     label: string;
 }
 
+const parseHistoryFilterKind = (
+    value: string | string[] | undefined,
+): HistoryFilterKind => {
+    const normalizedValue = Array.isArray(value) ? value[0] : value;
+
+    if (normalizedValue === 'hiit' || normalizedValue === 'gym') {
+        return normalizedValue;
+    }
+
+    return 'all';
+};
+
 const getSessionKey = (
     kind: TrainingSessionKind,
     sessionId: string,
@@ -38,11 +50,16 @@ const getSessionRoute = (
 const HistoryScreen = () => {
     const { t } = useTranslation();
     const router = useRouter();
+    const { kind } = useLocalSearchParams();
     const st = useStyles();
 
     const [search, setSearch] = useState('');
     const [selectedKind, setSelectedKind] =
-        useState<HistoryFilterKind>('all');
+        useState<HistoryFilterKind>(() => parseHistoryFilterKind(kind));
+
+    useEffect(() => {
+        setSelectedKind(parseHistoryFilterKind(kind));
+    }, [kind]);
     let queryKind: TrainingSessionKind | undefined;
     if (selectedKind !== 'all') {
         queryKind = selectedKind;
