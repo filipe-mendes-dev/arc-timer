@@ -5,6 +5,8 @@ export type ExerciseDefinitionSource = 'system' | 'user';
 
 export type ExerciseDefinitionAvailability = 'both' | 'workout' | 'gym';
 
+export type ExerciseDefinitionDeleteBlockReason = 'system' | 'referenced';
+
 export type ExerciseTrackingField =
     | 'reps'
     | 'weight'
@@ -18,6 +20,8 @@ export interface ExerciseDefinitionListItem {
     normalizedName: string;
     source: ExerciseDefinitionSource;
     availability: ExerciseDefinitionAvailability;
+    canDelete?: boolean;
+    deleteBlockReason?: ExerciseDefinitionDeleteBlockReason;
     createdAtMs: number;
     updatedAtMs: number;
 }

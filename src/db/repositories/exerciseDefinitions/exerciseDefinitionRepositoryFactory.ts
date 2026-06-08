@@ -4,6 +4,7 @@ import type { BaseSQLiteDatabase } from 'drizzle-orm/sqlite-core';
 import type {
     ExerciseDefinition,
     ExerciseDefinitionAvailability,
+    ExerciseDefinitionDeleteBlockReason,
     ExerciseDefinitionListItem,
     ExerciseDefinitionSource,
 } from '@src/core/entities/exerciseDefinition.interfaces';
@@ -31,6 +32,16 @@ export type ExerciseDefinitionRepositoryDb = BaseSQLiteDatabase<
 
 type ExerciseDefinitionDbInsert = typeof exerciseDefinitionsTable.$inferInsert;
 type ExerciseDefinitionDbRow = typeof exerciseDefinitionsTable.$inferSelect;
+
+interface ExerciseDefinitionBaseListItem {
+    id: string;
+    name: string;
+    normalizedName: string;
+    source: ExerciseDefinitionSource;
+    availability: ExerciseDefinitionAvailability;
+    createdAtMs: number;
+    updatedAtMs: number;
+}
 
 export interface CreateExerciseDefinitionInput {
     availability: ExerciseDefinitionAvailability;
@@ -103,7 +114,7 @@ export interface CreateExerciseDefinitionRepositoryArgs {
 
 const exerciseDefinitionFromRow = (
     row: ExerciseDefinitionDbRow,
-): ExerciseDefinitionListItem => ({
+): ExerciseDefinitionBaseListItem => ({
     id: row.id,
     name: row.name,
     normalizedName: row.normalizedName,
@@ -161,6 +172,38 @@ export const createExerciseDefinitionRepository = ({
         return normalizedName.length > 0 ? normalizedName : undefined;
     };
 
+    const getDeleteBlockReason = (
+        item: ExerciseDefinitionBaseListItem,
+    ): ExerciseDefinitionDeleteBlockReason | undefined => {
+        if (item.source === 'system') return 'system';
+
+        const hasReferences =
+            repository.hasWorkoutExerciseReferences(item.id) ||
+            repository.hasGymSessionExerciseReferences(item.id) ||
+            repository.hasGymPlanExerciseReferences(item.id);
+
+        return hasReferences ? 'referenced' : undefined;
+    };
+
+    const withDeleteMetadata = (
+        item: ExerciseDefinitionBaseListItem,
+    ): ExerciseDefinitionListItem => {
+        const deleteBlockReason = getDeleteBlockReason(item);
+
+        if (deleteBlockReason) {
+            return {
+                ...item,
+                canDelete: false,
+                deleteBlockReason,
+            };
+        }
+
+        return {
+            ...item,
+            canDelete: true,
+        };
+    };
+
     const repository: ExerciseDefinitionRepository = {
         create: (
             input: CreateExerciseDefinitionInput,
@@ -174,7 +217,7 @@ export const createExerciseDefinitionRepository = ({
                 .run();
 
             return exerciseDefinitionFromListItem(
-                input,
+                withDeleteMetadata(input),
                 exerciseDefinitionDataRepository,
                 exerciseDefinitionStatsRepository,
             );
@@ -192,7 +235,7 @@ export const createExerciseDefinitionRepository = ({
                 .from(exerciseDefinitionsTable)
                 .orderBy(asc(exerciseDefinitionsTable.name))
                 .all()
-                .map(exerciseDefinitionFromRow),
+                .map((row) => withDeleteMetadata(exerciseDefinitionFromRow(row))),
 
         getById: (id: string): ExerciseDefinition | null => {
             const row = db
@@ -203,7 +246,7 @@ export const createExerciseDefinitionRepository = ({
 
             return row
                 ? exerciseDefinitionFromListItem(
-                      exerciseDefinitionFromRow(row),
+                      withDeleteMetadata(exerciseDefinitionFromRow(row)),
                       exerciseDefinitionDataRepository,
                       exerciseDefinitionStatsRepository,
                   )
@@ -221,7 +264,7 @@ export const createExerciseDefinitionRepository = ({
 
             return row
                 ? exerciseDefinitionFromListItem(
-                      exerciseDefinitionFromRow(row),
+                      withDeleteMetadata(exerciseDefinitionFromRow(row)),
                       exerciseDefinitionDataRepository,
                       exerciseDefinitionStatsRepository,
                   )
@@ -333,7 +376,9 @@ export const createExerciseDefinitionRepository = ({
             const rows =
                 limit === undefined ? query.all() : query.limit(limit).all();
 
-            return rows.map(exerciseDefinitionFromRow);
+            return rows.map((row) =>
+                withDeleteMetadata(exerciseDefinitionFromRow(row)),
+            );
         },
 
         replaceGymPlanExerciseDefinitionReferences: ({
@@ -381,7 +426,7 @@ export const createExerciseDefinitionRepository = ({
                 assertUniqueNormalizedName(input.normalizedName, input.id);
             }
 
-            const next: ExerciseDefinitionListItem = {
+            const next: ExerciseDefinitionBaseListItem = {
                 ...existing,
                 name: input.name ?? existing.name,
                 normalizedName: input.normalizedName ?? existing.normalizedName,
@@ -403,7 +448,7 @@ export const createExerciseDefinitionRepository = ({
                 .run();
 
             return exerciseDefinitionFromListItem(
-                next,
+                withDeleteMetadata(next),
                 exerciseDefinitionDataRepository,
                 exerciseDefinitionStatsRepository,
             );
