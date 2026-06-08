@@ -44,5 +44,15 @@ export const useStyles = createStyles((theme: AppTheme) =>
             flex: 1,
             minWidth: 0,
         },
+        recentSessionsButton: {
+            alignItems: 'center',
+            flexDirection: 'row',
+            gap: 6,
+            paddingHorizontal: 0,
+            paddingVertical: 6,
+        },
+        recentSessionsButtonText: {
+            color: theme.palette.text.secondary,
+        },
     }),
 );

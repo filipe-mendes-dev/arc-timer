@@ -3,6 +3,8 @@ import { useRouter } from 'expo-router';
 
 import { MainContainer } from '@src/components/layout/MainContainer/MainContainer';
 import { AppText } from '@src/components/ui/Typography/AppText';
+import GuardedPressable from '@src/components/ui/GuardedPressable/GuardedPressable';
+import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import { HomeActionTile } from './components/HomeActionTile/HomeActionTile';
 import { useStyles } from './HomeScreen.styles';
 import { useTheme } from '@src/theme/ThemeProvider';
@@ -187,7 +189,30 @@ const HomeScreen = () => {
                 </View>
             </View>
 
-            <ScreenSection title={t('home.recentSessions')} flex>
+            <ScreenSection
+                title={t('home.recentSessions')}
+                rightAccessory={
+                    <GuardedPressable
+                        onPress={() => router.push('/history')}
+                        style={st.recentSessionsButton}
+                        hitSlop={8}
+                    >
+                        <AppText
+                            variant="bodySmall"
+                            numberOfLines={1}
+                            style={st.recentSessionsButtonText}
+                        >
+                            {t('home.actions.seeAllSessions')}
+                        </AppText>
+                        <AppIcon
+                            id="forwardCircle"
+                            size={14}
+                            color={theme.palette.text.secondary}
+                        />
+                    </GuardedPressable>
+                }
+                flex
+            >
                 <FlatList
                     data={recent}
                     keyExtractor={(s) => `${s.kind}:${s.id}`}
