@@ -46,7 +46,7 @@ const ExerciseDefinitionDetailsScreen = () => {
             });
         }
 
-        if (definition.source !== 'system') {
+        if (definition.canDelete) {
             options.push({
                 id: 'delete-exercise-definition',
                 label: t('common.actions.remove'),
