@@ -16,7 +16,7 @@ export const useStyles = createStyles((theme: AppTheme) =>
         },
         heading: {},
         subheading: {},
-        gridContainer: { gap: 14, paddingBottom: 16 },
+        gridContainer: { gap: 14 },
 
         grid: {
             flexDirection: 'row',

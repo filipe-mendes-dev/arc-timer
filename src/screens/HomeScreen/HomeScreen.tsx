@@ -17,6 +17,7 @@ import {
 } from '@src/data/gymSessions';
 import { useRecentTrainingSessions } from '@src/data/trainingSessions';
 import { ScreenSection } from '@src/components/layout/ScreenSection/ScreenSection';
+import { ActionModal } from '@src/components/modals/ActionModal';
 import { TrainingSessionListItem } from '../HistoryScreen/components/TrainingSessionListItem';
 import { AppLogo } from '@src/components/ui/AppLogo/AppLogo';
 import { useTranslation } from 'react-i18next';
@@ -45,6 +46,8 @@ const HomeScreen = () => {
     const st = useStyles();
 
     const [isGymSessionModalVisible, setEndGymSessionModalVisible] =
+        useState(false);
+    const [isSessionTypeModalVisible, setSessionTypeModalVisible] =
         useState(false);
 
     useSystemBackHandler({
@@ -80,6 +83,16 @@ const HomeScreen = () => {
         startGymSession.mutate(undefined, {
             onSuccess: () => router.push('/gymSession'),
         });
+    };
+
+    const handleStartWorkoutSession = () => {
+        setSessionTypeModalVisible(false);
+        startQuickHiitWorkout();
+    };
+
+    const handleStartGymSession = () => {
+        setSessionTypeModalVisible(false);
+        startOrResumeGymSession();
     };
 
     const handleConfirmFinish = () => {
@@ -146,30 +159,23 @@ const HomeScreen = () => {
                                 />
                             </View>
                         </View>
-                        <Separator height={1} />
                     </>
                 )}
 
-                <HomeActionTile
-                    title={t('home.actions.startHiitWorkout')}
-                    subtitle={t('home.startImmediately')}
-                    icon="play"
-                    variant="primary"
-                    onPress={startQuickHiitWorkout}
-                />
-
                 {!activeGymSession && (
                     <HomeActionTile
-                        title={t('home.actions.startGymSession')}
-                        subtitle={t('gym.actions.startNewSessionSubtitle')}
-                        icon="pulse-outline"
+                        title={t('home.quickSession')}
+                        subtitle={t('home.startImmediately')}
+                        icon="play"
                         variant="primary"
-                        onPress={startOrResumeGymSession}
+                        onPress={() => setSessionTypeModalVisible(true)}
                     />
                 )}
+            </View>
 
-                <Separator height={1} />
+            <Separator height={1} />
 
+            <ScreenSection title={t('home.quickAccess')}>
                 <View style={st.grid}>
                     <View style={st.gridItem}>
                         <HomeActionTile
@@ -187,7 +193,9 @@ const HomeScreen = () => {
                         />
                     </View>
                 </View>
-            </View>
+            </ScreenSection>
+
+            <Separator height={1} />
 
             <ScreenSection
                 title={t('home.recentSessions')}
@@ -241,6 +249,22 @@ const HomeScreen = () => {
                 onCancel={() => setEndGymSessionModalVisible(false)}
                 onComplete={handleConfirmFinish}
                 onDiscard={handleConfirmDiscard}
+            />
+
+            <ActionModal
+                visible={isSessionTypeModalVisible}
+                title={t('home.sessionTypeModal.title')}
+                description={t('home.sessionTypeModal.description')}
+                primaryAction={{
+                    title: t('home.actions.startHiitWorkout'),
+                    onPress: handleStartWorkoutSession,
+                }}
+                secondaryAction={{
+                    title: t('home.actions.startGymSession'),
+                    variant: 'secondary',
+                    onPress: handleStartGymSession,
+                }}
+                onClose={() => setSessionTypeModalVisible(false)}
             />
         </MainContainer>
     );

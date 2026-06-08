@@ -1,15 +1,7 @@
-import React, { useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
-import {
-    useRemoveWorkout,
-    useToggleFavoriteWorkout,
-    useWorkout,
-    useWorkoutCurrentVersionId,
-} from '@src/data/workouts';
-import { useWorkoutRunStore } from '@src/state/stores/useWorkoutRunStore';
 import { MainContainer } from '@src/components/layout/MainContainer/MainContainer';
 import { FooterBar } from '@src/components/layout/FooterBar';
 import { Button } from '@src/components/ui/Button/Button';
@@ -21,39 +13,19 @@ import { ErrorBanner } from '@src/components/ui/ErrorBanner/ErrorBanner';
 import { CircleIconButton } from '@src/components/ui/CircleIconButton/CircleIconButton';
 import GuardedPressable from '@src/components/ui/GuardedPressable/GuardedPressable';
 import ConfirmDialog from '@src/components/modals/ConfirmDialog/ConfirmDialog';
-
-import {
-    summarizeWorkout,
-    formatWorkoutDuration,
-} from '@core/workouts/summarizeWorkout';
-import { exportWorkoutToFile } from '@src/core/exportWorkout/exportWorkout';
-
 import { useTheme } from '@src/theme/ThemeProvider';
+
+import { WorkoutSummaryBlockItem } from './components/WorkoutSummaryBlockItem/WorkoutSummaryBlockItem';
 import { useWorkoutSummaryStyles } from './WorkoutSummaryScreen.styles';
-import { WorkoutBlockItem } from '../EditWorkoutScreen/components/WorkoutBlockItem/WorkoutBlockItem';
-import { useTranslation } from 'react-i18next';
+import { useWorkoutSummaryScreen } from './useWorkoutSummaryScreen';
 
 const WorkoutSummaryScreen = () => {
     const { t } = useTranslation();
-    const { id } = useLocalSearchParams<{ id?: string }>();
-    const router = useRouter();
-    const { data: workout } = useWorkout(id);
-    const { data: currentVersionId } = useWorkoutCurrentVersionId(id);
-    const removeWorkout = useRemoveWorkout();
-    const toggleFavoriteWorkout = useToggleFavoriteWorkout();
     const { theme } = useTheme();
     const st = useWorkoutSummaryStyles();
+    const screen = useWorkoutSummaryScreen();
 
-    const summary = useMemo(
-        () => summarizeWorkout(workout ?? undefined),
-        [workout],
-    );
-
-    const [exportError, setExportError] = useState<string | null>(null);
-    const [exporting, setExporting] = useState(false);
-    const [confirmRemoveVisible, setConfirmRemoveVisible] = useState(false);
-
-    if (!id || !workout) {
+    if (!screen.id || !screen.workout) {
         return (
             <MainContainer title={t('workoutSummary.title')} scroll={false}>
                 <View style={st.center}>
@@ -63,7 +35,7 @@ const WorkoutSummaryScreen = () => {
                     <Button
                         title={t('common.actions.back')}
                         variant="secondary"
-                        onPress={() => router.back()}
+                        onPress={screen.handleBack}
                         style={st.errorButton}
                     />
                 </View>
@@ -71,95 +43,42 @@ const WorkoutSummaryScreen = () => {
         );
     }
 
-    const timeLabel =
-        summary.approxSec > 0
-            ? formatWorkoutDuration(summary.approxSec)
-            : summary.hasReps
-              ? t('common.status.mixedTimeAndReps')
-              : t('common.status.noTimeEstimate');
-    const isFavorite = workout.isFavorite === true;
-
-    const handleExport = async () => {
-        if (exporting) return;
-        setExportError(null);
-        setExporting(true);
-
-        const result = await exportWorkoutToFile(workout);
-
-        if (!result.ok) {
-            if (result.error === 'SHARING_UNAVAILABLE') {
-                setExportError(t('workoutSummary.export.sharingUnavailable'));
-            } else if (result.error === 'WRITE_FAILED') {
-                setExportError(t('workoutSummary.export.writeFailed'));
-            } else {
-                setExportError(t('workoutSummary.export.failed'));
-            }
-        }
-
-        setExporting(false);
-    };
-
-    const openRemoveConfirm = () => {
-        setConfirmRemoveVisible(true);
-    };
-
-    const closeRemoveConfirm = () => {
-        setConfirmRemoveVisible(false);
-    };
-
-    const handleRemoveWorkout = () => {
-        removeWorkout.mutate(workout.id, {
-            onSuccess: () => {
-                setConfirmRemoveVisible(false);
-                router.back();
-            },
-        });
-    };
-
-    const topBarOptions = [
-        {
-            id: 'remove-workout',
-            label: t('common.actions.remove'),
-            icon: 'trash',
-            destructive: true,
-            onPress: openRemoveConfirm,
-        },
-    ] as const;
+    const { summary, workout } = screen;
+    let favoriteIconColor = theme.palette.text.secondary;
+    let favoriteIconId: 'star' | 'starOutline' = 'starOutline';
+    if (screen.isFavorite) {
+        favoriteIconColor = theme.palette.accent.primary;
+        favoriteIconId = 'star';
+    }
 
     return (
         <>
             <MainContainer
                 title={workout.name}
                 gap={0}
-                topBarOptions={topBarOptions}
+                topBarOptions={screen.topBarOptions}
             >
-                {/* Overview Section */}
                 <ScreenSection
                     title={t('workoutSummary.overview')}
                     topSpacing="small"
                     gap={12}
                     rightAccessory={
                         <GuardedPressable
-                            onPress={() =>
-                                toggleFavoriteWorkout.mutate(workout)
-                            }
+                            onPress={screen.toggleFavoriteWorkout}
                             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                             style={st.favoriteToggle}
                         >
                             <AppIcon
-                                id={isFavorite ? 'star' : 'starOutline'}
+                                id={favoriteIconId}
                                 size={20}
-                                color={
-                                    isFavorite
-                                        ? theme.palette.accent.primary
-                                        : theme.palette.text.secondary
-                                }
+                                color={favoriteIconColor}
                             />
                             <AppText
                                 variant="bodySmall"
                                 style={[
                                     st.favoriteLabel,
-                                    isFavorite && st.favoriteLabelActive,
+                                    screen.isFavorite &&
+                                        st.favoriteLabelActive,
                                 ]}
                             >
                                 {t('workoutSummary.favorite')}
@@ -237,7 +156,7 @@ const WorkoutSummaryScreen = () => {
                                         style={st.metricValue}
                                         numberOfLines={2}
                                     >
-                                        {timeLabel}
+                                        {screen.timeLabel}
                                     </AppText>
                                 </View>
                             </View>
@@ -245,27 +164,28 @@ const WorkoutSummaryScreen = () => {
                     />
 
                     <ErrorBanner
-                        message={exportError ?? ''}
-                        onClose={() => setExportError(null)}
+                        message={screen.exportError}
+                        onClose={screen.resetExportError}
                     />
                 </ScreenSection>
 
-                {/* Blocks Section*/}
                 <ScreenSection
                     title={t('workoutSummary.blocksSection')}
                     topSpacing="large"
                     gap={theme.layout.listItem.gap}
                 >
                     {workout.blocks.map((block, index) => (
-                        <WorkoutBlockItem
+                        <WorkoutSummaryBlockItem
                             key={block.id}
                             index={index}
                             block={block}
+                            onExercisePress={
+                                screen.handleOpenExerciseDefinition
+                            }
                         />
                     ))}
                 </ScreenSection>
 
-                {/* Hint + Share Section*/}
                 <ScreenSection topSpacing="medium" gap={8}>
                     <AppText
                         variant="caption"
@@ -277,15 +197,15 @@ const WorkoutSummaryScreen = () => {
                     </AppText>
 
                     <GuardedPressable
-                        onPress={handleExport}
-                        disabled={exporting}
+                        onPress={screen.handleExport}
+                        disabled={screen.exporting}
                         style={st.exportContainer}
                     >
                         <CircleIconButton
-                            onPress={handleExport}
+                            onPress={screen.handleExport}
                             variant="secondary"
                             size={50}
-                            disabled={exporting}
+                            disabled={screen.exporting}
                             style={st.exportButton}
                         >
                             <Ionicons
@@ -310,38 +230,25 @@ const WorkoutSummaryScreen = () => {
                     title={t('workoutSummary.actions.edit')}
                     variant="secondary"
                     flex={1}
-                    onPress={() =>
-                        router.push({
-                            pathname: '/workouts/edit',
-                            params: { id },
-                        })
-                    }
+                    onPress={screen.handleEditWorkout}
                 />
                 <Button
                     title={t('workoutSummary.actions.start')}
                     variant="primary"
                     flex={1}
-                    onPress={() => {
-                        useWorkoutRunStore
-                            .getState()
-                            .setSourceVersionId(currentVersionId ?? null);
-                        router.push({
-                            pathname: `/run/${id}`,
-                            params: { autoStart: '1' },
-                        });
-                    }}
+                    onPress={screen.handleStartWorkout}
                 />
             </FooterBar>
 
             <ConfirmDialog
-                visible={confirmRemoveVisible}
+                visible={screen.confirmRemoveVisible}
                 title={t('workouts.confirmRemove.title')}
                 message={t('workouts.confirmRemove.message')}
                 confirmLabel={t('workouts.confirmRemove.confirm')}
                 cancelLabel={t('workouts.confirmRemove.cancel')}
                 destructive
-                onConfirm={handleRemoveWorkout}
-                onCancel={closeRemoveConfirm}
+                onConfirm={screen.handleRemoveWorkout}
+                onCancel={screen.closeRemoveConfirm}
             />
         </>
     );

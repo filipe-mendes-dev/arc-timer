@@ -49,10 +49,6 @@ export const useWorkoutSummaryStyles = createStyles((theme: AppTheme) =>
             fontWeight: '700',
         },
 
-        blockBody: {
-            paddingVertical: 4,
-        },
-
         hint: {
             marginTop: 4,
         },
