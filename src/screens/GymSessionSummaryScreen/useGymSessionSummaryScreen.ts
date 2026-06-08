@@ -8,7 +8,6 @@ import { useGymPlan } from '@src/data/gymPlans';
 import {
     useDeleteGymSession,
     useGymSession,
-    useStartGymSessionFromPlan,
     useStartGymSessionFromSessionSnapshot,
 } from '@src/data/gymSessions';
 
@@ -31,18 +30,14 @@ export const useGymSessionSummaryScreen = () => {
     const { data: sourceGymPlan } = useGymPlan(session?.sourceGymPlanId);
     const { data: exerciseDefinitions = [] } = useGymExerciseDefinitions();
     const deleteGymSession = useDeleteGymSession();
-    const startSessionFromPlan = useStartGymSessionFromPlan();
     const startSessionFromSnapshot = useStartGymSessionFromSessionSnapshot();
     const locale = i18n.resolvedLanguage ?? i18n.language;
     const sourceGymPlanId =
         sourceGymPlan?.status === 'active' ? sourceGymPlan.id : undefined;
     const canOpenSourceGymPlan = sourceGymPlanId !== undefined;
-    const isStartingSession =
-        startSessionFromPlan.isPending || startSessionFromSnapshot.isPending;
+    const isStartingSession = startSessionFromSnapshot.isPending;
     const actionErrorMessage = t(
-        startSessionFromPlan.error?.message ??
-            startSessionFromSnapshot.error?.message ??
-            '',
+        startSessionFromSnapshot.error?.message ?? '',
     );
     const exerciseNameById = new Map(
         exerciseDefinitions.map((definition) => [
@@ -71,16 +66,12 @@ export const useGymSessionSummaryScreen = () => {
         router.push(`/gymPlans/${sourceGymPlanId}`);
     };
 
+    const handleOpenExerciseDefinition = (exerciseDefinitionId: string) => {
+        router.push(`/exercise-definitions/${exerciseDefinitionId}`);
+    };
+
     const handleRunAgain = () => {
         if (!session) return;
-
-        if (sourceGymPlanId !== undefined) {
-            startSessionFromPlan.mutate(
-                { gymPlanId: sourceGymPlanId },
-                { onSuccess: () => router.push('/gymSession') },
-            );
-            return;
-        }
 
         startSessionFromSnapshot.mutate(
             { sessionId: session.id },
@@ -89,7 +80,6 @@ export const useGymSessionSummaryScreen = () => {
     };
 
     const resetActionError = () => {
-        startSessionFromPlan.reset();
         startSessionFromSnapshot.reset();
     };
 
@@ -102,6 +92,7 @@ export const useGymSessionSummaryScreen = () => {
             exerciseSummaries: [],
             getSetDetails: handleGetSetDetails,
             handleDeleteSession,
+            handleOpenExerciseDefinition,
             handleOpenGymPlan,
             handleRunAgain,
             isDeleteConfirmVisible,
@@ -142,6 +133,7 @@ export const useGymSessionSummaryScreen = () => {
         exerciseSummaries,
         getSetDetails: handleGetSetDetails,
         handleDeleteSession,
+        handleOpenExerciseDefinition,
         handleOpenGymPlan,
         handleRunAgain,
         isDeleteConfirmVisible,
