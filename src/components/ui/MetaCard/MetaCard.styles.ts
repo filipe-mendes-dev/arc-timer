@@ -55,6 +55,8 @@ export const useMetaCardStyles = createStyles(
                 flexDirection: 'row',
                 gap: 6,
                 alignItems: 'center',
+                position: 'relative',
+                zIndex: 3,
             },
             dateTimePillText: {
                 color: theme.palette.metaCard.datePill.icon,
