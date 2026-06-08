@@ -350,11 +350,9 @@ export const ptPT: I18nResource = {
         sets: 'Séries',
         exercises: 'Exercícios',
         emptyTitle: 'Sem sessão de ginásio ativa',
-        emptyDescription:
-            'Inicia uma sessão de ginásio antes de registar exercícios.',
         noExercisesTitle: 'Ainda não existem exercícios',
         noExercisesDescription:
-            'Adiciona exercícios aqui à medida que avanças na sessão.',
+            'Adiciona exercícios à medida que avanças na sessão.',
         status: {
             complete: 'Concluído',
             inProgress: 'Em curso',
@@ -371,26 +369,17 @@ export const ptPT: I18nResource = {
             finish: 'Terminar',
             removeExercise: 'Remover',
         },
-        finishConfirm: {
-            title: 'Terminar sessão?',
-            message: 'Isto vai guardar a sessão de ginásio no histórico.',
-        },
-        discardConfirm: {
-            title: 'Descartar sessão?',
-            message:
-                'Esta sessão de ginásio será fechada sem manter progresso.',
-        },
         removeExerciseConfirm: {
             title: 'Remover exercício?',
             message:
                 'Este exercício e todas as suas séries serão removidos da sessão.',
         },
         addExerciseModal: {
-            create: 'Criar',
+            create: 'Adicionar',
             name: 'Nome',
             namePlaceholder: 'ex.: Supino',
             nameRequired: exerciseNameRequired,
-            subtitle: 'Usa um exercício guardado ou escreve um novo.',
+            subtitle: 'Seleciona um exercício existente ou adiciona um novo.',
             title: 'Adicionar exercício',
         },
         errors: {
@@ -435,8 +424,7 @@ export const ptPT: I18nResource = {
             runAgain: 'Repetir',
         },
         hints: {
-            noSourceGymPlan:
-                'O plano original não está disponível. Repetir irá recriar a estrutura desta sessão.',
+            noSourceGymPlan: 'Plano original não disponível.',
         },
         errors: {
             runAgainFailed: 'Não foi possível iniciar esta sessão novamente.',
@@ -461,7 +449,7 @@ export const ptPT: I18nResource = {
         newSet: 'Nova série',
         noSetsTitle: 'Ainda não existem séries',
         noSetsDescription:
-            'Adiciona dados quando a série tiver repetições, peso, tempo ou distância.',
+            'Adiciona séries ou seleciona os campos a ser registados.',
         notFoundTitle: 'Exercício não encontrado',
         notFoundDescription:
             'Este exercício não está na sessão de ginásio ativa.',
@@ -705,10 +693,10 @@ export const ptPT: I18nResource = {
             about: 'Sobre',
         },
         descriptions: {
-            theme: 'Seleciona o tema preferido',
-            accent: 'Seleciona a cor de destaque preferida',
+            theme: 'Seleciona o tema:',
+            accent: 'Seleciona a cor do tom da aplicação:',
             sound: 'Ativa efeitos sonoros',
-            language: 'Seleciona o idioma preferido',
+            language: 'Seleciona o idioma preferido:',
         },
         theme: {
             light: 'Claro',
@@ -805,8 +793,7 @@ export const ptPT: I18nResource = {
         emptyDefaultsDescription:
             'Escolhe os campos com que este exercício deve começar.',
         emptyStatsTitle: 'Sem estatísticas',
-        emptyStatsDescription:
-            'Completa sessões de ginásio para criar recordes pessoais.',
+        emptyStatsDescription: 'Completa sessões para criar recordes pessoais.',
         emptyRecentSessionsTitle: 'Sem sessões recentes',
         emptyRecentSessionsDescription:
             'As sessões concluídas com este exercício aparecem aqui.',
@@ -815,7 +802,7 @@ export const ptPT: I18nResource = {
             namePlaceholder: 'ex.: Flexões',
             availability: 'Disponibilidade',
             source: 'Origem',
-            trackingFields: 'Campos registados',
+            trackingFields: 'Campos predefinidos',
             defaultReps: 'Repetições predefinidas',
             defaultWeight: 'Peso predefinido',
             defaultDuration: 'Duração predefinida',
@@ -845,14 +832,14 @@ export const ptPT: I18nResource = {
         modal: {
             createTitle: 'Novo exercício',
             editTitle: 'Editar exercício',
-            subtitle: 'Mantém o catálogo de exercícios claro e reutilizável.',
+            subtitle: 'Adicionar exercício ao teu catálogo.',
             create: 'Criar',
             save: 'Guardar',
         },
         trackingModal: {
             title: 'Predefinições de registo',
             subtitle:
-                'Escolhe os campos que este exercício deve usar por defeito.',
+                'Escolhe os campos que este exercício deve registar por defeito.',
             removeDefaultAndSave: 'Remover valores e guardar',
             removeDefaultWarning:
                 'Guardar vai limpar os valores predefinidos para: {{fields}}.',

@@ -340,10 +340,9 @@ export const en: I18nResource = {
         sets: 'Sets',
         exercises: 'Exercises',
         emptyTitle: 'No active gym session',
-        emptyDescription: 'Start a gym session before tracking exercises.',
         noExercisesTitle: 'No exercises yet',
         noExercisesDescription:
-            'Add exercises here as you move through the session.',
+            'Add exercises as you move through the session.',
         status: {
             complete: 'Complete',
             inProgress: 'In progress',
@@ -360,26 +359,17 @@ export const en: I18nResource = {
             finish: 'Finish',
             removeExercise: 'Remove',
         },
-        finishConfirm: {
-            title: 'End session?',
-            message: 'This will save the gym session to your history.',
-        },
-        discardConfirm: {
-            title: 'Discard session?',
-            message:
-                'This gym session will be closed without keeping progress.',
-        },
         removeExerciseConfirm: {
             title: 'Remove exercise?',
             message:
                 'This exercise and all of its sets will be removed from the session.',
         },
         addExerciseModal: {
-            create: 'Create',
+            create: 'Add',
             name: 'Name',
             namePlaceholder: 'e.g., Bench press',
             nameRequired: exerciseNameRequired,
-            subtitle: 'Use a saved exercise or type a new one.',
+            subtitle: 'Select an existing exercise or add a new one.',
             title: 'Add exercise',
         },
         errors: {
@@ -420,8 +410,7 @@ export const en: I18nResource = {
             runAgain: 'Run again',
         },
         hints: {
-            noSourceGymPlan:
-                'The original plan is unavailable. Run again will replay this session structure.',
+            noSourceGymPlan: 'Original plan is unavailable.',
         },
         errors: {
             runAgainFailed: 'Could not start this gym session again.',
@@ -445,8 +434,7 @@ export const en: I18nResource = {
         setWithIndex: 'Set {{index}}',
         newSet: 'New set',
         noSetsTitle: 'No sets yet',
-        noSetsDescription:
-            'Add working data once a set has reps, weight, time, or distance.',
+        noSetsDescription: 'Add sets or select tracking fields.',
         notFoundTitle: 'Exercise not found',
         notFoundDescription: 'This exercise is not in the active gym session.',
         actions: {
@@ -685,10 +673,10 @@ export const en: I18nResource = {
             about: 'About',
         },
         descriptions: {
-            theme: 'Select your preferred theme',
-            accent: 'Select your preferred color accent',
-            sound: 'Enable sound effects',
-            language: 'Select your preferred language',
+            theme: 'Select your preferred theme:',
+            accent: 'Select your preferred color accent:',
+            sound: 'Enable sound effects:',
+            language: 'Select your preferred language:',
         },
         theme: {
             light: 'Light',
@@ -783,8 +771,7 @@ export const en: I18nResource = {
         emptyDefaultsDescription:
             'Choose the fields this exercise should start with.',
         emptyStatsTitle: 'No stats yet',
-        emptyStatsDescription:
-            'Complete gym sessions to build personal records.',
+        emptyStatsDescription: 'Complete sessions to build personal records.',
         emptyRecentSessionsTitle: 'No recent sessions',
         emptyRecentSessionsDescription:
             'Completed sessions with this exercise will appear here.',
@@ -793,7 +780,7 @@ export const en: I18nResource = {
             namePlaceholder: 'e.g., Push-ups',
             availability: 'Availability',
             source: 'Source',
-            trackingFields: 'Tracking fields',
+            trackingFields: 'Default fields',
             defaultReps: 'Default reps',
             defaultWeight: 'Default weight',
             defaultDuration: 'Default duration',
@@ -823,14 +810,14 @@ export const en: I18nResource = {
         modal: {
             createTitle: 'New exercise',
             editTitle: 'Edit exercise',
-            subtitle: 'Keep your exercise catalog clear and reusable.',
+            subtitle: 'Add exercise to your catalog.',
             create: 'Create',
             save: 'Save',
         },
         trackingModal: {
             title: 'Tracking defaults',
             subtitle:
-                'Choose which fields this exercise should use by default.',
+                'Choose which fields this exercise should track by default.',
             removeDefaultAndSave: 'Remove defaults and save',
             removeDefaultWarning:
                 'Saving will clear default values for: {{fields}}.',

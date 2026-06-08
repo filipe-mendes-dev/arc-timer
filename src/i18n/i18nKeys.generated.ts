@@ -78,7 +78,6 @@ export const i18nKeys = {
             description: 'home.sessionTypeModal.description',
         },
         actions: {
-            continueGymSession: 'home.actions.continueGymSession',
             gymPlans: 'home.actions.gymPlans',
             savedHiitWorkouts: 'home.actions.savedHiitWorkouts',
             seeAllSessions: 'home.actions.seeAllSessions',
@@ -101,8 +100,6 @@ export const i18nKeys = {
             historySubtitle: 'gym.actions.historySubtitle',
             plans: 'gym.actions.plans',
             plansSubtitle: 'gym.actions.plansSubtitle',
-            sessionInProgress: 'gym.actions.sessionInProgress',
-            sessionInProgressSubtitle: 'gym.actions.sessionInProgressSubtitle',
         },
         finishSessionModal: {
             title: 'gym.finishSessionModal.title',
@@ -298,7 +295,6 @@ export const i18nKeys = {
             nameRequired: 'gymPlanBuilder.validation.nameRequired',
             sectionRequired: 'gymPlanBuilder.validation.sectionRequired',
             sectionExerciseRequired: 'gymPlanBuilder.validation.sectionExerciseRequired',
-            placeholderExerciseRequired: 'gymPlanBuilder.validation.placeholderExerciseRequired',
             saveFailed: 'gymPlanBuilder.validation.saveFailed',
         },
         discardConfirm: {
@@ -337,7 +333,6 @@ export const i18nKeys = {
         sets: 'gymActiveSession.sets',
         exercises: 'gymActiveSession.exercises',
         emptyTitle: 'gymActiveSession.emptyTitle',
-        emptyDescription: 'gymActiveSession.emptyDescription',
         noExercisesTitle: 'gymActiveSession.noExercisesTitle',
         noExercisesDescription: 'gymActiveSession.noExercisesDescription',
         status: {
@@ -355,14 +350,6 @@ export const i18nKeys = {
             end: 'gymActiveSession.actions.end',
             finish: 'gymActiveSession.actions.finish',
             removeExercise: 'gymActiveSession.actions.removeExercise',
-        },
-        finishConfirm: {
-            title: 'gymActiveSession.finishConfirm.title',
-            message: 'gymActiveSession.finishConfirm.message',
-        },
-        discardConfirm: {
-            title: 'gymActiveSession.discardConfirm.title',
-            message: 'gymActiveSession.discardConfirm.message',
         },
         removeExerciseConfirm: {
             title: 'gymActiveSession.removeExerciseConfirm.title',

@@ -323,7 +323,6 @@ export interface I18nResource {
         sets: string;
         exercises: string;
         emptyTitle: string;
-        emptyDescription: string;
         noExercisesTitle: string;
         noExercisesDescription: string;
         status: {
@@ -341,14 +340,6 @@ export interface I18nResource {
             end: string;
             finish: string;
             removeExercise: string;
-        };
-        finishConfirm: {
-            title: string;
-            message: string;
-        };
-        discardConfirm: {
-            title: string;
-            message: string;
         };
         removeExerciseConfirm: {
             title: string;
@@ -525,8 +516,8 @@ export interface I18nResource {
         notFound: string;
         workoutSessionFallback: string;
         endedAt: string;
-        exercises: string;
-        noExercises: string;
+        byBlock: string;
+        noCompletedBlocks: string;
         blockStats: {
             sets: string;
             exercises: string;
