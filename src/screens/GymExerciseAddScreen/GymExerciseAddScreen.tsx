@@ -10,11 +10,22 @@ import { ErrorBanner } from '@src/components/ui/ErrorBanner/ErrorBanner';
 import { TextField } from '@src/components/ui/TextField/TextField';
 import type { TextFieldSuggestionItem } from '@src/components/ui/TextField/TextField.interfaces';
 import { AppText } from '@src/components/ui/Typography/AppText';
-import { useExerciseDefinitionSuggestions } from '@src/data/exerciseDefinitions';
+import type { ExerciseDefinitionTargetSetData } from '@src/core/entities/exerciseDefinition.interfaces';
+import {
+    useExerciseDefinition,
+    useExerciseDefinitionSuggestions,
+} from '@src/data/exerciseDefinitions';
 import {
     useActiveGymSession,
+    useAddGymExerciseRecordSet,
     useAddGymExerciseRecordByName,
 } from '@src/data/gymSessions';
+import {
+    createTargetSetFromDefinition,
+    DEFAULT_REPS,
+    DEFAULT_WEIGHT_KG,
+} from '@src/helpers/exerciseDefinition.helpers';
+import { getWeightGrams } from '@src/helpers/gymExerciseRecord.helpers';
 
 import { useStyles } from './GymExerciseAddScreen.styles';
 
@@ -30,6 +41,9 @@ const GymExerciseAddScreen = () => {
     const [nameError, setNameError] = useState<string | undefined>();
     const { data: activeSession } = useActiveGymSession();
     const addGymExerciseRecord = useAddGymExerciseRecordByName();
+    const addGymExerciseRecordSet = useAddGymExerciseRecordSet();
+    const { data: selectedExerciseDefinition } =
+        useExerciseDefinition(exerciseDefinitionId);
     const suggestions = useExerciseDefinitionSuggestions(name, {
         availability: 'gym',
     });
@@ -48,6 +62,7 @@ const GymExerciseAddScreen = () => {
         setExerciseDefinitionId(undefined);
         setNameError(undefined);
         addGymExerciseRecord.reset();
+        addGymExerciseRecordSet.reset();
     };
 
     const handleSuggestionPress = (suggestion: TextFieldSuggestionItem) => {
@@ -56,6 +71,7 @@ const GymExerciseAddScreen = () => {
         setExerciseDefinitionId(suggestion.id);
         setNameError(undefined);
         addGymExerciseRecord.reset();
+        addGymExerciseRecordSet.reset();
     };
 
     const handleNameBlur = () => {
@@ -65,6 +81,36 @@ const GymExerciseAddScreen = () => {
         }
 
         setName((value) => value.trim());
+    };
+
+    const addInitialSet = (recordId: string) => {
+        if (!selectedExerciseDefinition) {
+            router.replace(`/gymExerciseData/${recordId}`);
+            return;
+        }
+
+        const fallbackTargetSet: ExerciseDefinitionTargetSetData = {
+            reps: DEFAULT_REPS,
+            weightGrams: getWeightGrams(DEFAULT_WEIGHT_KG),
+        };
+        const targetSet = createTargetSetFromDefinition(
+            selectedExerciseDefinition,
+            fallbackTargetSet,
+        );
+
+        addGymExerciseRecordSet.mutate(
+            {
+                distanceMeters: targetSet.distanceMeters,
+                durationSec: targetSet.durationSec,
+                exerciseRecordId: recordId,
+                reps: targetSet.reps,
+                rpeTenths: targetSet.rpeTenths,
+                weightGrams: targetSet.weightGrams,
+            },
+            {
+                onSuccess: () => router.replace(`/gymExerciseData/${recordId}`),
+            },
+        );
     };
 
     const handleCreate = () => {
@@ -85,7 +131,7 @@ const GymExerciseAddScreen = () => {
             },
             {
                 onSuccess: (record) => {
-                    router.replace(`/gymExerciseData/${record.id}`);
+                    addInitialSet(record.id);
                 },
             },
         );
@@ -138,20 +184,27 @@ const GymExerciseAddScreen = () => {
                         <View>
                             <ErrorBanner
                                 message={
-                                    addGymExerciseRecord.error
+                                    addGymExerciseRecord.error ||
+                                    addGymExerciseRecordSet.error
                                         ? t(
                                               'gymActiveSession.errors.addExerciseFailed',
                                           )
                                         : ''
                                 }
-                                onClose={() => addGymExerciseRecord.reset()}
+                                onClose={() => {
+                                    addGymExerciseRecord.reset();
+                                    addGymExerciseRecordSet.reset();
+                                }}
                             />
                             <Button
                                 title={t(
                                     'gymActiveSession.addExerciseModal.create',
                                 )}
                                 variant="primary"
-                                loading={addGymExerciseRecord.isPending}
+                                loading={
+                                    addGymExerciseRecord.isPending ||
+                                    addGymExerciseRecordSet.isPending
+                                }
                                 onPress={handleCreate}
                             />
                         </View>
