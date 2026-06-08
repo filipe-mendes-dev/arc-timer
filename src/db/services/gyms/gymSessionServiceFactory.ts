@@ -443,6 +443,47 @@ export const createGymSessionService = ({
                 sourceGymPlan?.status === 'active'
                     ? sourceGymPlan.id
                     : undefined;
+            const newRecordIdBySourceRecordId = new Map<string, string>();
+            const exerciseRecords: InsertGymSessionAggregateInput['exerciseRecords'] =
+                sourceRecords.map((record, index) => {
+                    const recordId = uid();
+                    newRecordIdBySourceRecordId.set(record.id, recordId);
+
+                    return {
+                        id: recordId,
+                        gymSessionId: newSessionId,
+                        exerciseDefinitionId: record.exerciseDefinitionId,
+                        sourceGymPlanExerciseId: record.sourceGymPlanExerciseId,
+                        sortIndex: index,
+                        startedAtMs: undefined,
+                        notes: record.notes,
+                        createdAtMs: nowMs,
+                        updatedAtMs: nowMs,
+                    };
+                });
+            const exerciseRecordSets: InsertGymSessionAggregateInput['exerciseRecordSets'] =
+                sourceRecords.flatMap((record) => {
+                    const newRecordId = newRecordIdBySourceRecordId.get(
+                        record.id,
+                    );
+                    if (newRecordId === undefined) return [];
+
+                    return record.sets.map((set) => ({
+                        id: uid(),
+                        gymExerciseRecordId: newRecordId,
+                        setIndex: set.setIndex,
+                        reps: set.reps,
+                        weightGrams: set.weightGrams,
+                        durationSec: set.durationSec,
+                        distanceMeters: set.distanceMeters,
+                        rpeTenths: set.rpeTenths,
+                        isWarmup: set.isWarmup,
+                        completedAtMs: undefined,
+                        notes: set.notes,
+                        createdAtMs: nowMs,
+                        updatedAtMs: nowMs,
+                    }));
+                });
 
             gymSessionRepository.insertWithExerciseRecords({
                 session: {
@@ -454,18 +495,8 @@ export const createGymSessionService = ({
                     createdAtMs: nowMs,
                     updatedAtMs: nowMs,
                 },
-                exerciseRecords: sourceRecords.map((record, index) => ({
-                    id: uid(),
-                    gymSessionId: newSessionId,
-                    exerciseDefinitionId: record.exerciseDefinitionId,
-                    sourceGymPlanExerciseId: record.sourceGymPlanExerciseId,
-                    sortIndex: index,
-                    startedAtMs: undefined,
-                    notes: record.notes,
-                    createdAtMs: nowMs,
-                    updatedAtMs: nowMs,
-                })),
-                exerciseRecordSets: [],
+                exerciseRecords,
+                exerciseRecordSets,
             });
 
             return hydrateSessionRow(getSessionOrThrow(newSessionId));
