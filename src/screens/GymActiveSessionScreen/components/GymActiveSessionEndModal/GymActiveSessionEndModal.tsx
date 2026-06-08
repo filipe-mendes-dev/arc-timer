@@ -8,6 +8,7 @@ import { AppText } from '@src/components/ui/Typography/AppText';
 import { useStyles } from './GymActiveSessionEndModal.styles';
 
 interface GymActiveSessionEndModalProps {
+    hasCompletedSet: boolean;
     isDiscardingSession: boolean;
     isFinishingSession: boolean;
     visible: boolean;
@@ -17,6 +18,7 @@ interface GymActiveSessionEndModalProps {
 }
 
 export const GymActiveSessionEndModal = ({
+    hasCompletedSet,
     isDiscardingSession,
     isFinishingSession,
     visible,
@@ -27,6 +29,10 @@ export const GymActiveSessionEndModal = ({
     const { t } = useTranslation();
     const st = useStyles();
     const isActionPending = isFinishingSession || isDiscardingSession;
+    let message = t('gym.finishSessionModal.message');
+    if (!hasCompletedSet) {
+        message = t('gym.finishSessionModal.discardOnlyMessage');
+    }
 
     return (
         <Modal
@@ -46,18 +52,20 @@ export const GymActiveSessionEndModal = ({
                         tone="secondary"
                         style={st.modalMessage}
                     >
-                        {t('gym.finishSessionModal.message')}
+                        {message}
                     </AppText>
                 </View>
 
                 <View style={st.modalActions}>
-                    <Button
-                        title={t('gym.finishSessionModal.complete')}
-                        variant="primary"
-                        loading={isFinishingSession}
-                        disabled={isDiscardingSession}
-                        onPress={onComplete}
-                    />
+                    {hasCompletedSet && (
+                        <Button
+                            title={t('gym.finishSessionModal.complete')}
+                            variant="primary"
+                            loading={isFinishingSession}
+                            disabled={isDiscardingSession}
+                            onPress={onComplete}
+                        />
+                    )}
 
                     <Button
                         title={t('gym.finishSessionModal.discard')}

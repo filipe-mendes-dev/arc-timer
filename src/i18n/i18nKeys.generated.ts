@@ -104,6 +104,7 @@ export const i18nKeys = {
         finishSessionModal: {
             title: 'gym.finishSessionModal.title',
             message: 'gym.finishSessionModal.message',
+            discardOnlyMessage: 'gym.finishSessionModal.discardOnlyMessage',
             complete: 'gym.finishSessionModal.complete',
             discard: 'gym.finishSessionModal.discard',
         },
@@ -295,6 +296,7 @@ export const i18nKeys = {
             nameRequired: 'gymPlanBuilder.validation.nameRequired',
             sectionRequired: 'gymPlanBuilder.validation.sectionRequired',
             sectionExerciseRequired: 'gymPlanBuilder.validation.sectionExerciseRequired',
+            placeholderExerciseRequired: 'gymPlanBuilder.validation.placeholderExerciseRequired',
             saveFailed: 'gymPlanBuilder.validation.saveFailed',
         },
         discardConfirm: {
@@ -333,6 +335,7 @@ export const i18nKeys = {
         sets: 'gymActiveSession.sets',
         exercises: 'gymActiveSession.exercises',
         emptyTitle: 'gymActiveSession.emptyTitle',
+        emptyDescription: 'gymActiveSession.emptyDescription',
         noExercisesTitle: 'gymActiveSession.noExercisesTitle',
         noExercisesDescription: 'gymActiveSession.noExercisesDescription',
         status: {
@@ -526,8 +529,8 @@ export const i18nKeys = {
         notFound: 'historySession.notFound',
         workoutSessionFallback: 'historySession.workoutSessionFallback',
         endedAt: 'historySession.endedAt',
-        byBlock: 'historySession.byBlock',
-        noCompletedBlocks: 'historySession.noCompletedBlocks',
+        exercises: 'historySession.exercises',
+        noExercises: 'historySession.noExercises',
         blockStats: {
             sets: 'historySession.blockStats.sets',
             exercises: 'historySession.blockStats.exercises',

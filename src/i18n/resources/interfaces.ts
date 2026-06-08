@@ -94,6 +94,7 @@ export interface I18nResource {
         finishSessionModal: {
             title: string;
             message: string;
+            discardOnlyMessage: string;
             complete: string;
             discard: string;
         };
@@ -285,6 +286,7 @@ export interface I18nResource {
             nameRequired: string;
             sectionRequired: string;
             sectionExerciseRequired: string;
+            placeholderExerciseRequired: string;
             saveFailed: string;
         };
         discardConfirm: {
@@ -323,6 +325,7 @@ export interface I18nResource {
         sets: string;
         exercises: string;
         emptyTitle: string;
+        emptyDescription: string;
         noExercisesTitle: string;
         noExercisesDescription: string;
         status: {
@@ -516,8 +519,8 @@ export interface I18nResource {
         notFound: string;
         workoutSessionFallback: string;
         endedAt: string;
-        byBlock: string;
-        noCompletedBlocks: string;
+        exercises: string;
+        noExercises: string;
         blockStats: {
             sets: string;
             exercises: string;

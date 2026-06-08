@@ -99,6 +99,8 @@ export const ptPT: I18nResource = {
             title: 'Terminar sessão?',
             message:
                 'Conclui a sessão para guardar no histórico ou descarta-a sem manter registo.',
+            discardOnlyMessage:
+                'Não tem séries concluídas. Esta sessão será descartada.',
             complete: 'Concluir',
             discard: 'Descartar',
         },
@@ -310,6 +312,8 @@ export const ptPT: I18nResource = {
             sectionRequired: 'Adiciona pelo menos uma secção.',
             sectionExerciseRequired:
                 'A secção {{index}} precisa de pelo menos um exercício.',
+            placeholderExerciseRequired:
+                'A secção {{index}} tem um exercício sem nome.',
             saveFailed:
                 'Não foi possível guardar este rascunho. Tenta novamente.',
         },
@@ -350,6 +354,8 @@ export const ptPT: I18nResource = {
         sets: 'Séries',
         exercises: 'Exercícios',
         emptyTitle: 'Sem sessão de ginásio ativa',
+        emptyDescription:
+            'Inicia ou retoma uma sessão de ginásio para registar exercícios e séries.',
         noExercisesTitle: 'Ainda não existem exercícios',
         noExercisesDescription:
             'Adiciona exercícios à medida que avanças na sessão.',

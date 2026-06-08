@@ -137,6 +137,10 @@ export const useGymActiveSessionScreen = () => {
             (total, record) => total + record.sets.length,
             0,
         ) ?? 0;
+    const hasCompletedSet =
+        activeSession?.exerciseRecords.some((record) =>
+            record.sets.some((set) => set.completedAtMs !== undefined),
+        ) ?? false;
 
     return {
         activeSession,
@@ -144,6 +148,7 @@ export const useGymActiveSessionScreen = () => {
         errorMessage: getErrorMessage(),
         exerciseNameById,
         exerciseRecordCount,
+        hasCompletedSet,
         handleAddExercise,
         handleBack,
         handleBackToGym,

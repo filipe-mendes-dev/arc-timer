@@ -99,6 +99,8 @@ export const en: I18nResource = {
             title: 'End session?',
             message:
                 'Complete session to save it to history or discard it without keeping record.',
+            discardOnlyMessage:
+                'No completed sets yet. This session will be discarded.',
             complete: 'Complete',
             discard: 'Discard',
         },
@@ -302,6 +304,8 @@ export const en: I18nResource = {
             sectionRequired: 'Add at least one section.',
             sectionExerciseRequired:
                 'Section {{index}} needs at least one exercise.',
+            placeholderExerciseRequired:
+                'Section {{index}} has an exercise without a name.',
             saveFailed: 'Could not save this draft. Try again.',
         },
         discardConfirm: {
@@ -340,6 +344,8 @@ export const en: I18nResource = {
         sets: 'Sets',
         exercises: 'Exercises',
         emptyTitle: 'No active gym session',
+        emptyDescription:
+            'Start or resume a gym session to track exercises and sets.',
         noExercisesTitle: 'No exercises yet',
         noExercisesDescription:
             'Add exercises as you move through the session.',

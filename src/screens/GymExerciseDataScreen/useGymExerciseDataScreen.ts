@@ -263,44 +263,57 @@ export const useGymExerciseDataScreen = () => {
         if (!record) return;
 
         const previousSet = sets.at(-1);
-        const nextReps = previousSet?.reps ?? DEFAULT_REPS;
-        const nextDurationSec = previousSet?.durationSec;
-        const nextDistanceMeters = previousSet?.distanceMeters;
-        const nextRpeTenths = previousSet?.rpeTenths;
-        const nextWeightGrams = getNextWeightGrams(
-            previousSet,
-            definition?.stats?.weightPr?.value,
-        );
+        let nextDistanceMeters: number | undefined;
+        let nextDurationSec: number | undefined;
+        let nextReps: number | undefined;
+        let nextRpeTenths: number | undefined;
+        let nextWeightGrams: number | undefined;
+
+        if (trackingFields.hasDistanceMeters) {
+            nextDistanceMeters = previousSet?.distanceMeters;
+        }
+
+        if (trackingFields.hasDurationSec) {
+            nextDurationSec = previousSet?.durationSec;
+        }
+
+        if (trackingFields.hasReps) {
+            nextReps = previousSet?.reps ?? DEFAULT_REPS;
+        }
+
+        if (trackingFields.hasRpe) {
+            nextRpeTenths = previousSet?.rpeTenths;
+        }
+
+        if (trackingFields.hasWeight) {
+            nextWeightGrams = getNextWeightGrams(
+                previousSet,
+                definition?.stats?.weightPr?.value,
+            );
+        }
+
         const hasMeaningfulValue =
-            (trackingFields.hasReps && nextReps > 0) ||
-            (trackingFields.hasWeight && nextWeightGrams !== undefined) ||
-            (trackingFields.hasDurationSec && nextDurationSec !== undefined) ||
-            (trackingFields.hasDistanceMeters &&
-                nextDistanceMeters !== undefined) ||
-            (trackingFields.hasRpe && nextRpeTenths !== undefined);
+            (nextReps !== undefined && nextReps > 0) ||
+            nextWeightGrams !== undefined ||
+            nextDurationSec !== undefined ||
+            nextDistanceMeters !== undefined ||
+            nextRpeTenths !== undefined;
 
         if (!hasMeaningfulValue) return;
 
-        const distanceMeters = trackingFields.hasDistanceMeters
-            ? nextDistanceMeters
-            : undefined;
-        const durationSec = trackingFields.hasDurationSec
-            ? nextDurationSec
-            : undefined;
-        const reps =
-            trackingFields.hasReps && nextReps > 0 ? nextReps : undefined;
-        const weightGrams = trackingFields.hasWeight
-            ? nextWeightGrams
-            : undefined;
-        const rpeTenths = trackingFields.hasRpe ? nextRpeTenths : undefined;
+        let reps: number | undefined;
+
+        if (nextReps !== undefined && nextReps > 0) {
+            reps = nextReps;
+        }
 
         addSet.mutate({
-            distanceMeters,
-            durationSec,
+            distanceMeters: nextDistanceMeters,
+            durationSec: nextDurationSec,
             exerciseRecordId: record.id,
             reps,
-            rpeTenths,
-            weightGrams,
+            rpeTenths: nextRpeTenths,
+            weightGrams: nextWeightGrams,
         });
     };
 

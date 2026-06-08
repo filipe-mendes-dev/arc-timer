@@ -30,6 +30,7 @@ const GymActiveSessionScreen = () => {
         handleConfirmFinish,
         handleConfirmRemoveExercise,
         handleOpenExercise,
+        hasCompletedSet,
         isDiscardingSession,
         isEndSessionModalVisible,
         isFinishingSession,
@@ -223,6 +224,7 @@ const GymActiveSessionScreen = () => {
 
                 <GymActiveSessionEndModal
                     visible={isEndSessionModalVisible}
+                    hasCompletedSet={hasCompletedSet}
                     isDiscardingSession={isDiscardingSession}
                     isFinishingSession={isFinishingSession}
                     onCancel={() => setEndSessionModalVisible(false)}
