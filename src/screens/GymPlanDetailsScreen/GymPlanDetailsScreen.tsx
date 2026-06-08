@@ -44,6 +44,7 @@ const GymPlanDetailsScreen = () => {
     }
 
     const { gymPlan } = screen;
+    const notes = gymPlan.description?.trim();
     let favoriteIconColor = theme.palette.text.secondary;
     let favoriteIconId: 'star' | 'starOutline' = 'starOutline';
     if (screen.isFavorite) {
@@ -163,9 +164,25 @@ const GymPlanDetailsScreen = () => {
                     />
                 </ScreenSection>
 
+                {notes && (
+                    <ScreenSection
+                        title={t('gymPlanBuilder.fields.notes')}
+                        topSpacing="small"
+                        gap={8}
+                    >
+                        <AppText
+                            variant="bodySmall"
+                            tone="secondary"
+                            style={st.notesText}
+                        >
+                            {notes}
+                        </AppText>
+                    </ScreenSection>
+                )}
+
                 <ScreenSection
                     title={t('gymPlanDetails.sections')}
-                    topSpacing="small"
+                    topSpacing={notes ? 'large' : 'small'}
                     gap={theme.layout.listItem.gap}
                 >
                     {gymPlan.sections.map((section, sectionIndex) => (

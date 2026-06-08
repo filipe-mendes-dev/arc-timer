@@ -40,6 +40,10 @@ export const useStyles = createStyles((theme: AppTheme) =>
         errorBanner: {
             marginTop: 8,
         },
+        notesText: {
+            flexShrink: 1,
+            lineHeight: 20,
+        },
         favoriteToggle: {
             flexDirection: 'row',
             alignItems: 'center',
