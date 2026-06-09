@@ -26,7 +26,7 @@ export interface GymPlanService {
     upsertDraftGymPlan: (gymPlan: GymPlan) => void;
     commitGymPlanDraft: () => GymPlan;
     discardGymPlanDraft: () => void;
-    toggleFavorite: (gymPlan: GymPlanListItem) => void;
+    toggleFavorite: (gymPlanId: GymPlan['id']) => void;
     archiveGymPlan: (id: string) => void;
     restoreGymPlan: (id: string) => void;
     deleteGymPlan: (id: string) => void;
@@ -306,13 +306,12 @@ export const createGymPlanService = ({
             }
         },
 
-        toggleFavorite: (gymPlan: GymPlanListItem): void => {
-            getGymPlanOrThrow(gymPlan.id);
+        toggleFavorite: (gymPlanId: GymPlan['id']): void => {
+            const gymPlan = getGymPlanOrThrow(gymPlanId);
 
             gymPlanRepository.updateGymPlan({
-                id: gymPlan.id,
+                id: gymPlanId,
                 isFavorite: !gymPlan.isFavorite,
-                status: gymPlan.status,
                 updatedAtMs: clock.now(),
             });
         },

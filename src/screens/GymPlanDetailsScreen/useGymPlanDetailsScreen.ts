@@ -95,7 +95,7 @@ export const useGymPlanDetailsScreen = (): UseGymPlanDetailsScreenResult => {
     const toggleFavoritePlan = () => {
         if (!gymPlan) return;
 
-        toggleFavorite.mutate(gymPlan);
+        toggleFavorite.mutate(gymPlan.id);
     };
 
     const handleStartPlan = () => {

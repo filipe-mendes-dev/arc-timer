@@ -1,9 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import type {
-    GymPlan,
-    GymPlanListItem,
-} from '@src/core/entities/gymPlan.interfaces';
+import type { GymPlan } from '@src/core/entities/gymPlan.interfaces';
 import { dbServices } from '@src/db/dbServices';
 
 import { exerciseDefinitionKeys } from '../exerciseDefinitions/exerciseDefinitionKeys';
@@ -73,8 +70,8 @@ export const useToggleFavoriteGymPlan = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (gymPlan: GymPlanListItem) => {
-            dbServices.gymPlanService.toggleFavorite(gymPlan);
+        mutationFn: async (gymPlanId: GymPlan['id']) => {
+            dbServices.gymPlanService.toggleFavorite(gymPlanId);
         },
         onSuccess: async () => {
             await invalidateGymPlanQueries(queryClient);

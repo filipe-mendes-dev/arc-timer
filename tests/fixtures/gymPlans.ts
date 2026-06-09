@@ -79,7 +79,7 @@ export const createGymPlanExerciseFixture = (
         exerciseDefinitionId:
             args.exerciseDefinitionId ?? 'definition-gym-plan-exercise',
         sortIndex: args.sortIndex ?? 0,
-        targetSetDrafts: args.targetSetDrafts,
+        targetSetDrafts: args.targetSetDrafts ?? [],
         notes: args.notes,
         createdAtMs,
         updatedAtMs: args.updatedAtMs ?? createdAtMs,
@@ -95,12 +95,11 @@ export const createGymPlanSectionFixture = (
         id: args.id ?? 'gym-plan-section-1',
         title: args.title,
         sortIndex: args.sortIndex ?? 0,
-        exercises:
-            args.exercises ?? [
-                createGymPlanExerciseFixture({
-                    exerciseDefinitionId: 'definition-gym-plan-exercise',
-                }),
-            ],
+        exercises: args.exercises ?? [
+            createGymPlanExerciseFixture({
+                exerciseDefinitionId: 'definition-gym-plan-exercise',
+            }),
+        ],
         createdAtMs,
         updatedAtMs: args.updatedAtMs ?? createdAtMs,
     };
@@ -110,17 +109,15 @@ export const createGymPlanFixture = (
     args: GymPlanFixtureArgs = {},
 ): GymPlan => {
     const createdAtMs = args.createdAtMs ?? DEFAULT_CREATED_AT_MS;
-    const sections =
-        args.sections ??
-        [
-            createGymPlanSectionFixture({
-                exercises: [
-                    createGymPlanExerciseFixture({
-                        exerciseDefinitionId: 'definition-gym-plan-exercise',
-                    }),
-                ],
-            }),
-        ];
+    const sections = args.sections ?? [
+        createGymPlanSectionFixture({
+            exercises: [
+                createGymPlanExerciseFixture({
+                    exerciseDefinitionId: 'definition-gym-plan-exercise',
+                }),
+            ],
+        }),
+    ];
 
     return {
         id: args.id ?? 'gym-plan-1',

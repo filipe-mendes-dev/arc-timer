@@ -101,7 +101,9 @@ const GymPlansScreen = () => {
                         isSelectMode={selection.isSelectMode}
                         isSelected={selection.isSelected(item.id)}
                         onSelect={() => selection.toggleItem(item.id)}
-                        onToggleFavorite={() => list.toggleFavoritePlan(item)}
+                        onToggleFavorite={() =>
+                            list.toggleFavoritePlan(item.id)
+                        }
                     />
                 )}
                 ListEmptyComponent={

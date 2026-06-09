@@ -1,4 +1,4 @@
-import type { GymSessionStatus } from '@src/core/entities/gym.interfaces';
+import type { GymSessionStatus } from '@src/core/entities/gymSession.interfaces';
 import {
     gymExerciseRecordsTable,
     gymExerciseRecordSetsTable,
@@ -19,7 +19,6 @@ export interface SeedGymSessionInput {
 }
 
 export interface SeedGymExerciseRecordInput {
-    completedAtMs?: number;
     createdAtMs?: number;
     exerciseDefinitionId: string;
     gymSessionId: string;
@@ -79,7 +78,6 @@ export const seedGymExerciseRecord = (
     testDb.db
         .insert(gymExerciseRecordsTable)
         .values({
-            completedAtMs: input.completedAtMs ?? null,
             createdAtMs,
             exerciseDefinitionId: input.exerciseDefinitionId,
             gymSessionId: input.gymSessionId,

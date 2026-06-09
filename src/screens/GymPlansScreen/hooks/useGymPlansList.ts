@@ -1,7 +1,10 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'expo-router';
 
-import type { GymPlanListItem } from '@src/core/entities/gymPlan.interfaces';
+import type {
+    GymPlan,
+    GymPlanListItem,
+} from '@src/core/entities/gymPlan.interfaces';
 import {
     useGymPlanListItems,
     useToggleFavoriteGymPlan,
@@ -13,7 +16,7 @@ interface UseGymPlansListResult {
     hasSearch: boolean;
     search: string;
     setSearch: (value: string) => void;
-    toggleFavoritePlan: (gymPlan: GymPlanListItem) => void;
+    toggleFavoritePlan: (gymPlanId: GymPlan['id']) => void;
 }
 
 export const useGymPlansList = (): UseGymPlansListResult => {
@@ -40,8 +43,8 @@ export const useGymPlansList = (): UseGymPlansListResult => {
     );
 
     const toggleFavoritePlan = useCallback(
-        (gymPlan: GymPlanListItem) => {
-            toggleFavorite.mutate(gymPlan);
+        (gymPlanId: GymPlan['id']) => {
+            toggleFavorite.mutate(gymPlanId);
         },
         [toggleFavorite],
     );
