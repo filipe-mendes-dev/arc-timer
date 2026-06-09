@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import GuardedPressable from '@src/components/ui/GuardedPressable/GuardedPressable';
@@ -38,9 +39,11 @@ const GymExerciseSetLine = ({
     onToggleComplete,
     set,
 }: GymExerciseSetLineProps) => {
+    const { t } = useTranslation();
     const { theme } = useTheme();
     const st = useStyles();
     const accentColor = theme.palette.accent.primary;
+    const dangerColor = theme.palette.text.error;
     const mutedColor = theme.palette.text.muted;
     const secondaryColor = theme.palette.text.secondary;
     const selectionIconId = isSelected ? 'checkmarkCircle' : 'radioButtonOff';
@@ -49,6 +52,8 @@ const GymExerciseSetLine = ({
         ? 'checkmark-circle'
         : 'checkmark-circle-outline';
     const completeIconColor = isCompleted ? accentColor : mutedColor;
+    const isSelectionDisabled = isSelectMode && isCompleted;
+    const canPressLine = !isSelectionDisabled && !isCompleted;
 
     return (
         <View
@@ -65,14 +70,19 @@ const GymExerciseSetLine = ({
                         return;
                     }
 
-                    if (isCompleted) return;
-
                     onEdit(set);
                 }}
-                disabled={isCompleted}
+                disabled={!canPressLine}
+                isPressedFeedbackDisabled={isSelectMode}
                 style={st.setLineMain}
             >
-                {isSelectMode && (
+                {isSelectionDisabled && (
+                    <View style={st.completedSelectionState}>
+                        <AppIcon id="lock" size={22} color={dangerColor} />
+                    </View>
+                )}
+
+                {isSelectMode && !isSelectionDisabled && (
                     <View style={st.setIndexBubbleSelection}>
                         <AppIcon
                             id={selectionIconId}
@@ -105,6 +115,18 @@ const GymExerciseSetLine = ({
                         {details}
                     </AppText>
                 </View>
+
+                {isSelectionDisabled && (
+                    <View style={st.completedSelectionPill}>
+                        <AppText
+                            variant="caption"
+                            style={st.completedSelectionPillText}
+                            numberOfLines={1}
+                        >
+                            {t('gymExerciseData.status.complete')}
+                        </AppText>
+                    </View>
+                )}
             </GuardedPressable>
 
             {!isSelectMode && (

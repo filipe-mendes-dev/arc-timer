@@ -44,6 +44,26 @@ export const useStyles = createStyles((theme: AppTheme) =>
             alignItems: 'center',
             justifyContent: 'center',
         },
+        completedSelectionState: {
+            width: 28,
+            height: 28,
+            borderRadius: 14,
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+        completedSelectionPill: {
+            maxWidth: 96,
+            paddingHorizontal: 10,
+            paddingVertical: 4,
+            borderRadius: 999,
+            borderWidth: 1,
+            borderColor: theme.palette.accent.primary,
+            backgroundColor: theme.palette.accent.soft,
+        },
+        completedSelectionPillText: {
+            color: theme.palette.accent.primary,
+            fontWeight: '700',
+        },
         setIndexText: {
             fontSize: 12,
             fontWeight: '700',
