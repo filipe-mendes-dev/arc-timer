@@ -277,6 +277,7 @@ export const createGymPlanService = ({
 
             if (draft.draftTargetGymPlanId) {
                 const target = getGymPlanOrThrow(draft.draftTargetGymPlanId);
+                gymPlanRepository.deleteGymPlan(draft.id);
                 persistGymPlanAggregate({
                     ...draft,
                     id: target.id,
@@ -285,7 +286,6 @@ export const createGymPlanService = ({
                     status:
                         target.status === 'archived' ? 'archived' : 'active',
                 });
-                gymPlanRepository.deleteGymPlan(draft.id);
 
                 return getGymPlanOrThrow(target.id);
             }
