@@ -191,8 +191,6 @@ const assertSetIsValid = (set: GymSetValidationInput): void => {
         set.weightGrams,
     ];
 
-    console.log('Values: ', values);
-
     if (values.some((value) => value != null && value < 0)) {
         throw createGymError(gymErrors.invalidGymSet);
     }
