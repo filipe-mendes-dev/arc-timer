@@ -133,6 +133,7 @@ export const en: I18nResource = {
             sessionNotFound: 'Gym session was not found.',
             sessionNotMutable: 'Gym session is not active.',
             startFailed: 'Could not start a gym session. Try again.',
+            duplicateExerciseRecord: 'Exercise already exists in this session.',
         },
     },
     gymPlans: {

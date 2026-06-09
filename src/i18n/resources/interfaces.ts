@@ -121,6 +121,7 @@ export interface I18nResource {
             sessionNotFound: string;
             sessionNotMutable: string;
             startFailed: string;
+            duplicateExerciseRecord: string;
         };
     };
     gymPlans: {

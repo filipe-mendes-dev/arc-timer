@@ -1,10 +1,12 @@
+import type { I18nKey } from 'src/i18n/i18nKey';
+
 export interface AppError<TCode extends string> extends Error {
     readonly code: TCode;
 }
 
 export interface AppErrorDefinition<TCode extends string> {
     readonly code: TCode;
-    readonly message: string;
+    readonly message: I18nKey;
 }
 
 interface ErrorCodeCandidate {

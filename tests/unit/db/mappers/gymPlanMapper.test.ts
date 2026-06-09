@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 import { gymPlanToGymPlanListItem } from '@src/db/mappers/gym/gymPlanMapper';
-import { createGymPlanFixture } from 'tests/fixtures/gymPlans';
+import { createGymPlanFixture } from 'tests/fixtures/gymPlans.fixtures';
 
 describe('gymPlanToGymPlanListItem', () => {
     it('maps a gym plan aggregate to a gym plan list item', () => {

@@ -23,13 +23,13 @@ import {
 import { seedExerciseDefinition } from '../../helpers/seedExerciseDefinition';
 import { seedGymPlan } from '../../helpers/seedGymPlan';
 import { gymPlanToGymPlanListItem } from 'src/db/mappers/gym/gymPlanMapper';
-import type { GymPlanFixtureArgs } from 'tests/fixtures/gymPlans';
+import type { GymPlanFixtureArgs } from 'tests/fixtures/gymPlans.fixtures';
 import {
     createGymPlanExerciseFixture,
     createGymPlanExerciseTargetSetFixture,
     createGymPlanFixture,
     createGymPlanSectionFixture,
-} from 'tests/fixtures/gymPlans';
+} from 'tests/fixtures/gymPlans.fixtures';
 import type { GymPlan } from 'src/core/entities/gymPlan.interfaces';
 
 const FIXED_NOW_MS = 1_900_000_000_000;

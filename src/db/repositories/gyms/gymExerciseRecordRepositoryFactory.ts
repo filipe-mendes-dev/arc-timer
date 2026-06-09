@@ -1,4 +1,4 @@
-import { asc, desc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq } from 'drizzle-orm';
 
 import type {
     GymExerciseRecord,
@@ -11,42 +11,39 @@ import {
 } from '../../schema';
 import type { RepositoryDb } from '../workouts/workoutRepositoryFactory';
 
-export type GymExerciseRecordRow =
-    typeof gymExerciseRecordsTable.$inferSelect;
+export type GymExerciseRecordRow = typeof gymExerciseRecordsTable.$inferSelect;
 export type GymExerciseRecordSetRow =
     typeof gymExerciseRecordSetsTable.$inferSelect;
 type GymExerciseRecordInsert = typeof gymExerciseRecordsTable.$inferInsert;
 type GymExerciseRecordSetInsert =
     typeof gymExerciseRecordSetsTable.$inferInsert;
 
-export interface PersistedGymExerciseRecord
-    extends Omit<GymExerciseRecord, 'sets'> {
+export interface PersistedGymExerciseRecord extends Omit<
+    GymExerciseRecord,
+    'sets'
+> {
     gymSessionId: string;
     sets: PersistedGymExerciseRecordSet[];
 }
 
-export interface PersistedGymExerciseRecordSet
-    extends GymExerciseRecordSet {
+export interface PersistedGymExerciseRecordSet extends GymExerciseRecordSet {
     gymExerciseRecordId: string;
 }
 
-export interface InsertGymExerciseRecordInput
-    extends GymExerciseRecordInsert {}
+export interface InsertGymExerciseRecordInput extends GymExerciseRecordInsert {}
 
 export interface UpdateGymExerciseRecordInput
-    extends Pick<GymExerciseRecordRow, 'id' | 'updatedAtMs'>,
+    extends
+        Pick<GymExerciseRecordRow, 'id' | 'updatedAtMs'>,
         Partial<
-            Pick<
-                GymExerciseRecordRow,
-                'notes' | 'sortIndex' | 'startedAtMs'
-            >
+            Pick<GymExerciseRecordRow, 'notes' | 'sortIndex' | 'startedAtMs'>
         > {}
 
-export interface InsertGymExerciseRecordSetInput
-    extends GymExerciseRecordSetInsert {}
+export interface InsertGymExerciseRecordSetInput extends GymExerciseRecordSetInsert {}
 
 export interface UpdateGymExerciseRecordSetInput
-    extends Pick<GymExerciseRecordSetRow, 'id' | 'updatedAtMs'>,
+    extends
+        Pick<GymExerciseRecordSetRow, 'id' | 'updatedAtMs'>,
         Partial<
             Pick<
                 GymExerciseRecordSetRow,
@@ -68,6 +65,10 @@ export interface GymExerciseRecordRepository {
     getNextRecordSortIndex: (sessionId: string) => number;
     getNextSetIndex: (recordId: string) => number;
     getSetById: (id: string) => PersistedGymExerciseRecordSet | null;
+    getBySessionIdAndExerciseDefinitionId: (
+        gymSessionId: string,
+        exerciseDefinitionId: string,
+    ) => GymExerciseRecordRow | undefined;
     insertRecord: (input: InsertGymExerciseRecordInput) => void;
     insertSet: (input: InsertGymExerciseRecordSetInput) => void;
     updateRecord: (input: UpdateGymExerciseRecordInput) => void;
@@ -264,7 +265,12 @@ export const createGymExerciseRecordRepository = ({
             const row = db
                 .select({ setIndex: gymExerciseRecordSetsTable.setIndex })
                 .from(gymExerciseRecordSetsTable)
-                .where(eq(gymExerciseRecordSetsTable.gymExerciseRecordId, recordId))
+                .where(
+                    eq(
+                        gymExerciseRecordSetsTable.gymExerciseRecordId,
+                        recordId,
+                    ),
+                )
                 .orderBy(desc(gymExerciseRecordSetsTable.setIndex))
                 .limit(1)
                 .get();
@@ -283,6 +289,23 @@ export const createGymExerciseRecordRepository = ({
 
             return row ? gymExerciseRecordSetFromRow(row) : null;
         },
+        getBySessionIdAndExerciseDefinitionId: (
+            gymSessionId: string,
+            exerciseDefinitionId: string,
+        ): GymExerciseRecordRow | undefined =>
+            db
+                .select()
+                .from(gymExerciseRecordsTable)
+                .where(
+                    and(
+                        eq(gymExerciseRecordsTable.gymSessionId, gymSessionId),
+                        eq(
+                            gymExerciseRecordsTable.exerciseDefinitionId,
+                            exerciseDefinitionId,
+                        ),
+                    ),
+                )
+                .get(),
 
         insertRecord: (input: InsertGymExerciseRecordInput): void => {
             assertRecordInput(input);
@@ -305,7 +328,10 @@ export const createGymExerciseRecordRepository = ({
 
         insertSet: (input: InsertGymExerciseRecordSetInput): void => {
             assertNonEmptyId(input.id, 'Gym exercise record set ID');
-            assertNonEmptyId(input.gymExerciseRecordId, 'Gym exercise record ID');
+            assertNonEmptyId(
+                input.gymExerciseRecordId,
+                'Gym exercise record ID',
+            );
             assertOptionalFiniteTimestamp(input.completedAtMs, 'completedAtMs');
             assertFiniteTimestamp(input.createdAtMs, 'createdAtMs');
             assertFiniteTimestamp(input.updatedAtMs, 'updatedAtMs');
@@ -355,7 +381,11 @@ export const createGymExerciseRecordRepository = ({
             assertOptionalIntegerAtLeast(input.reps, 1, 'reps');
             assertOptionalIntegerAtLeast(input.weightGrams, 0, 'weightGrams');
             assertOptionalIntegerAtLeast(input.durationSec, 1, 'durationSec');
-            assertOptionalIntegerAtLeast(input.distanceMeters, 1, 'distanceMeters');
+            assertOptionalIntegerAtLeast(
+                input.distanceMeters,
+                1,
+                'distanceMeters',
+            );
             assertOptionalIntegerBetween(input.rpeTenths, 0, 100, 'rpeTenths');
 
             db.update(gymExerciseRecordSetsTable)

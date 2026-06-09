@@ -115,6 +115,14 @@ export interface CreateGymSessionServiceArgs {
     gymSessionRepository: GymSessionRepository;
 }
 
+interface GymSetValidationInput {
+    distanceMeters?: number | null;
+    durationSec?: number | null;
+    reps?: number | null;
+    rpeTenths?: number | null;
+    weightGrams?: number | null;
+}
+
 const DEFAULT_RECENT_SESSION_LIMIT = 10;
 
 const gymExerciseRecordSetFromPersisted = (
@@ -165,19 +173,36 @@ const gymSessionFromRow = (
     updatedAtMs: row.updatedAtMs,
 });
 
-const hasMeaningfulSetValue = (
-    set: Pick<
-        GymExerciseRecordSet,
-        'distanceMeters' | 'durationSec' | 'reps' | 'weightGrams'
-    >,
-): boolean =>
-    set.reps !== undefined ||
-    set.weightGrams !== undefined ||
-    set.durationSec !== undefined ||
-    set.distanceMeters !== undefined;
+const hasMeaningfulSetValue = (set: GymSetValidationInput): boolean =>
+    set.reps != null ||
+    set.weightGrams != null ||
+    set.durationSec != null ||
+    set.distanceMeters != null;
 
 const hasCompletedSet = (record: PersistedGymExerciseRecord): boolean =>
     record.sets.some((set) => set.completedAtMs !== undefined);
+
+const assertSetIsValid = (set: GymSetValidationInput): void => {
+    const values = [
+        set.distanceMeters,
+        set.durationSec,
+        set.reps,
+        set.rpeTenths,
+        set.weightGrams,
+    ];
+
+    if (values.some((value) => value != null && value < 0)) {
+        throw createGymError(gymErrors.invalidGymSet);
+    }
+
+    if (set.rpeTenths != null && set.rpeTenths > 100) {
+        throw createGymError(gymErrors.invalidGymSet);
+    }
+
+    if (!hasMeaningfulSetValue(set)) {
+        throw createGymError(gymErrors.invalidGymSet);
+    }
+};
 
 export const createGymSessionService = ({
     clock = systemClock,
@@ -264,17 +289,6 @@ export const createGymSessionService = ({
         }
     };
 
-    const assertSetIsMeaningful = (
-        set: Pick<
-            GymExerciseRecordSet,
-            'distanceMeters' | 'durationSec' | 'reps' | 'weightGrams'
-        >,
-    ): void => {
-        if (!hasMeaningfulSetValue(set)) {
-            throw createGymError(gymErrors.invalidGymSet);
-        }
-    };
-
     const getSessionCreatedUserExerciseDefinitionIds = (
         exerciseDefinitionIds: string[],
         startedAtMs: number,
@@ -353,6 +367,11 @@ export const createGymSessionService = ({
             const planExercises = gymPlan.sections.flatMap(
                 (section) => section.exercises,
             );
+
+            if (planExercises.length === 0) {
+                throw createGymError(gymErrors.invalidGymPlan);
+            }
+
             planExercises.forEach((exercise) => {
                 assertExerciseDefinitionCanBeUsed(
                     exercise.exerciseDefinitionId,
@@ -527,6 +546,16 @@ export const createGymSessionService = ({
 
             assertExerciseDefinitionCanBeUsed(targetDefinitionId);
 
+            const existingExerciseRecord =
+                gymExerciseRecordRepository.getBySessionIdAndExerciseDefinitionId(
+                    session.id,
+                    targetDefinitionId,
+                );
+
+            if (existingExerciseRecord) {
+                throw createGymError(gymErrors.duplicateExerciseRecord);
+            }
+
             const nowMs = clock.now();
             const id = uid();
             gymExerciseRecordRepository.insertRecord({
@@ -562,10 +591,11 @@ export const createGymSessionService = ({
             weightGrams,
         }: AddSetToExerciseRecordInput): GymExerciseRecordSet => {
             getRecordInActiveSessionOrThrow(exerciseRecordId);
-            assertSetIsMeaningful({
+            assertSetIsValid({
                 distanceMeters,
                 durationSec,
                 reps,
+                rpeTenths,
                 weightGrams,
             });
 
@@ -610,7 +640,22 @@ export const createGymSessionService = ({
             setIndex,
             weightGrams,
         }: UpdateExerciseRecordSetInput): GymExerciseRecordSet => {
-            getSetInActiveSessionOrThrow(id);
+            const currentSet = getSetInActiveSessionOrThrow(id);
+
+            const nextSet = {
+                ...currentSet,
+                completedAtMs,
+                distanceMeters,
+                durationSec,
+                isWarmup,
+                notes,
+                reps,
+                rpeTenths,
+                setIndex,
+                weightGrams,
+            };
+
+            assertSetIsValid(nextSet);
 
             gymExerciseRecordRepository.updateSet({
                 id,

@@ -33,6 +33,7 @@ export const gymErrors = {
         code: 'EXERCISE_RECORD_NOT_IN_ACTIVE_SESSION',
         message: 'gym.errors.exerciseRecordNotInActiveSession',
     },
+
     exerciseSetNotFound: {
         code: 'EXERCISE_SET_NOT_FOUND',
         message: 'gym.errors.exerciseSetNotFound',
@@ -73,10 +74,13 @@ export const gymErrors = {
         code: 'SESSION_NOT_MUTABLE',
         message: 'gym.errors.sessionNotMutable',
     },
+    duplicateExerciseRecord: {
+        code: 'DUPLICATE_EXERCISE_RECORD',
+        message: 'gym.errors.duplicateExerciseRecord',
+    },
 } as const satisfies Record<string, AppErrorDefinition<string>>;
 
-export type GymErrorCode =
-    (typeof gymErrors)[keyof typeof gymErrors]['code'];
+export type GymErrorCode = (typeof gymErrors)[keyof typeof gymErrors]['code'];
 
 export type GymErrorMessage =
     (typeof gymErrors)[keyof typeof gymErrors]['message'];

@@ -135,6 +135,7 @@ export const ptPT: I18nResource = {
             sessionNotFound: 'A sessão de ginásio não foi encontrada.',
             sessionNotMutable: 'A sessão de ginásio não está ativa.',
             startFailed: 'Não foi possível iniciar a sessão. Tenta novamente.',
+            duplicateExerciseRecord: 'Exercício já existe nesta sessão.',
         },
     },
     gymPlans: {

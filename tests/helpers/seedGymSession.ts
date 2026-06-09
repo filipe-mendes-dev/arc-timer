@@ -1,4 +1,8 @@
-import type { GymSessionStatus } from '@src/core/entities/gymSession.interfaces';
+import type {
+    GymExerciseRecord,
+    GymExerciseRecordSet,
+    GymSession,
+} from '@src/core/entities/gymSession.interfaces';
 import {
     gymExerciseRecordsTable,
     gymExerciseRecordSetsTable,
@@ -7,112 +11,82 @@ import {
 
 import type { TestDb } from './createTestDb';
 
-export interface SeedGymSessionInput {
-    createdAtMs?: number;
-    endedAtMs?: number;
-    id: string;
-    notes?: string;
-    sourceGymPlanId?: string;
-    startedAtMs: number;
-    status: GymSessionStatus;
-    updatedAtMs?: number;
-}
-
-export interface SeedGymExerciseRecordInput {
-    createdAtMs?: number;
-    exerciseDefinitionId: string;
-    gymSessionId: string;
-    id: string;
-    notes?: string;
-    sortIndex: number;
-    sourceGymPlanExerciseId?: string;
-    startedAtMs?: number;
-    updatedAtMs?: number;
-}
-
-export interface SeedGymExerciseRecordSetInput {
-    completedAtMs?: number;
-    createdAtMs?: number;
-    distanceMeters?: number;
-    durationSec?: number;
-    gymExerciseRecordId: string;
-    id: string;
-    isWarmup?: boolean;
-    notes?: string;
-    reps?: number;
-    rpeTenths?: number;
-    setIndex: number;
-    updatedAtMs?: number;
-    weightGrams?: number;
-}
-
-const DEFAULT_CREATED_AT_MS = 1_800_000_000_000;
-
 export const seedGymSession = (
     testDb: TestDb,
-    input: SeedGymSessionInput,
-): void => {
-    const createdAtMs = input.createdAtMs ?? DEFAULT_CREATED_AT_MS;
-
+    gymSession: GymSession,
+): GymSession => {
     testDb.db
         .insert(gymSessionsTable)
         .values({
-            createdAtMs,
-            endedAtMs: input.endedAtMs ?? null,
-            id: input.id,
-            notes: input.notes ?? null,
-            sourceGymPlanId: input.sourceGymPlanId ?? null,
-            startedAtMs: input.startedAtMs,
-            status: input.status,
-            updatedAtMs: input.updatedAtMs ?? createdAtMs,
+            createdAtMs: gymSession.createdAtMs,
+            endedAtMs: gymSession.endedAtMs ?? null,
+            id: gymSession.id,
+            notes: gymSession.notes ?? null,
+            sourceGymPlanId: gymSession.sourceGymPlanId ?? null,
+            startedAtMs: gymSession.startedAtMs,
+            status: gymSession.status,
+            updatedAtMs: gymSession.updatedAtMs,
         })
         .run();
+
+    gymSession.exerciseRecords.forEach((exerciseRecord) => {
+        seedGymExerciseRecord(testDb, gymSession.id, exerciseRecord);
+    });
+
+    return gymSession;
 };
 
 export const seedGymExerciseRecord = (
     testDb: TestDb,
-    input: SeedGymExerciseRecordInput,
-): void => {
-    const createdAtMs = input.createdAtMs ?? DEFAULT_CREATED_AT_MS;
-
+    gymSessionId: string,
+    exerciseRecord: GymExerciseRecord,
+): GymExerciseRecord => {
     testDb.db
         .insert(gymExerciseRecordsTable)
         .values({
-            createdAtMs,
-            exerciseDefinitionId: input.exerciseDefinitionId,
-            gymSessionId: input.gymSessionId,
-            id: input.id,
-            notes: input.notes ?? null,
-            sortIndex: input.sortIndex,
-            sourceGymPlanExerciseId: input.sourceGymPlanExerciseId ?? null,
-            startedAtMs: input.startedAtMs ?? null,
-            updatedAtMs: input.updatedAtMs ?? createdAtMs,
+            createdAtMs: exerciseRecord.createdAtMs,
+            exerciseDefinitionId: exerciseRecord.exerciseDefinitionId,
+            gymSessionId,
+            id: exerciseRecord.id,
+            notes: exerciseRecord.notes ?? null,
+            sortIndex: exerciseRecord.sortIndex,
+            sourceGymPlanExerciseId:
+                exerciseRecord.sourceGymPlanExerciseId ?? null,
+            startedAtMs: exerciseRecord.startedAtMs ?? null,
+            updatedAtMs: exerciseRecord.updatedAtMs,
         })
         .run();
+
+    exerciseRecord.sets.forEach((set) => {
+        seedGymExerciseRecordSet(testDb, exerciseRecord.id, set);
+    });
+
+    return exerciseRecord;
 };
 
 export const seedGymExerciseRecordSet = (
     testDb: TestDb,
-    input: SeedGymExerciseRecordSetInput,
-): void => {
-    const createdAtMs = input.createdAtMs ?? DEFAULT_CREATED_AT_MS;
-
+    gymExerciseRecordId: string,
+    set: GymExerciseRecordSet,
+): GymExerciseRecordSet => {
     testDb.db
         .insert(gymExerciseRecordSetsTable)
         .values({
-            completedAtMs: input.completedAtMs ?? null,
-            createdAtMs,
-            distanceMeters: input.distanceMeters ?? null,
-            durationSec: input.durationSec ?? null,
-            gymExerciseRecordId: input.gymExerciseRecordId,
-            id: input.id,
-            isWarmup: input.isWarmup ?? false,
-            notes: input.notes ?? null,
-            reps: input.reps ?? null,
-            rpeTenths: input.rpeTenths ?? null,
-            setIndex: input.setIndex,
-            updatedAtMs: input.updatedAtMs ?? createdAtMs,
-            weightGrams: input.weightGrams ?? null,
+            completedAtMs: set.completedAtMs ?? null,
+            createdAtMs: set.createdAtMs,
+            distanceMeters: set.distanceMeters ?? null,
+            durationSec: set.durationSec ?? null,
+            gymExerciseRecordId,
+            id: set.id,
+            isWarmup: set.isWarmup,
+            notes: set.notes ?? null,
+            reps: set.reps ?? null,
+            rpeTenths: set.rpeTenths ?? null,
+            setIndex: set.setIndex,
+            updatedAtMs: set.updatedAtMs,
+            weightGrams: set.weightGrams ?? null,
         })
         .run();
+
+    return set;
 };
