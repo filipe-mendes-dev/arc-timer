@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { View } from 'react-native';
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 
 import type { Workout } from '@src/core/entities/workout.interfaces';
 import { formatWorkoutDuration } from '@core/workouts/summarizeWorkout';
@@ -146,8 +146,8 @@ export const ShareWorkoutCard = ({
                     </View>
 
                     <View style={st.cardDurationPill}>
-                        <Feather
-                            name="clock"
+                        <AppIcon
+                            id="duration"
                             size={14}
                             color={theme.palette.text.muted}
                             style={st.cardDurationIcon}

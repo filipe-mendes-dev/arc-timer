@@ -91,8 +91,8 @@ const GymPlanDetailsScreen = () => {
                         topLeftContent={{
                             text: t('gymPlanDetails.cardTitle'),
                             icon: (
-                                <Ionicons
-                                    name="barbell-outline"
+                                <AppIcon
+                                    id="gymPlan"
                                     size={14}
                                     color={
                                         theme.palette.metaCard.topLeftContent

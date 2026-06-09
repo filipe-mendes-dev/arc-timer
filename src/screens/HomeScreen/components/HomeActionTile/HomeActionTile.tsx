@@ -1,7 +1,7 @@
-import { useState, type ComponentProps } from 'react';
+import { useState } from 'react';
 import { Pressable, View, type LayoutChangeEvent } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@src/components/ui/Typography/AppText';
+import { AppIcon, type IconId } from '@src/components/ui/Icon/AppIcon';
 import { useTheme } from '@src/theme/ThemeProvider';
 import { Watermark } from '@src/components/ui/Watermark/Watermark';
 import { useStyles } from './HomeActionTile.styles';
@@ -9,7 +9,7 @@ import { useStyles } from './HomeActionTile.styles';
 export interface HomeActionTileProps {
     title: string;
     subtitle?: string;
-    icon: ComponentProps<typeof Ionicons>['name'];
+    icon: IconId;
     variant?: 'primary' | 'secondary';
     onPress: () => void;
 }
@@ -58,8 +58,8 @@ export const HomeActionTile = ({
                     sizeScale={0.9}
                 />
             )}
-            <Ionicons
-                name={icon}
+            <AppIcon
+                id={icon}
                 size={iconSize}
                 color={iconColor}
             />

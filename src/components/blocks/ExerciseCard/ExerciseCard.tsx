@@ -1,9 +1,9 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
 import type { WorkoutExercise } from '@src/core/entities/workout.interfaces';
+import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { TextField } from '@src/components/ui/TextField/TextField';
 import { Stepper } from '@src/components/ui/Stepper/Stepper';
@@ -43,8 +43,8 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
             topLeftContent={{
                 text: label,
                 icon: (
-                    <Ionicons
-                        name="barbell-outline"
+                    <AppIcon
+                        id="exercise"
                         size={14}
                         color={theme.palette.metaCard.topLeftContent.text}
                     />
@@ -52,8 +52,8 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
             }}
             actionStrip={{
                 icon: (
-                    <Ionicons
-                        name="trash-outline"
+                    <AppIcon
+                        id="trash"
                         size={16}
                         color={theme.palette.metaCard.actionStrip.icon}
                     />

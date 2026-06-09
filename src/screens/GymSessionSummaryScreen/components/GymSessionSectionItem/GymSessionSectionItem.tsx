@@ -1,5 +1,4 @@
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
 import { AppIcon } from '@src/components/ui/Icon/AppIcon';
@@ -48,8 +47,8 @@ export const GymSessionSectionItem = ({
             topLeftContent={{
                 text: section.label,
                 icon: (
-                    <Ionicons
-                        name="list-outline"
+                    <AppIcon
+                        id="section"
                         size={14}
                         color={theme.palette.metaCard.topLeftContent.text}
                     />

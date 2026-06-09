@@ -59,7 +59,7 @@ const GymScreen = () => {
                     <HomeActionTile
                         title={t('gym.actions.startNewSession')}
                         subtitle={t('gym.actions.startNewSessionSubtitle')}
-                        icon="play"
+                        icon="gymSession"
                         variant="primary"
                         onPress={handleStartSession}
                     />
@@ -70,7 +70,7 @@ const GymScreen = () => {
                         <View style={st.activeActionItem}>
                             <HomeActionTile
                                 title={t('gym.actions.resumeSession')}
-                                icon="pulse-outline"
+                                icon="gymSession"
                                 variant="secondary"
                                 onPress={() => router.push('/gymSession')}
                             />
@@ -79,7 +79,7 @@ const GymScreen = () => {
                         <View style={st.activeActionItem}>
                             <HomeActionTile
                                 title={t('gym.actions.finishSession')}
-                                icon="checkmark-circle-outline"
+                                icon="checkmarkCircle"
                                 variant="secondary"
                                 onPress={() => setFinishModalVisible(true)}
                             />
@@ -182,7 +182,7 @@ const GymScreen = () => {
                 <HomeActionTile
                     title={t('gym.actions.plans')}
                     subtitle={t('gym.actions.plansSubtitle')}
-                    icon="barbell-outline"
+                    icon="gymPlan"
                     variant="secondary"
                     onPress={() => router.push('/gymPlans')}
                 />
@@ -190,7 +190,7 @@ const GymScreen = () => {
                 <HomeActionTile
                     title={t('gym.actions.history')}
                     subtitle={t('gym.actions.historySubtitle')}
-                    icon="time-outline"
+                    icon="history"
                     variant="secondary"
                     onPress={() =>
                         router.navigate({

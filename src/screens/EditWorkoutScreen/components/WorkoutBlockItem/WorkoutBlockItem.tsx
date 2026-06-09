@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 import type { WorkoutBlock } from '@src/core/entities/workout.interfaces';
+import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import { IndexedListItem } from '@src/components/ui/IndexedListItem';
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { AppText } from '@src/components/ui/Typography/AppText';
@@ -98,8 +98,8 @@ export const WorkoutBlockItem = ({
     const actionStrip = onRemove
         ? {
               icon: (
-                  <Ionicons
-                      name="trash-outline"
+                  <AppIcon
+                      id="trash"
                       size={18}
                       color={theme.palette.metaCard.actionStrip.icon}
                   />
@@ -124,8 +124,8 @@ export const WorkoutBlockItem = ({
                 topLeftContent={{
                     text: blockLabel,
                     icon: (
-                        <Ionicons
-                            name="layers-outline"
+                        <AppIcon
+                            id="block"
                             size={14}
                             color={theme.palette.metaCard.topLeftContent.text}
                         />
@@ -144,8 +144,8 @@ export const WorkoutBlockItem = ({
                 summaryContent={
                     <View style={st.body}>
                         <View style={st.blockInfoRow}>
-                            <Ionicons
-                                name="timer-outline"
+                            <AppIcon
+                                id="duration"
                                 size={14}
                                 color={theme.palette.text.secondary}
                             />

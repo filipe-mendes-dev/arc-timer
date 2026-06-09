@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
 import { AppIcon, type IconId } from '@src/components/ui/Icon/AppIcon';
@@ -44,7 +43,7 @@ export const TrainingSessionListItem = ({
     let kindBackgroundColor = theme.palette.accent.primary;
     let kindContentColor = theme.palette.text.inverted;
     if (session.kind === 'gym') {
-        kindIconId = 'exercise';
+        kindIconId = 'gymSession';
         kindBackgroundColor = theme.palette.accent.soft;
         kindContentColor = theme.palette.accent.primaryStrong;
     }
@@ -145,8 +144,8 @@ export const TrainingSessionListItem = ({
                     </View>
 
                     <View style={st.durationPill}>
-                        <Ionicons
-                            name="time-outline"
+                        <AppIcon
+                            id="duration"
                             size={14}
                             color={theme.palette.metaCard.datePill.icon}
                         />

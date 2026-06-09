@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { AppIcon } from '@src/components/ui/Icon/AppIcon';
@@ -77,8 +76,8 @@ const SessionListItem = ({
                     </View>
 
                     <View style={st.durationPill}>
-                        <Ionicons
-                            name="time-outline"
+                        <AppIcon
+                            id="duration"
                             size={14}
                             color={theme.palette.metaCard.datePill.icon}
                         />

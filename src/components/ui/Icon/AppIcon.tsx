@@ -19,9 +19,34 @@ type IconDefinition =
       };
 
 const ICON_MAP = {
+    home: {
+        lib: 'ion',
+        name: 'home-outline',
+        defaultSize: 18,
+    },
     workout: {
         lib: 'ion',
-        name: 'walk-outline',
+        name: 'fitness-outline',
+        defaultSize: 18,
+    },
+    gym: {
+        lib: 'ion',
+        name: 'barbell-outline',
+        defaultSize: 18,
+    },
+    gymPlan: {
+        lib: 'ion',
+        name: 'barbell-outline',
+        defaultSize: 18,
+    },
+    gymSession: {
+        lib: 'ion',
+        name: 'barbell-outline',
+        defaultSize: 18,
+    },
+    exerciseDefinition: {
+        lib: 'ion',
+        name: 'list-outline',
         defaultSize: 18,
     },
     block: {
@@ -29,15 +54,35 @@ const ICON_MAP = {
         name: 'layers-outline',
         defaultSize: 16,
     },
+    section: {
+        lib: 'ion',
+        name: 'layers-outline',
+        defaultSize: 16,
+    },
     exercise: {
         lib: 'ion',
-        name: 'barbell-outline',
+        name: 'body-outline',
         defaultSize: 16,
     },
     time: {
         lib: 'ion',
         name: 'timer-outline',
         defaultSize: 16,
+    },
+    duration: {
+        lib: 'ion',
+        name: 'timer-outline',
+        defaultSize: 16,
+    },
+    history: {
+        lib: 'ion',
+        name: 'time-outline',
+        defaultSize: 18,
+    },
+    quickSession: {
+        lib: 'ion',
+        name: 'play-circle-outline',
+        defaultSize: 22,
     },
     sets: {
         lib: 'feather',
@@ -107,6 +152,11 @@ const ICON_MAP = {
     info: {
         lib: 'ion',
         name: 'information-circle-outline',
+        defaultSize: 20,
+    },
+    settings: {
+        lib: 'ion',
+        name: 'settings-outline',
         defaultSize: 20,
     },
     back: {

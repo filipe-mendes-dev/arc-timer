@@ -31,7 +31,7 @@ export const GymActiveSessionHeader = ({
                 <View style={st.titleBlock}>
                     <View style={st.titleRow}>
                         <AppIcon
-                            id="exercise"
+                            id="gymSession"
                             size={22}
                             color={theme.palette.text.primary}
                         />
@@ -51,7 +51,7 @@ export const GymActiveSessionHeader = ({
 
                 <View style={st.durationContainer}>
                     <AppIcon
-                        id="time"
+                        id="duration"
                         size={16}
                         color={theme.palette.text.primary}
                         style={st.durationIcon}
@@ -69,7 +69,7 @@ export const GymActiveSessionHeader = ({
             <View style={st.metricsRow}>
                 <View style={st.metricItem}>
                     <AppIcon
-                        id="intensity"
+                        id="exercise"
                         size={14}
                         color={theme.palette.text.muted}
                         style={st.metricIcon}

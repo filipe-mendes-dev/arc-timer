@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
+import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import { IndexedListItem } from '@src/components/ui/IndexedListItem';
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { AppText } from '@src/components/ui/Typography/AppText';
@@ -94,8 +94,8 @@ export const GymPlanSectionItem = ({
                 topLeftContent={{
                     text: sectionLabel,
                     icon: (
-                        <Ionicons
-                            name="list-outline"
+                        <AppIcon
+                            id="section"
                             size={14}
                             color={theme.palette.metaCard.topLeftContent.text}
                         />
@@ -108,8 +108,8 @@ export const GymPlanSectionItem = ({
                 actionStrip={
                     onRemove && {
                         icon: (
-                            <Ionicons
-                                name="trash-outline"
+                            <AppIcon
+                                id="trash"
                                 size={18}
                                 color={theme.palette.metaCard.actionStrip.icon}
                             />
@@ -127,8 +127,8 @@ export const GymPlanSectionItem = ({
                 summaryContent={
                     <View style={st.body}>
                         <View style={st.sectionInfoRow}>
-                            <Ionicons
-                                name="barbell-outline"
+                            <AppIcon
+                                id="exercise"
                                 size={14}
                                 color={theme.palette.text.secondary}
                             />

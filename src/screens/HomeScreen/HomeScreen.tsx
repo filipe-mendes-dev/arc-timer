@@ -146,7 +146,7 @@ const HomeScreen = () => {
                             <View style={st.activeSessionActionItem}>
                                 <HomeActionTile
                                     title={t('gym.actions.resumeSession')}
-                                    icon="pulse-outline"
+                                    icon="gymSession"
                                     variant="secondary"
                                     onPress={() => router.push('/gymSession')}
                                 />
@@ -155,7 +155,7 @@ const HomeScreen = () => {
                             <View style={st.activeSessionActionItem}>
                                 <HomeActionTile
                                     title={t('gym.actions.finishSession')}
-                                    icon="checkmark-circle-outline"
+                                    icon="checkmarkCircle"
                                     variant="secondary"
                                     onPress={() =>
                                         setEndGymSessionModalVisible(true)
@@ -170,7 +170,7 @@ const HomeScreen = () => {
                     <HomeActionTile
                         title={t('home.quickSession')}
                         subtitle={t('home.startImmediately')}
-                        icon="play"
+                        icon="quickSession"
                         variant="primary"
                         onPress={() => setSessionTypeModalVisible(true)}
                     />
@@ -184,7 +184,7 @@ const HomeScreen = () => {
                     <View style={st.gridItem}>
                         <HomeActionTile
                             title={t('home.actions.savedHiitWorkouts')}
-                            icon="barbell-outline"
+                            icon="workout"
                             onPress={() => router.navigate('/workouts')}
                         />
                     </View>
@@ -192,7 +192,7 @@ const HomeScreen = () => {
                     <View style={st.gridItem}>
                         <HomeActionTile
                             title={t('home.actions.gymPlans')}
-                            icon="fitness-outline"
+                            icon="gymPlan"
                             onPress={() => router.push('/gymPlans')}
                         />
                     </View>
@@ -266,14 +266,14 @@ const HomeScreen = () => {
                 <View style={st.sessionTypeTiles}>
                     <HomeActionTile
                         title={t('home.actions.startHiitWorkout')}
-                        icon="play"
+                        icon="quickSession"
                         variant="primary"
                         onPress={handleStartWorkoutSession}
                     />
 
                     <HomeActionTile
                         title={t('home.actions.startGymSession')}
-                        icon="pulse-outline"
+                        icon="gymSession"
                         variant="secondary"
                         onPress={handleStartGymSession}
                     />

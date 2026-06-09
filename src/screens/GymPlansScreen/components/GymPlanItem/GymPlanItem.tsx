@@ -1,5 +1,4 @@
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
 import GuardedPressable from '@src/components/ui/GuardedPressable/GuardedPressable';
@@ -107,8 +106,8 @@ export const GymPlanItem = ({
             topLeftContent={{
                 text: t('gymPlans.card.label'),
                 icon: (
-                    <Ionicons
-                        name="barbell-outline"
+                    <AppIcon
+                        id="gymPlan"
                         size={14}
                         color={theme.palette.metaCard.topLeftContent.text}
                     />
@@ -135,8 +134,8 @@ export const GymPlanItem = ({
 
                     <View style={st.metaRow}>
                         <View style={st.metaItem}>
-                            <Ionicons
-                                name="layers-outline"
+                            <AppIcon
+                                id="section"
                                 size={14}
                                 color={theme.palette.text.secondary}
                             />
@@ -152,8 +151,8 @@ export const GymPlanItem = ({
                         </View>
 
                         <View style={st.metaItem}>
-                            <Ionicons
-                                name="barbell-outline"
+                            <AppIcon
+                                id="exercise"
                                 size={14}
                                 color={theme.palette.text.secondary}
                             />

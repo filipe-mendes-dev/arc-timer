@@ -90,8 +90,8 @@ const WorkoutSummaryScreen = () => {
                         topLeftContent={{
                             text: t('workoutSummary.cardTitle'),
                             icon: (
-                                <Ionicons
-                                    name="barbell-outline"
+                                <AppIcon
+                                    id="workout"
                                     size={14}
                                     color={
                                         theme.palette.metaCard.topLeftContent

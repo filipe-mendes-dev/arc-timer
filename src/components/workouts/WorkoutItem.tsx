@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 import type { Workout } from '@src/core/entities/workout.interfaces';
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
@@ -92,8 +91,8 @@ export const WorkoutItem: React.FC<WorkoutItemProps> = ({
             topLeftContent={{
                 text: timeLabel,
                 icon: (
-                    <Ionicons
-                        name="timer-outline"
+                    <AppIcon
+                        id="duration"
                         size={14}
                         color={theme.palette.metaCard.topLeftContent.text}
                     />
@@ -107,8 +106,8 @@ export const WorkoutItem: React.FC<WorkoutItemProps> = ({
                 !isSelectMode && onRemove
                     ? {
                           icon: (
-                              <Ionicons
-                                  name="trash-outline"
+                              <AppIcon
+                                  id="trash"
                                   size={18}
                                   color={
                                       theme.palette.metaCard.actionStrip.icon
@@ -140,8 +139,8 @@ export const WorkoutItem: React.FC<WorkoutItemProps> = ({
 
                     <View style={st.metaRow}>
                         <View style={st.metaItem}>
-                            <Ionicons
-                                name="layers-outline"
+                            <AppIcon
+                                id="block"
                                 size={14}
                                 color={theme.palette.text.secondary}
                             />
@@ -157,8 +156,8 @@ export const WorkoutItem: React.FC<WorkoutItemProps> = ({
                         </View>
 
                         <View style={st.metaItem}>
-                            <Ionicons
-                                name="barbell-outline"
+                            <AppIcon
+                                id="exercise"
                                 size={14}
                                 color={theme.palette.text.secondary}
                             />

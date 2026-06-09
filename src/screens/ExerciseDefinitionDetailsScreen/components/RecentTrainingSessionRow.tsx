@@ -1,9 +1,9 @@
-import { Ionicons } from '@expo/vector-icons';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import type { ExerciseDefinitionRecentSessionItem } from '@src/core/entities/exerciseDefinition.interfaces';
 import GuardedPressable from '@src/components/ui/GuardedPressable/GuardedPressable';
+import { AppIcon, type IconId } from '@src/components/ui/Icon/AppIcon';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { useTheme } from '@src/theme/ThemeProvider';
 
@@ -25,9 +25,9 @@ export const RecentTrainingSessionRow = ({
     if (title.length === 0 && session.kind === 'gym') {
         title = t('gymHistory.sessionTitle');
     }
-    let kindIconName: 'barbell-outline' | 'timer-outline' = 'timer-outline';
+    let kindIconId: IconId = 'workout';
     if (session.kind === 'gym') {
-        kindIconName = 'barbell-outline';
+        kindIconId = 'gymSession';
     }
 
     return (
@@ -44,8 +44,8 @@ export const RecentTrainingSessionRow = ({
             </View>
 
             <View style={st.sessionDurationPill}>
-                <Ionicons
-                    name={kindIconName}
+                <AppIcon
+                    id={kindIconId}
                     size={14}
                     color={theme.palette.metaCard.datePill.icon}
                 />
