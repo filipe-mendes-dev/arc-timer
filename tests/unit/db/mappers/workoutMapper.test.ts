@@ -161,6 +161,8 @@ describe('workoutFromDbRows', () => {
             name: version.name,
             updatedAtMs: version.updatedAtMs,
             isFavorite: false,
+            blockCount: 2,
+            exerciseCount: 2,
             blocks: [
                 {
                     id: blockFirst.id,
@@ -312,7 +314,9 @@ describe('workoutsByVersionIdFromDbRows', () => {
             id: row.workout_versions.id,
             name: row.workout_versions.name,
             updatedAtMs: row.workout_versions.updatedAtMs,
-            isFavorite: undefined,
+            isFavorite: false,
+            blockCount: 1,
+            exerciseCount: 0,
             blocks: [
                 {
                     id: block.id,

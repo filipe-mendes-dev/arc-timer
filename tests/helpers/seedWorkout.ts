@@ -1,4 +1,4 @@
-import type { Workout } from '@src/core/entities/entities';
+import type { Workout } from '@src/core/entities/workout.interfaces';
 import {
     workoutBlocksTable,
     workoutExercisesTable,

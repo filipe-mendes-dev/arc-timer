@@ -1,7 +1,7 @@
 import { expect } from '@jest/globals';
 import { asc, eq } from 'drizzle-orm';
 
-import type { Workout } from '@src/core/entities/entities';
+import type { Workout } from '@src/core/entities/workout.interfaces';
 import type { Clock } from '@src/db/repositories/repositoryClock';
 import {
     exerciseDefinitionsTable,

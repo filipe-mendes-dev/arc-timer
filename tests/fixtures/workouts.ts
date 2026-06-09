@@ -1,4 +1,4 @@
-import type { Workout } from '@src/core/entities/entities';
+import type { Workout } from '@src/core/entities/workout.interfaces';
 
 export interface WorkoutFixtureArgs {
     id?: string;
@@ -16,7 +16,9 @@ export const createWorkoutFixture = (
         id,
         name: args.name ?? 'Morning Intervals',
         updatedAtMs: args.updatedAtMs ?? 1_700_000_000_000,
-        isFavorite: args.isFavorite,
+        isFavorite: args.isFavorite ?? false,
+        blockCount: 2,
+        exerciseCount: 3,
         blocks: [
             {
                 id: `${id}-block-1`,
@@ -67,7 +69,9 @@ export const createQuickWorkoutFixture = (
         id,
         name: args.name ?? 'Quick Workout',
         updatedAtMs: args.updatedAtMs ?? 1_700_000_000_000,
-        isFavorite: args.isFavorite,
+        isFavorite: args.isFavorite ?? false,
+        blockCount: 1,
+        exerciseCount: 2,
         blocks: [
             {
                 id: `${id}-block-1`,

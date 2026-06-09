@@ -639,11 +639,12 @@ export const createExerciseDefinitionRepository = ({
             }
 
             const next: ExerciseDefinitionBaseListItem = {
-                ...existing,
+                id: existing.id,
                 name: input.name ?? existing.name,
                 normalizedName: input.normalizedName ?? existing.normalizedName,
                 source: input.source ?? existing.source,
                 availability: input.availability ?? existing.availability,
+                createdAtMs: existing.createdAtMs,
                 updatedAtMs: input.updatedAtMs,
             };
             const updateValues: Partial<ExerciseDefinitionDbInsert> = {

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from '@jest/globals';
 import { eq } from 'drizzle-orm';
 
-import type { Workout } from '@src/core/entities/entities';
+import type { Workout } from '@src/core/entities/workout.interfaces';
 import {
     workoutBlocksTable,
     workoutSessionsTable,
@@ -262,6 +262,7 @@ describe('workoutService integration', () => {
             id: 'session-1',
             startedAtMs: 100,
             endedAtMs: 200,
+            workoutName: workout.name,
             workoutSnapshot: workout,
             workoutVersionId: 'source-version-1',
             totalDurationSec: 100,
@@ -336,6 +337,7 @@ describe('workoutService integration', () => {
             id: 'session-1',
             startedAtMs: 100,
             endedAtMs: 200,
+            workoutName: workout.name,
             workoutSnapshot: workout,
             workoutVersionId: 'source-version-1',
             totalDurationSec: 100,
@@ -419,6 +421,7 @@ describe('workoutService integration', () => {
             id: 'session-1',
             startedAtMs: 100,
             endedAtMs: 200,
+            workoutName: workout.name,
             workoutSnapshot: workout,
             workoutVersionId: versionId,
             totalDurationSec: 100,

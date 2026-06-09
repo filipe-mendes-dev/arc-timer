@@ -2,8 +2,8 @@ import type {
     WorkoutSession,
     WorkoutSessionStats,
 } from '@src/core/entities/workoutSession.interfaces';
-import type { Workout } from '@src/core/entities/entities';
-import type { WorkoutSessionRow } from '@src/db/mappers/workoutSessionMapper';
+import type { Workout } from '@src/core/entities/workout.interfaces';
+import type { WorkoutSessionRow } from '@src/db/mappers/workouts/workoutSessionMapper';
 
 import { createQuickWorkoutFixture } from './workouts';
 
@@ -44,6 +44,7 @@ export const createSessionFixture = (
         id: args.id ?? 'session-1',
         startedAtMs,
         endedAtMs,
+        workoutName: workoutSnapshot.name,
         workoutSnapshot,
         activeWorkoutId: args.activeWorkoutId,
         workoutVersionId: args.workoutVersionId ?? 'version-1',
