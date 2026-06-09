@@ -1,24 +1,59 @@
 import { afterEach, beforeEach, describe, expect, it } from '@jest/globals';
 import { eq } from 'drizzle-orm';
 
-import type { ExerciseDefinition, Workout } from '@src/core/entities/entities';
+import type { ExerciseDefinition } from '@src/core/entities/exerciseDefinition.interfaces';
+import type { Workout } from '@src/core/entities/workout.interfaces';
+import {
+    isExerciseDefinitionError,
+    type ExerciseDefinitionErrorCode,
+} from '@src/db/repositories/exerciseDefinitions/exerciseDefinitionErrors';
 import {
     exerciseDefinitionsTable,
+    gymExerciseRecordsTable,
+    gymPlanExercisesTable,
     workoutExercisesTable,
 } from '@src/db/schema';
 
 import { createExerciseDefinitionFixture } from '../../fixtures/exerciseDefinitions';
+import { createSessionFixture } from '../../fixtures/sessions';
+import {
+    createGymPlanExerciseFixture,
+    createGymPlanFixture,
+    createGymPlanSectionFixture,
+} from '../../fixtures/gymPlans';
 import { createWorkoutFixture } from '../../fixtures/workouts';
 import {
     createRepositoryContext,
     type RepositoryContext,
 } from '../../helpers/dbIntegrationHelpers';
 import { seedExerciseDefinition } from '../../helpers/seedExerciseDefinition';
+import {
+    seedGymExerciseRecord,
+    seedGymSession,
+} from '../../helpers/seedGymSession';
+import { seedGymPlan } from '../../helpers/seedGymPlan';
 import { seedPersistedWorkout } from '../../helpers/seedWorkout';
+import { seedWorkoutSession } from '../../helpers/seedWorkoutSession';
 
 type ExerciseDefinitionRow = typeof exerciseDefinitionsTable.$inferSelect;
 
 const FIXED_NOW_MS = 2_000_000_000_000;
+
+const expectExerciseDefinitionErrorCode = (
+    action: () => void,
+    code: ExerciseDefinitionErrorCode,
+): void => {
+    try {
+        action();
+    } catch (error) {
+        expect(isExerciseDefinitionError(error)).toBe(true);
+        if (!isExerciseDefinitionError(error)) throw error;
+        expect(error.code).toBe(code);
+        return;
+    }
+
+    throw new Error(`Expected exercise definition error ${code}`);
+};
 
 const readExerciseDefinitionRowOrThrow = (
     context: RepositoryContext,
@@ -99,6 +134,32 @@ const seedWorkoutReferencingExerciseDefinition = (
     return workout;
 };
 
+const seedWorkoutSessionReferencingExerciseDefinition = (
+    context: RepositoryContext,
+    definition: ExerciseDefinition,
+): Workout => {
+    const workout = createWorkoutFixture({
+        id: `workout-session-content-referencing-${definition.id}`,
+    });
+
+    workout.blocks[0].exercises[0] = {
+        ...workout.blocks[0].exercises[0],
+        exerciseDefinitionId: definition.id,
+        name: undefined,
+    };
+
+    seedWorkoutSession(
+        context.testDb,
+        createSessionFixture({
+            id: `workout-session-referencing-${definition.id}`,
+            workoutSnapshot: workout,
+            workoutVersionId: `workout-session-version-${definition.id}`,
+        }),
+    );
+
+    return workout;
+};
+
 const readWorkoutExerciseDefinitionIdOrThrow = (
     context: RepositoryContext,
     exerciseId: string,
@@ -114,6 +175,96 @@ const readWorkoutExerciseDefinitionIdOrThrow = (
     expect(exercise).toBeDefined();
     if (!exercise) {
         throw new Error(`Expected workout exercise row ${exerciseId}`);
+    }
+
+    return exercise.exerciseDefinitionId;
+};
+
+const seedGymSessionReferencingExerciseDefinition = (
+    context: RepositoryContext,
+    definition: ExerciseDefinition,
+): string => {
+    const gymSessionId = `gym-session-referencing-${definition.id}`;
+    const recordId = `gym-session-record-referencing-${definition.id}`;
+
+    seedGymSession(context.testDb, {
+        id: gymSessionId,
+        startedAtMs: FIXED_NOW_MS - 1_000,
+        endedAtMs: FIXED_NOW_MS,
+        status: 'completed',
+    });
+    seedGymExerciseRecord(context.testDb, {
+        id: recordId,
+        gymSessionId,
+        exerciseDefinitionId: definition.id,
+        sortIndex: 0,
+    });
+
+    return recordId;
+};
+
+const readGymSessionExerciseDefinitionIdOrThrow = (
+    context: RepositoryContext,
+    recordId: string,
+): string => {
+    const record = context.testDb.db
+        .select({
+            exerciseDefinitionId: gymExerciseRecordsTable.exerciseDefinitionId,
+        })
+        .from(gymExerciseRecordsTable)
+        .where(eq(gymExerciseRecordsTable.id, recordId))
+        .get();
+
+    expect(record).toBeDefined();
+    if (!record) {
+        throw new Error(`Expected gym session exercise record ${recordId}`);
+    }
+
+    return record.exerciseDefinitionId;
+};
+
+const seedGymPlanReferencingExerciseDefinition = (
+    context: RepositoryContext,
+    definition: ExerciseDefinition,
+): string => {
+    const gymPlanExerciseId = `gym-plan-exercise-referencing-${definition.id}`;
+
+    seedGymPlan(
+        context.testDb,
+        createGymPlanFixture({
+            id: `gym-plan-referencing-${definition.id}`,
+            sections: [
+                createGymPlanSectionFixture({
+                    id: `gym-plan-section-referencing-${definition.id}`,
+                    exercises: [
+                        createGymPlanExerciseFixture({
+                            id: gymPlanExerciseId,
+                            exerciseDefinitionId: definition.id,
+                        }),
+                    ],
+                }),
+            ],
+        }),
+    );
+
+    return gymPlanExerciseId;
+};
+
+const readGymPlanExerciseDefinitionIdOrThrow = (
+    context: RepositoryContext,
+    exerciseId: string,
+): string => {
+    const exercise = context.testDb.db
+        .select({
+            exerciseDefinitionId: gymPlanExercisesTable.exerciseDefinitionId,
+        })
+        .from(gymPlanExercisesTable)
+        .where(eq(gymPlanExercisesTable.id, exerciseId))
+        .get();
+
+    expect(exercise).toBeDefined();
+    if (!exercise) {
+        throw new Error(`Expected gym plan exercise row ${exerciseId}`);
     }
 
     return exercise.exerciseDefinitionId;
@@ -168,13 +319,11 @@ describe('exerciseDefinitionService integration', () => {
 
             seedExerciseDefinition(context.testDb, definition);
 
-            expect(() => {
+            expectExerciseDefinitionErrorCode(() => {
                 exerciseDefinitionService.createUserExerciseDefinition({
                     name: ' cossack  squat ',
                 });
-            }).toThrow(
-                `Exercise definition already exists for normalized name "${definition.normalizedName}"`,
-            );
+            }, 'DUPLICATE_NAME');
 
             const rows = context.testDb.db
                 .select()
@@ -201,9 +350,11 @@ describe('exerciseDefinitionService integration', () => {
 
             seedExerciseDefinition(context.testDb, definition);
 
-            expect(exerciseDefinitionService.getById(definition.id)).toEqual(
-                definition,
-            );
+            expect(exerciseDefinitionService.getById(definition.id)).toEqual({
+                ...definition,
+                references: { items: [] },
+                recentSessions: [],
+            });
         });
 
         it('returns null when the definition does not exist', () => {
@@ -537,57 +688,149 @@ describe('exerciseDefinitionService integration', () => {
                 expectExerciseDefinitionRowToMatchFixture(row, expected);
             });
 
-            it('rejects gym-only availability when there are workout references', () => {
-                const { exerciseDefinitionService } = context.testDb.dbServices;
+            describe('when changing workout-referenced exercise availability away from workout', () => {
+                it.each([
+                    {
+                        name: 'workout session',
+                        seedReference:
+                            seedWorkoutSessionReferencingExerciseDefinition,
+                    },
+                    {
+                        name: 'workout',
+                        seedReference: seedWorkoutReferencingExerciseDefinition,
+                    },
+                ])(
+                    'rejects changing a workout-only definition to gym-only when referenced by $name',
+                    ({ seedReference }) => {
+                        const { exerciseDefinitionService } =
+                            context.testDb.dbServices;
 
-                seedWorkoutReferencingExerciseDefinition(
-                    context,
-                    workoutDefinition,
-                );
-                seedWorkoutReferencingExerciseDefinition(
-                    context,
-                    bothDefinition,
+                        seedReference(context, workoutDefinition);
+
+                        expectExerciseDefinitionErrorCode(() => {
+                            exerciseDefinitionService.updateExerciseDefinition({
+                                availability: 'gym',
+                                id: workoutDefinition.id,
+                            });
+                        }, 'GYM_ONLY_RESTRICTED');
+
+                        expectExerciseDefinitionRowToMatchFixture(
+                            readExerciseDefinitionRowOrThrow(
+                                context,
+                                workoutDefinition.id,
+                            ),
+                            workoutDefinition,
+                        );
+                    },
                 );
 
-                expect(() => {
-                    exerciseDefinitionService.updateExerciseDefinition({
-                        availability: 'gym',
-                        id: workoutDefinition.id,
-                    });
-                }).toThrow(
-                    `Cannot make workout-referenced exercise definition ${workoutDefinition.id} gym-only`,
-                );
-                expect(() => {
-                    exerciseDefinitionService.updateExerciseDefinition({
-                        availability: 'gym',
-                        id: bothDefinition.id,
-                    });
-                }).toThrow(
-                    `Cannot make workout-referenced exercise definition ${bothDefinition.id} gym-only`,
-                );
-                expectExerciseDefinitionRowToMatchFixture(
-                    readExerciseDefinitionRowOrThrow(
-                        context,
-                        workoutDefinition.id,
-                    ),
-                    workoutDefinition,
-                );
-                expectExerciseDefinitionRowToMatchFixture(
-                    readExerciseDefinitionRowOrThrow(
-                        context,
-                        bothDefinition.id,
-                    ),
-                    bothDefinition,
+                it.each([
+                    {
+                        name: 'workout session',
+                        seedReference:
+                            seedWorkoutSessionReferencingExerciseDefinition,
+                    },
+                    {
+                        name: 'workout',
+                        seedReference: seedWorkoutReferencingExerciseDefinition,
+                    },
+                ])(
+                    'rejects changing a both-available definition to gym-only when referenced by $name',
+                    ({ seedReference }) => {
+                        const { exerciseDefinitionService } =
+                            context.testDb.dbServices;
+
+                        seedReference(context, bothDefinition);
+
+                        expectExerciseDefinitionErrorCode(() => {
+                            exerciseDefinitionService.updateExerciseDefinition({
+                                availability: 'gym',
+                                id: bothDefinition.id,
+                            });
+                        }, 'GYM_ONLY_RESTRICTED');
+
+                        expectExerciseDefinitionRowToMatchFixture(
+                            readExerciseDefinitionRowOrThrow(
+                                context,
+                                bothDefinition.id,
+                            ),
+                            bothDefinition,
+                        );
+                    },
                 );
             });
 
-            it.todo(
-                'rejects workout-only availability when a both-available definition is referenced by gym plans',
-            );
+            describe('when changing gym-referenced exercise availability away from gym', () => {
+                it.each([
+                    {
+                        name: 'gym session',
+                        seedReference:
+                            seedGymSessionReferencingExerciseDefinition,
+                    },
+                    {
+                        name: 'gym plan',
+                        seedReference: seedGymPlanReferencingExerciseDefinition,
+                    },
+                ])(
+                    'rejects changing a gym-only definition to workout-only when referenced by $name',
+                    ({ seedReference }) => {
+                        const { exerciseDefinitionService } =
+                            context.testDb.dbServices;
 
-            it.todo(
-                'rejects workout-only availability when a gym-only definition is referenced by gym plans',
-            );
+                        seedReference(context, gymDefinition);
+
+                        expectExerciseDefinitionErrorCode(() => {
+                            exerciseDefinitionService.updateExerciseDefinition({
+                                availability: 'workout',
+                                id: gymDefinition.id,
+                            });
+                        }, 'WORKOUT_ONLY_RESTRICTED');
+
+                        expectExerciseDefinitionRowToMatchFixture(
+                            readExerciseDefinitionRowOrThrow(
+                                context,
+                                gymDefinition.id,
+                            ),
+                            gymDefinition,
+                        );
+                    },
+                );
+
+                it.each([
+                    {
+                        name: 'gym session',
+                        seedReference:
+                            seedGymSessionReferencingExerciseDefinition,
+                    },
+                    {
+                        name: 'gym plan',
+                        seedReference: seedGymPlanReferencingExerciseDefinition,
+                    },
+                ])(
+                    'rejects changing a both-available definition to workout-only when referenced by $name',
+                    ({ seedReference }) => {
+                        const { exerciseDefinitionService } =
+                            context.testDb.dbServices;
+
+                        seedReference(context, bothDefinition);
+
+                        expectExerciseDefinitionErrorCode(() => {
+                            exerciseDefinitionService.updateExerciseDefinition({
+                                availability: 'workout',
+                                id: bothDefinition.id,
+                            });
+                        }, 'WORKOUT_ONLY_RESTRICTED');
+
+                        expectExerciseDefinitionRowToMatchFixture(
+                            readExerciseDefinitionRowOrThrow(
+                                context,
+                                bothDefinition.id,
+                            ),
+                            bothDefinition,
+                        );
+                    },
+                );
+            });
         });
 
         describe('when updating a renamed system definition', () => {
@@ -658,6 +901,8 @@ describe('exerciseDefinitionService integration', () => {
                 name: 'Press Variation',
             });
             const targetDefinition = createExerciseDefinitionFixture({
+                canDelete: false,
+                deleteBlockReason: 'referenced',
                 id: 'definition-target-merged-press',
                 availability: 'both',
                 name: 'Merged Press',
@@ -702,6 +947,55 @@ describe('exerciseDefinitionService integration', () => {
             ).not.toBe(sourceDefinition.id);
         });
 
+        it('moves gym plan references to the target identity and deletes the user-owned source', () => {
+            const sourceDefinition = createExerciseDefinitionFixture({
+                id: 'definition-source-gym-variation',
+                availability: 'gym',
+                name: 'Gym Variation',
+            });
+            const targetDefinition = createExerciseDefinitionFixture({
+                canDelete: false,
+                deleteBlockReason: 'referenced',
+                id: 'definition-target-merged-gym',
+                availability: 'both',
+                name: 'Merged Gym',
+            });
+            const { exerciseDefinitionService } = context.testDb.dbServices;
+
+            seedExerciseDefinition(context.testDb, sourceDefinition);
+            seedExerciseDefinition(context.testDb, targetDefinition);
+            const gymPlanExerciseId = seedGymPlanReferencingExerciseDefinition(
+                context,
+                sourceDefinition,
+            );
+
+            const merged = exerciseDefinitionService.mergeExerciseDefinition({
+                sourceId: sourceDefinition.id,
+                targetId: targetDefinition.id,
+            });
+
+            const sourceRow = context.testDb.db
+                .select()
+                .from(exerciseDefinitionsTable)
+                .where(eq(exerciseDefinitionsTable.id, sourceDefinition.id))
+                .get();
+
+            expect(merged).toEqual(targetDefinition);
+            expect(sourceRow).toBeUndefined();
+            expect(
+                readGymPlanExerciseDefinitionIdOrThrow(
+                    context,
+                    gymPlanExerciseId,
+                ),
+            ).toBe(targetDefinition.id);
+            expect(
+                readGymPlanExerciseDefinitionIdOrThrow(
+                    context,
+                    gymPlanExerciseId,
+                ),
+            ).not.toBe(sourceDefinition.id);
+        });
+
         it('preserves system-owned source definitions after moving references', () => {
             const sourceDefinition =
                 readExerciseDefinitionByNormalizedNameOrThrow(
@@ -709,6 +1003,8 @@ describe('exerciseDefinitionService integration', () => {
                     'burpee',
                 );
             const targetDefinition = createExerciseDefinitionFixture({
+                canDelete: false,
+                deleteBlockReason: 'referenced',
                 id: 'definition-target-loaded-burpee',
                 availability: 'both',
                 name: 'Loaded Burpee',
@@ -822,14 +1118,12 @@ describe('exerciseDefinitionService integration', () => {
                 sourceDefinition,
             );
 
-            expect(() => {
+            expectExerciseDefinitionErrorCode(() => {
                 exerciseDefinitionService.mergeExerciseDefinition({
                     sourceId: sourceDefinition.id,
                     targetId: targetDefinition.id,
                 });
-            }).toThrow(
-                `Cannot merge workout-referenced exercise definition ${sourceDefinition.id} into gym-only definition ${targetDefinition.id}`,
-            );
+            }, 'MERGE_GYM_ONLY_CONFLICT');
             expectExerciseDefinitionRowToMatchFixture(
                 readExerciseDefinitionRowOrThrow(context, sourceDefinition.id),
                 sourceDefinition,
@@ -847,9 +1141,50 @@ describe('exerciseDefinitionService integration', () => {
                 ),
             ).not.toBe(targetDefinition.id);
         });
-        it.todo(
-            'rejects merging gym references into a workout-only target when a gym definition is referenced by gym plans',
-        );
+
+        it('rejects merging gym references into a workout-only target when a gym definition is referenced by gym plans', () => {
+            const sourceDefinition = createExerciseDefinitionFixture({
+                id: 'definition-source-gym-reference',
+                availability: 'gym',
+                name: 'Source Gym Reference',
+            });
+            const targetDefinition = createExerciseDefinitionFixture({
+                id: 'definition-target-workout-only',
+                availability: 'workout',
+                name: 'Target Workout Only',
+            });
+            const { exerciseDefinitionService } = context.testDb.dbServices;
+
+            seedExerciseDefinition(context.testDb, sourceDefinition);
+            seedExerciseDefinition(context.testDb, targetDefinition);
+            const gymPlanExerciseId = seedGymPlanReferencingExerciseDefinition(
+                context,
+                sourceDefinition,
+            );
+
+            expectExerciseDefinitionErrorCode(() => {
+                exerciseDefinitionService.mergeExerciseDefinition({
+                    sourceId: sourceDefinition.id,
+                    targetId: targetDefinition.id,
+                });
+            }, 'MERGE_WORKOUT_ONLY_CONFLICT');
+            expectExerciseDefinitionRowToMatchFixture(
+                readExerciseDefinitionRowOrThrow(context, sourceDefinition.id),
+                sourceDefinition,
+            );
+            expect(
+                readGymPlanExerciseDefinitionIdOrThrow(
+                    context,
+                    gymPlanExerciseId,
+                ),
+            ).toBe(sourceDefinition.id);
+            expect(
+                readGymPlanExerciseDefinitionIdOrThrow(
+                    context,
+                    gymPlanExerciseId,
+                ),
+            ).not.toBe(targetDefinition.id);
+        });
     });
 
     describe('deleteUserExerciseDefinition', () => {
@@ -901,21 +1236,45 @@ describe('exerciseDefinitionService integration', () => {
                 seedExerciseDefinition(context.testDb, userDefinition);
                 seedPersistedWorkout(context.testDb, workout);
 
-                expect(() => {
+                expectExerciseDefinitionErrorCode(() => {
                     exerciseDefinitionService.deleteUserExerciseDefinition(
                         systemDefinition.id,
                     );
-                }).toThrow(
-                    `Cannot delete system exercise definition ${systemDefinition.id}`,
-                );
-                expect(() => {
+                }, 'DELETE_SYSTEM_FORBIDDEN');
+                expectExerciseDefinitionErrorCode(() => {
                     exerciseDefinitionService.deleteUserExerciseDefinition(
                         userDefinition.id,
                     );
-                }).toThrow(
-                    `Cannot delete referenced exercise definition ${userDefinition.id}`,
+                }, 'DELETE_REFERENCED');
+
+                expectExerciseDefinitionRowToMatchFixture(
+                    readExerciseDefinitionRowOrThrow(
+                        context,
+                        userDefinition.id,
+                    ),
+                    userDefinition,
+                );
+            });
+
+            it('preserves gym plan referenced exercise identities', () => {
+                const userDefinition = createExerciseDefinitionFixture({
+                    id: 'definition-gym-referenced-delete',
+                    name: 'Gym Referenced Delete',
+                    availability: 'gym',
+                });
+                const { exerciseDefinitionService } = context.testDb.dbServices;
+
+                seedExerciseDefinition(context.testDb, userDefinition);
+                seedGymPlanReferencingExerciseDefinition(
+                    context,
+                    userDefinition,
                 );
 
+                expectExerciseDefinitionErrorCode(() => {
+                    exerciseDefinitionService.deleteUserExerciseDefinition(
+                        userDefinition.id,
+                    );
+                }, 'DELETE_REFERENCED');
                 expectExerciseDefinitionRowToMatchFixture(
                     readExerciseDefinitionRowOrThrow(
                         context,
