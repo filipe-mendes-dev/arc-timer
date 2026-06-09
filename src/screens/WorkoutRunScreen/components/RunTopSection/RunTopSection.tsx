@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 import { View } from 'react-native';
-import { Feather, Ionicons } from '@expo/vector-icons';
 
 import { AppearingView } from '@src/components/ui/AppearingView/AppearingView';
+import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { useTheme } from '@src/theme/ThemeProvider';
 
@@ -59,7 +59,7 @@ export const RunTopSection = ({
     const totalBlocks = meta.totalBlocks;
     const blockIdx = Math.min(
         Math.max(0, currentBlockIdx),
-        Math.max(0, totalBlocks - 1)
+        Math.max(0, totalBlocks - 1),
     );
     const currentBlockTitle = meta.blockTitles[blockIdx];
     const resolvedBlockTitle =
@@ -74,7 +74,7 @@ export const RunTopSection = ({
 
     const exerciseIdx = Math.min(
         Math.max(0, currentExerciseIndexInBlock),
-        Math.max(0, totalExercisesInBlock - 1)
+        Math.max(0, totalExercisesInBlock - 1),
     );
 
     const [runningHeaderH, setRunningHeaderH] = useState(0);
@@ -97,9 +97,9 @@ export const RunTopSection = ({
                 <View style={st.upperRowContainer}>
                     <View style={st.blockHeaderRow}>
                         <View style={st.titleRow}>
-                            <Ionicons
-                                name="layers-outline"
-                                size={16}
+                            <AppIcon
+                                id="block"
+                                size={22}
                                 color={theme.palette.text.primary}
                                 style={st.headerIcon}
                             />
@@ -125,8 +125,8 @@ export const RunTopSection = ({
                     </View>
 
                     <View style={st.workoutTimerContainer}>
-                        <Ionicons
-                            name="timer-outline"
+                        <AppIcon
+                            id="duration"
                             size={16}
                             color={theme.palette.text.primary}
                             style={st.workoutTimerIcon}
@@ -207,9 +207,9 @@ export const RunTopSection = ({
                 <View style={st.upperRowContainer}>
                     <View style={st.blockHeaderRow}>
                         <View style={st.titleRow}>
-                            <Ionicons
-                                name="barbell-outline"
-                                size={16}
+                            <AppIcon
+                                id="workout"
+                                size={22}
                                 color={theme.palette.text.primary}
                                 style={st.headerIcon}
                             />
@@ -238,8 +238,8 @@ export const RunTopSection = ({
                 <View style={st.finishedMetaRow}>
                     {totalBlocks > 0 ? (
                         <View style={st.finishedMetaItem}>
-                            <Ionicons
-                                name="layers-outline"
+                            <AppIcon
+                                id="block"
                                 size={14}
                                 color={theme.palette.text.muted}
                                 style={st.finishedMetaIcon}
@@ -260,8 +260,8 @@ export const RunTopSection = ({
 
                     {totalSetsInWorkout > 0 ? (
                         <View style={st.finishedMetaItem}>
-                            <Feather
-                                name="repeat"
+                            <AppIcon
+                                id="sets"
                                 size={14}
                                 color={theme.palette.text.muted}
                                 style={st.finishedMetaIcon}
@@ -282,8 +282,8 @@ export const RunTopSection = ({
 
                     {totalExercisesInWorkout > 0 ? (
                         <View style={st.finishedMetaItem}>
-                            <Feather
-                                name="activity"
+                            <AppIcon
+                                id="exercise"
                                 size={14}
                                 color={theme.palette.text.muted}
                                 style={st.finishedMetaIcon}
