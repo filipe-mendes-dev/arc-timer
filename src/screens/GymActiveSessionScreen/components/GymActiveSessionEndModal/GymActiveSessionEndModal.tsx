@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -17,6 +18,15 @@ interface GymActiveSessionEndModalProps {
     onDiscard: () => void;
 }
 
+interface GymActiveSessionEndModalContent {
+    cancelLabel: string;
+    completeLabel: string;
+    discardLabel: string;
+    hasCompletedSet: boolean;
+    message: string;
+    title: string;
+}
+
 export const GymActiveSessionEndModal = ({
     hasCompletedSet,
     isDiscardingSession,
@@ -33,6 +43,24 @@ export const GymActiveSessionEndModal = ({
     if (!hasCompletedSet) {
         message = t('gym.finishSessionModal.discardOnlyMessage');
     }
+    const contentRef = useRef<GymActiveSessionEndModalContent | null>(null);
+
+    if (visible) {
+        contentRef.current = {
+            cancelLabel: t('common.actions.cancel'),
+            completeLabel: t('gym.finishSessionModal.complete'),
+            discardLabel: t('gym.finishSessionModal.discard'),
+            hasCompletedSet,
+            message,
+            title: t('gym.finishSessionModal.title'),
+        };
+    }
+
+    const content = contentRef.current;
+
+    if (!content) {
+        return null;
+    }
 
     return (
         <Modal
@@ -44,7 +72,7 @@ export const GymActiveSessionEndModal = ({
             <View style={st.modalBody}>
                 <View style={st.modalTextContainer}>
                     <AppText variant="title3" style={st.modalTitle}>
-                        {t('gym.finishSessionModal.title')}
+                        {content.title}
                     </AppText>
 
                     <AppText
@@ -52,14 +80,14 @@ export const GymActiveSessionEndModal = ({
                         tone="secondary"
                         style={st.modalMessage}
                     >
-                        {message}
+                        {content.message}
                     </AppText>
                 </View>
 
                 <View style={st.modalActions}>
-                    {hasCompletedSet && (
+                    {content.hasCompletedSet && (
                         <Button
-                            title={t('gym.finishSessionModal.complete')}
+                            title={content.completeLabel}
                             variant="primary"
                             loading={isFinishingSession}
                             disabled={isDiscardingSession}
@@ -68,7 +96,7 @@ export const GymActiveSessionEndModal = ({
                     )}
 
                     <Button
-                        title={t('gym.finishSessionModal.discard')}
+                        title={content.discardLabel}
                         variant="danger"
                         loading={isDiscardingSession}
                         disabled={isFinishingSession}
@@ -76,7 +104,7 @@ export const GymActiveSessionEndModal = ({
                     />
 
                     <Button
-                        title={t('common.actions.cancel')}
+                        title={content.cancelLabel}
                         variant="ghost"
                         disabled={isActionPending}
                         onPress={onCancel}

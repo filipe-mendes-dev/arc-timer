@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { useRef } from 'react';
 import { View } from 'react-native';
 
 import { Modal } from '../Modal';
@@ -7,16 +7,24 @@ import { AppText } from '@src/components/ui/Typography/AppText';
 import { Button } from '@src/components/ui/Button/Button';
 import { useConfirmDialogStyles } from './ConfirmDialog.styles';
 
-type ConfirmDialogProps = {
+interface ConfirmDialogContent {
+    cancelLabel: string;
+    confirmLabel: string;
+    destructive: boolean;
+    message?: ReactNode;
+    title: string;
+}
+
+interface ConfirmDialogProps {
     visible: boolean;
     title: string;
-    message?: ReactNode; // can be undefined on parent hide
+    message?: ReactNode;
     confirmLabel?: string;
     cancelLabel?: string;
     destructive?: boolean;
     onConfirm: () => void;
     onCancel: () => void;
-};
+}
 
 const ConfirmDialog = ({
     visible,
@@ -28,16 +36,24 @@ const ConfirmDialog = ({
     onConfirm,
     onCancel,
 }: ConfirmDialogProps) => {
-    // Cache message while visible so it doesn't vanish during exit animation
-    const [cachedMessage, setCachedMessage] = useState<ReactNode>(message);
     const st = useConfirmDialogStyles();
+    const contentRef = useRef<ConfirmDialogContent | null>(null);
 
-    useEffect(() => {
-        if (visible && message !== undefined) {
-            setCachedMessage(message);
-        }
-        // do not clear on hide; Modal unmount will handle it
-    }, [visible, message]);
+    if (visible) {
+        contentRef.current = {
+            cancelLabel,
+            confirmLabel,
+            destructive,
+            message,
+            title,
+        };
+    }
+
+    const content = contentRef.current;
+
+    if (!content) {
+        return null;
+    }
 
     return (
         <Modal
@@ -49,31 +65,31 @@ const ConfirmDialog = ({
             <View style={st.container}>
                 <View style={st.textContainer}>
                     <AppText variant="title3" style={st.title}>
-                        {title}
+                        {content.title}
                     </AppText>
 
-                    {cachedMessage ? (
+                    {content.message ? (
                         <AppText
                             variant="bodySmall"
                             tone="secondary"
                             style={st.message}
                         >
-                            {cachedMessage}
+                            {content.message}
                         </AppText>
                     ) : null}
                 </View>
 
                 <View style={st.row}>
                     <Button
-                        title={cancelLabel}
+                        title={content.cancelLabel}
                         variant="secondary"
                         onPress={onCancel}
                         style={st.button}
                     />
 
                     <Button
-                        title={confirmLabel}
-                        variant={destructive ? 'danger' : 'primary'}
+                        title={content.confirmLabel}
+                        variant={content.destructive ? 'danger' : 'primary'}
                         onPress={onConfirm}
                         style={st.button}
                     />
