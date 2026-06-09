@@ -9,7 +9,6 @@ import {
 } from '@src/db/repositories/exerciseDefinitions/exerciseDefinitionErrors';
 import {
     exerciseDefinitionsTable,
-    gymExerciseRecordsTable,
     gymPlanExercisesTable,
     workoutExercisesTable,
 } from '@src/db/schema';
@@ -20,20 +19,21 @@ import {
     createGymPlanExerciseFixture,
     createGymPlanFixture,
     createGymPlanSectionFixture,
-} from '../../fixtures/gymPlans';
+} from '../../fixtures/gymPlans.fixtures';
 import { createWorkoutFixture } from '../../fixtures/workouts';
 import {
     createRepositoryContext,
     type RepositoryContext,
 } from '../../helpers/dbIntegrationHelpers';
 import { seedExerciseDefinition } from '../../helpers/seedExerciseDefinition';
-import {
-    seedGymExerciseRecord,
-    seedGymSession,
-} from '../../helpers/seedGymSession';
+import { seedGymSession } from '../../helpers/seedGymSession';
 import { seedGymPlan } from '../../helpers/seedGymPlan';
 import { seedPersistedWorkout } from '../../helpers/seedWorkout';
 import { seedWorkoutSession } from '../../helpers/seedWorkoutSession';
+import {
+    createGymExerciseRecordFixture,
+    createGymSessionFixture,
+} from 'tests/fixtures/gymSession.fixtures';
 
 type ExerciseDefinitionRow = typeof exerciseDefinitionsTable.$inferSelect;
 
@@ -187,42 +187,24 @@ const seedGymSessionReferencingExerciseDefinition = (
     const gymSessionId = `gym-session-referencing-${definition.id}`;
     const recordId = `gym-session-record-referencing-${definition.id}`;
 
-    seedGymSession(context.testDb, {
-        id: gymSessionId,
-        startedAtMs: FIXED_NOW_MS - 1_000,
-        endedAtMs: FIXED_NOW_MS,
-        status: 'completed',
-    });
-    seedGymExerciseRecord(context.testDb, {
-        id: recordId,
-        gymSessionId,
-        exerciseDefinitionId: definition.id,
-        sortIndex: 0,
-    });
+    seedGymSession(
+        context.testDb,
+        createGymSessionFixture({
+            id: gymSessionId,
+            startedAtMs: FIXED_NOW_MS - 1_000,
+            endedAtMs: FIXED_NOW_MS,
+            status: 'completed',
+            exerciseRecords: [
+                createGymExerciseRecordFixture({
+                    id: recordId,
+                    exerciseDefinitionId: definition.id,
+                }),
+            ],
+        }),
+    );
 
     return recordId;
 };
-
-const readGymSessionExerciseDefinitionIdOrThrow = (
-    context: RepositoryContext,
-    recordId: string,
-): string => {
-    const record = context.testDb.db
-        .select({
-            exerciseDefinitionId: gymExerciseRecordsTable.exerciseDefinitionId,
-        })
-        .from(gymExerciseRecordsTable)
-        .where(eq(gymExerciseRecordsTable.id, recordId))
-        .get();
-
-    expect(record).toBeDefined();
-    if (!record) {
-        throw new Error(`Expected gym session exercise record ${recordId}`);
-    }
-
-    return record.exerciseDefinitionId;
-};
-
 const seedGymPlanReferencingExerciseDefinition = (
     context: RepositoryContext,
     definition: ExerciseDefinition,
