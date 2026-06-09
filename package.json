@@ -4,6 +4,7 @@
     "main": "expo-router/entry",
     "scripts": {
         "start": "expo start",
+        "db:generate": "drizzle-kit generate --name",
         "ios": "npm run guard:dev-variant && expo run:ios -d",
         "ios:build:dev": "npm run guard:dev-variant && expo run:ios -d --configuration Release",
         "android": "npm run guard:dev-variant && expo run:android -d",
