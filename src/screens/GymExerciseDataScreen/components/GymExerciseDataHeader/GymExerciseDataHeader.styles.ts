@@ -7,7 +7,7 @@ export const useStyles = createStyles((theme: AppTheme) =>
     StyleSheet.create({
         root: {
             width: '100%',
-            gap: 12,
+            gap: 14,
             paddingHorizontal: theme.layout.screen.fullScreenHorizontalPadding,
             paddingBottom: theme.layout.card.padding,
         },
@@ -20,7 +20,7 @@ export const useStyles = createStyles((theme: AppTheme) =>
         titleBlock: {
             flex: 1,
             minWidth: 0,
-            gap: 6,
+            gap: 10,
         },
         titleRow: {
             flexDirection: 'row',

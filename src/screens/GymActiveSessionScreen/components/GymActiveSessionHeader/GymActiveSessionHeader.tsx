@@ -32,7 +32,7 @@ export const GymActiveSessionHeader = ({
                     <View style={st.titleRow}>
                         <AppIcon
                             id="exercise"
-                            size={16}
+                            size={22}
                             color={theme.palette.text.primary}
                         />
                         <AppText

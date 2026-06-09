@@ -4,7 +4,7 @@ import type { AppTheme } from '@src/theme/theme';
 export const useStyles = createStyles((theme: AppTheme) => ({
     root: {
         width: '100%',
-        gap: 12,
+        gap: 14,
         paddingHorizontal: theme.layout.screen.fullScreenHorizontalPadding,
         paddingBottom: theme.layout.card.padding,
     },
@@ -17,12 +17,12 @@ export const useStyles = createStyles((theme: AppTheme) => ({
     titleBlock: {
         flex: 1,
         minWidth: 0,
-        gap: 6,
+        gap: 10,
     },
     titleRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6,
+        gap: 10,
         minWidth: 0,
     },
     headerTitle: {
