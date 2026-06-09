@@ -9,6 +9,7 @@ import {
     useDeleteGymExerciseRecordSet,
     useActiveGymSession,
     useUpdateGymExerciseRecordSet,
+    isGymError,
 } from '@src/data/gymSessions';
 import { useListSelection } from '@src/hooks/useListSelection';
 
@@ -24,6 +25,7 @@ import {
     DEFAULT_WEIGHT_KG,
 } from 'src/helpers/exerciseDefinition.helpers';
 import { getWeightGrams } from 'src/helpers/gymExerciseRecord.helpers';
+import type { UpdateExerciseRecordSetInput } from 'src/db/services/gyms/gymSessionServiceFactory';
 
 const getRecordIdParam = (recordId?: string | string[]): string | undefined => {
     if (Array.isArray(recordId)) {
@@ -44,15 +46,6 @@ const getNextWeightGrams = (
     previousSet
         ? previousSet.weightGrams
         : getFirstSetWeightGrams(weightPrGrams);
-
-interface ClearTrackingFieldInput {
-    distanceMeters?: null;
-    durationSec?: null;
-    id: string;
-    reps?: null;
-    rpeTenths?: null;
-    weightGrams?: null;
-}
 
 const getRemovedTrackingFields = (
     current: TrackingFields,
@@ -193,14 +186,26 @@ export const useGymExerciseDataScreen = () => {
 
     const getErrorMessage = (): string => {
         if (addSet.error) {
+            if (isGymError(addSet.error)) {
+                return t(addSet.error.message);
+            }
+
             return t('gymExerciseData.errors.addSetFailed');
         }
 
         if (updateSet.error) {
+            if (isGymError(updateSet.error)) {
+                return t(updateSet.error.message);
+            }
+
             return t('gymExerciseData.errors.updateSetFailed');
         }
 
         if (deleteSet.error) {
+            if (isGymError(deleteSet.error)) {
+                return t(deleteSet.error.message);
+            }
+
             return t('gymExerciseData.errors.deleteSetFailed');
         }
 
@@ -215,46 +220,52 @@ export const useGymExerciseDataScreen = () => {
         setTrackingFieldsModalVisible(false);
     };
 
-    const handleSaveTrackingFields = (nextTrackingFields: TrackingFields) => {
+    const handleSaveTrackingFields = async (
+        nextTrackingFields: TrackingFields,
+    ): Promise<void> => {
         const removedFields = getRemovedTrackingFields(
             trackingFields,
             nextTrackingFields,
         );
 
-        for (const set of sets) {
-            const shouldUpdateSet = removedFields.some((field) =>
-                setHasTrackingFieldData(set, field),
-            );
+        try {
+            for (const set of sets) {
+                const shouldUpdateSet = removedFields.some((field) =>
+                    setHasTrackingFieldData(set, field),
+                );
 
-            if (!shouldUpdateSet) continue;
+                if (!shouldUpdateSet) continue;
 
-            const clearInput: ClearTrackingFieldInput = { id: set.id };
+                const clearInput: UpdateExerciseRecordSetInput = { ...set };
 
-            if (removedFields.includes('hasDistanceMeters')) {
-                clearInput.distanceMeters = null;
+                if (removedFields.includes('hasDistanceMeters')) {
+                    clearInput.distanceMeters = null;
+                }
+
+                if (removedFields.includes('hasDurationSec')) {
+                    clearInput.durationSec = null;
+                }
+
+                if (removedFields.includes('hasReps')) {
+                    clearInput.reps = null;
+                }
+
+                if (removedFields.includes('hasWeight')) {
+                    clearInput.weightGrams = null;
+                }
+
+                if (removedFields.includes('hasRpe')) {
+                    clearInput.rpeTenths = null;
+                }
+
+                await updateSet.mutateAsync(clearInput);
             }
 
-            if (removedFields.includes('hasDurationSec')) {
-                clearInput.durationSec = null;
-            }
-
-            if (removedFields.includes('hasReps')) {
-                clearInput.reps = null;
-            }
-
-            if (removedFields.includes('hasWeight')) {
-                clearInput.weightGrams = null;
-            }
-
-            if (removedFields.includes('hasRpe')) {
-                clearInput.rpeTenths = null;
-            }
-
-            updateSet.mutate(clearInput);
+            setTrackingFields(nextTrackingFields);
+        } catch {
+        } finally {
+            closeTrackingFieldsModal();
         }
-
-        setTrackingFields(nextTrackingFields);
-        closeTrackingFieldsModal();
     };
 
     const fieldsWithData = getFieldsWithData(sets);
@@ -354,20 +365,12 @@ export const useGymExerciseDataScreen = () => {
         );
     };
 
-    const handleToggleCompleteSet = (set: GymExerciseRecordSet) => {
+    const handleToggleCompleteSet = (set: GymExerciseRecordSet): void => {
         if (!record) return;
 
-        if (set.completedAtMs !== undefined) {
-            updateSet.mutate({
-                id: set.id,
-                completedAtMs: null,
-            });
-            return;
-        }
-
         updateSet.mutate({
-            id: set.id,
-            completedAtMs: Date.now(),
+            ...set,
+            completedAtMs: set.completedAtMs !== undefined ? null : Date.now(),
         });
     };
 

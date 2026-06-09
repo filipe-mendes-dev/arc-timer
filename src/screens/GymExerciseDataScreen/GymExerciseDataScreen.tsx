@@ -82,6 +82,7 @@ const GymExerciseDataScreen = () => {
                     )}
                     style={st.list}
                     contentContainerStyle={st.listContent}
+                    ListHeaderComponentStyle={st.errorBanner}
                     ListHeaderComponent={
                         <ErrorBanner
                             message={screen.errorMessage}

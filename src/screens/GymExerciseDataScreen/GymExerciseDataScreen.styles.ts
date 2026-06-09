@@ -20,5 +20,8 @@ export const useStyles = createStyles((theme: AppTheme) =>
         listContent: {
             flexGrow: 1,
         },
+        errorBanner: {
+            paddingHorizontal: theme.layout.screen.paddingHorizontal,
+        },
     }),
 );
