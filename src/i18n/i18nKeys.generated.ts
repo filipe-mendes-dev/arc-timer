@@ -131,6 +131,7 @@ export const i18nKeys = {
             sessionNotFound: 'gym.errors.sessionNotFound',
             sessionNotMutable: 'gym.errors.sessionNotMutable',
             startFailed: 'gym.errors.startFailed',
+            duplicateExerciseRecord: 'gym.errors.duplicateExerciseRecord',
         },
     },
     gymPlans: {
