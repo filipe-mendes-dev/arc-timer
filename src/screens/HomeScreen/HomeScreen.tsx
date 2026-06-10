@@ -266,7 +266,7 @@ const HomeScreen = () => {
                 <View style={st.sessionTypeTiles}>
                     <HomeActionTile
                         title={t('home.actions.startHiitWorkout')}
-                        icon="quickSession"
+                        icon="workout"
                         variant="primary"
                         onPress={handleStartWorkoutSession}
                     />

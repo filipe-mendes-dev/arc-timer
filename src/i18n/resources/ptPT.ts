@@ -832,7 +832,7 @@ export const ptPT: I18nResource = {
             user: 'Personalizado',
         },
         availability: {
-            both: 'Treino + ginásio',
+            both: 'Treino + Ginásio',
             workout: 'Treino',
             gym: 'Ginásio',
         },

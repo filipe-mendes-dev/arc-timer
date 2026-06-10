@@ -59,7 +59,7 @@ const GymScreen = () => {
                     <HomeActionTile
                         title={t('gym.actions.startNewSession')}
                         subtitle={t('gym.actions.startNewSessionSubtitle')}
-                        icon="gymSession"
+                        icon="quickSession"
                         variant="primary"
                         onPress={handleStartSession}
                     />

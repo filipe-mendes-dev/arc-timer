@@ -810,7 +810,7 @@ export const en: I18nResource = {
             user: 'Custom',
         },
         availability: {
-            both: 'Workout + gym',
+            both: 'Workout + Gym',
             workout: 'Workout',
             gym: 'Gym',
         },

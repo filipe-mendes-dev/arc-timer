@@ -44,11 +44,6 @@ const ICON_MAP = {
         name: 'barbell-outline',
         defaultSize: 18,
     },
-    exerciseDefinition: {
-        lib: 'ion',
-        name: 'list-outline',
-        defaultSize: 18,
-    },
     block: {
         lib: 'ion',
         name: 'layers-outline',
@@ -81,7 +76,7 @@ const ICON_MAP = {
     },
     quickSession: {
         lib: 'ion',
-        name: 'play-circle-outline',
+        name: 'play',
         defaultSize: 22,
     },
     sets: {

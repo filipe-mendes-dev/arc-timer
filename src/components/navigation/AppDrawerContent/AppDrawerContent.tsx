@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 
 const resolveLabel = (
     routeName: string,
-    options?: { title?: string; drawerLabel?: unknown }
+    options?: { title?: string; drawerLabel?: unknown },
 ) => {
     if (typeof options?.title === 'string') return options.title;
     if (typeof options?.drawerLabel === 'string') return options.drawerLabel;
@@ -23,7 +23,7 @@ const ICONS_BY_ROUTE: Record<string, IconId> = {
     index: 'home',
     'workouts/index': 'workout',
     'gym/index': 'gym',
-    'exercise-definitions/index': 'exerciseDefinition',
+    'exercise-definitions/index': 'exercise',
     'history/index': 'history',
     'settings/index': 'settings',
 };

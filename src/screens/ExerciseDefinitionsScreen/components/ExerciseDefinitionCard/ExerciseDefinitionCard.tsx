@@ -112,7 +112,7 @@ export const ExerciseDefinitionCard = ({
                     <View style={st.metaRow}>
                         <View style={st.metaItem}>
                             <AppIcon
-                                id="exerciseDefinition"
+                                id="info"
                                 size={14}
                                 color={theme.palette.text.secondary}
                             />
