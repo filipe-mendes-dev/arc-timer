@@ -519,6 +519,7 @@ describe('gymPlanService integration', () => {
                                     createGymPlanExerciseTargetSetFixture({
                                         id: 'upserted-curl-target-1',
                                         reps: 12,
+                                        rpeTenths: 75,
                                     }),
                                 ],
                             }),
@@ -601,6 +602,9 @@ describe('gymPlanService integration', () => {
                     ?.id,
                 reps: draftGymPlan.sections[0].exercises[0].targetSetDrafts?.[0]
                     ?.reps,
+                rpeTenths:
+                    draftGymPlan.sections[0].exercises[0].targetSetDrafts?.[0]
+                        ?.rpeTenths,
                 setIndex: 0,
                 createdAtMs: FIXED_NOW_MS,
                 updatedAtMs: FIXED_NOW_MS,
