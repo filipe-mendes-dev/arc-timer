@@ -75,7 +75,7 @@ export const en: I18nResource = {
             gymPlans: 'Gym plans',
             savedHiitWorkouts: 'HIIT workouts',
             seeAllSessions: 'See all',
-            startGymSession: 'Start gym session',
+            startGymSession: 'Start Gym session',
             startHiitWorkout: 'Start HIIT workout',
         },
     },
