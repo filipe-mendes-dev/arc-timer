@@ -165,7 +165,7 @@ export const importGymPlanFromFile =
         }
 
         if (!isExportedGymPlanFileV1(parsedUnknown)) {
-            console.warn('GYM_PLAN_INVALID_SHAPE', parsedUnknown);
+            console.warn('GYM_PLAN_INVALID_SHAPE');
             return { ok: false, error: 'INVALID_SHAPE' };
         }
 
