@@ -147,6 +147,8 @@ const gymExerciseRecordFromPersisted = (
 ): GymExerciseRecord => ({
     id: record.id,
     exerciseDefinitionId: record.exerciseDefinitionId,
+    sourceGymPlanSectionId: record.sourceGymPlanSectionId,
+    sourceGymPlanSectionTitle: record.sourceGymPlanSectionTitle,
     sourceGymPlanExerciseId: record.sourceGymPlanExerciseId,
     sortIndex: record.sortIndex,
     startedAtMs: record.startedAtMs,
@@ -177,7 +179,8 @@ const hasMeaningfulSetValue = (set: GymSetValidationInput): boolean =>
     set.reps != null ||
     set.weightGrams != null ||
     set.durationSec != null ||
-    set.distanceMeters != null;
+    set.distanceMeters != null ||
+    set.rpeTenths != null;
 
 const hasCompletedSet = (record: PersistedGymExerciseRecord): boolean =>
     record.sets.some((set) => set.completedAtMs !== undefined);
@@ -385,13 +388,22 @@ export const createGymSessionService = ({
                 [];
             const exerciseRecordSets: InsertGymSessionAggregateInput['exerciseRecordSets'] =
                 [];
+            const sourceSectionByExerciseId = new Map(
+                gymPlan.sections.flatMap((section) =>
+                    section.exercises.map((exercise) => [exercise.id, section]),
+                ),
+            );
 
             planExercises.forEach((exercise, index) => {
                 const recordId = uid();
+                const sourceSection = sourceSectionByExerciseId.get(exercise.id);
+
                 exerciseRecords.push({
                     id: recordId,
                     gymSessionId: sessionId,
                     exerciseDefinitionId: exercise.exerciseDefinitionId,
+                    sourceGymPlanSectionId: sourceSection?.id,
+                    sourceGymPlanSectionTitle: sourceSection?.title,
                     sourceGymPlanExerciseId: exercise.id,
                     sortIndex: index,
                     notes: exercise.notes,
@@ -472,6 +484,9 @@ export const createGymSessionService = ({
                         id: recordId,
                         gymSessionId: newSessionId,
                         exerciseDefinitionId: record.exerciseDefinitionId,
+                        sourceGymPlanSectionId: record.sourceGymPlanSectionId,
+                        sourceGymPlanSectionTitle:
+                            record.sourceGymPlanSectionTitle,
                         sourceGymPlanExerciseId: record.sourceGymPlanExerciseId,
                         sortIndex: index,
                         startedAtMs: undefined,

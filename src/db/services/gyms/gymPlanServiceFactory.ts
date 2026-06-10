@@ -63,6 +63,7 @@ interface PersistableGymPlanRows {
         gymPlanExerciseId: string;
         id: string;
         reps: number | null;
+        rpeTenths: number | null;
         setIndex: number;
         updatedAtMs: number;
         weightGrams: number | null;
@@ -109,6 +110,7 @@ const assertGymPlanCanBePersisted = (
             );
             (exercise.targetSetDrafts ?? []).forEach((targetSet) => {
                 assertNonEmptyText(targetSet.id);
+                assertTargetSetCanBePersisted(targetSet);
             });
         });
     });
@@ -120,6 +122,30 @@ const getExerciseTargetSetsForPersistence = (
     if (!exercise.targetSetDrafts) return [];
 
     return exercise.targetSetDrafts;
+};
+
+const assertTargetSetCanBePersisted = (
+    targetSet: GymPlanExerciseTargetSet,
+): void => {
+    const values = [
+        targetSet.distanceMeters,
+        targetSet.durationSec,
+        targetSet.reps,
+        targetSet.rpeTenths,
+        targetSet.weightGrams,
+    ];
+
+    if (values.some((value) => value !== undefined && value < 0)) {
+        throw createGymError(gymErrors.invalidGymSet);
+    }
+
+    if (targetSet.reps === 0 || targetSet.durationSec === 0) {
+        throw createGymError(gymErrors.invalidGymSet);
+    }
+
+    if (targetSet.rpeTenths !== undefined && targetSet.rpeTenths > 100) {
+        throw createGymError(gymErrors.invalidGymSet);
+    }
 };
 
 const assertGymPlanCanBeCommitted = (
@@ -178,6 +204,7 @@ const gymPlanRowsFromAggregate = (
                             gymPlanExerciseId: exercise.id,
                             id: targetSet.id,
                             reps: targetSet.reps ?? null,
+                            rpeTenths: targetSet.rpeTenths ?? null,
                             setIndex,
                             updatedAtMs: nowMs,
                             weightGrams: targetSet.weightGrams ?? null,

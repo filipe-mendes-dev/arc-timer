@@ -27,6 +27,8 @@ export interface GymExerciseRecordFixtureArgs {
     notes?: string;
     sets?: GymExerciseRecordSet[];
     sortIndex?: number;
+    sourceGymPlanSectionId?: string;
+    sourceGymPlanSectionTitle?: string;
     sourceGymPlanExerciseId?: string;
     startedAtMs?: number;
     updatedAtMs?: number;
@@ -78,6 +80,8 @@ export const createGymExerciseRecordFixture = (
         id: args.id ?? 'gym-exercise-record-1',
         exerciseDefinitionId:
             args.exerciseDefinitionId ?? 'definition-gym-exercise-record',
+        sourceGymPlanSectionId: args.sourceGymPlanSectionId,
+        sourceGymPlanSectionTitle: args.sourceGymPlanSectionTitle,
         sourceGymPlanExerciseId: args.sourceGymPlanExerciseId,
         sortIndex: args.sortIndex ?? 0,
         startedAtMs: args.startedAtMs,

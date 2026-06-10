@@ -102,6 +102,23 @@ const assertOptionalIntegerAtLeast = (
     }
 };
 
+const assertOptionalIntegerBetween = (
+    value: number | null | undefined,
+    minimum: number,
+    maximum: number,
+    fieldName: string,
+): void => {
+    if (
+        value !== undefined &&
+        value !== null &&
+        (!Number.isInteger(value) || value < minimum || value > maximum)
+    ) {
+        throw new Error(
+            `${fieldName} must be an integer between ${minimum} and ${maximum}`,
+        );
+    }
+};
+
 const gymPlanExerciseTargetSetFromRow = (
     row: GymPlanExerciseTargetSetRow,
 ): GymPlanExerciseTargetSet => ({
@@ -111,6 +128,7 @@ const gymPlanExerciseTargetSetFromRow = (
     weightGrams: row.weightGrams ?? undefined,
     durationSec: row.durationSec ?? undefined,
     distanceMeters: row.distanceMeters ?? undefined,
+    rpeTenths: row.rpeTenths ?? undefined,
     createdAtMs: row.createdAtMs,
     updatedAtMs: row.updatedAtMs,
 });
@@ -350,6 +368,7 @@ export const createGymPlanRepository = ({
         assertOptionalIntegerAtLeast(input.weightGrams, 0, 'weightGrams');
         assertOptionalIntegerAtLeast(input.durationSec, 1, 'durationSec');
         assertOptionalIntegerAtLeast(input.distanceMeters, 1, 'distanceMeters');
+        assertOptionalIntegerBetween(input.rpeTenths, 0, 100, 'rpeTenths');
         assertFiniteTimestamp(input.createdAtMs, 'createdAtMs');
         assertFiniteTimestamp(input.updatedAtMs, 'updatedAtMs');
     };

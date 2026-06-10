@@ -20,6 +20,8 @@ export interface GymExerciseRecordSet {
 export interface GymExerciseRecord {
     id: UUID;
     exerciseDefinitionId: UUID;
+    sourceGymPlanSectionId?: UUID;
+    sourceGymPlanSectionTitle?: string;
     sourceGymPlanExerciseId?: UUID;
     sortIndex: number;
     startedAtMs?: number;

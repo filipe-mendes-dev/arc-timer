@@ -87,6 +87,7 @@ export const seedGymPlanExercise = (
                     gymPlanExerciseId: exercise.id,
                     id: targetSet.id,
                     reps: targetSet.reps ?? null,
+                    rpeTenths: targetSet.rpeTenths ?? null,
                     setIndex: targetSet.setIndex,
                     updatedAtMs: targetSet.updatedAtMs,
                     weightGrams: targetSet.weightGrams ?? null,

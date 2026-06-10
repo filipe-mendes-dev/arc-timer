@@ -193,6 +193,8 @@ const gymExerciseRecordFromRow = (
     id: row.id,
     gymSessionId: row.gymSessionId,
     exerciseDefinitionId: row.exerciseDefinitionId,
+    sourceGymPlanSectionId: row.sourceGymPlanSectionId ?? undefined,
+    sourceGymPlanSectionTitle: row.sourceGymPlanSectionTitle ?? undefined,
     sourceGymPlanExerciseId: row.sourceGymPlanExerciseId ?? undefined,
     sortIndex: row.sortIndex,
     startedAtMs: row.startedAtMs ?? undefined,
@@ -318,6 +320,10 @@ export const createGymExerciseRecordRepository = ({
                     id: input.id,
                     notes: input.notes ?? null,
                     sortIndex: input.sortIndex,
+                    sourceGymPlanSectionId:
+                        input.sourceGymPlanSectionId ?? null,
+                    sourceGymPlanSectionTitle:
+                        input.sourceGymPlanSectionTitle ?? null,
                     sourceGymPlanExerciseId:
                         input.sourceGymPlanExerciseId ?? null,
                     startedAtMs: input.startedAtMs ?? null,

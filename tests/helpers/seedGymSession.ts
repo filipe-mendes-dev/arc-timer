@@ -50,6 +50,10 @@ export const seedGymExerciseRecord = (
             id: exerciseRecord.id,
             notes: exerciseRecord.notes ?? null,
             sortIndex: exerciseRecord.sortIndex,
+            sourceGymPlanSectionId:
+                exerciseRecord.sourceGymPlanSectionId ?? null,
+            sourceGymPlanSectionTitle:
+                exerciseRecord.sourceGymPlanSectionTitle ?? null,
             sourceGymPlanExerciseId:
                 exerciseRecord.sourceGymPlanExerciseId ?? null,
             startedAtMs: exerciseRecord.startedAtMs ?? null,

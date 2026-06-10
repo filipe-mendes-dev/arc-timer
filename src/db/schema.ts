@@ -189,6 +189,7 @@ export const gymPlanExerciseTargetSetsTable = sqliteTable('gym_plan_exercise_tar
     weightGrams: integer('weight_grams'),
     durationSec: integer('duration_sec'),
     distanceMeters: integer('distance_meters'),
+    rpeTenths: integer('rpe_tenths'),
     createdAtMs: integer('created_at_ms').notNull(),
     updatedAtMs: integer('updated_at_ms').notNull(),
 }, (table) => [
@@ -231,6 +232,8 @@ export const gymExerciseRecordsTable = sqliteTable('gym_exercise_records', {
     exerciseDefinitionId: text('exercise_definition_id')
         .notNull()
         .references(() => exerciseDefinitionsTable.id, { onDelete: 'restrict' }),
+    sourceGymPlanSectionId: text('source_gym_plan_section_id'),
+    sourceGymPlanSectionTitle: text('source_gym_plan_section_title'),
     sourceGymPlanExerciseId: text('source_gym_plan_exercise_id').references(
         () => gymPlanExercisesTable.id,
         { onDelete: 'set null' },
