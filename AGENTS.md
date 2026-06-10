@@ -37,7 +37,7 @@ You are working in a React Native / Expo Router project (Arc Timer). Follow thes
 ## 2.1) Comments
 
 - Keep comments **short and single-line**. The code should be clear enough on its own.
-- Use comments only to provide context that the code cannot express: *why* a non-obvious choice was made, or an important caveat (e.g. a platform gotcha, a workaround, a performance reason).
+- Use comments only to provide context that the code cannot express: _why_ a non-obvious choice was made, or an important caveat (e.g. a platform gotcha, a workaround, a performance reason).
 - Do **not** restate what the code does — if a comment would just paraphrase the next line, delete it.
 
 ---
@@ -64,12 +64,12 @@ You are working in a React Native / Expo Router project (Arc Timer). Follow thes
 
 ## 4) Styling Rules
 
-- React Native styling lives in a **`styles.ts`** file next to the screen/component.
-- Styles are imported as:
-    - `import { st } from './styles';`
-- Do not use `.styles.ts` suffix (unless the project already does in some older areas and you’re not asked to migrate).
-- No raw hex colors in components:
-    - All colors must be defined in `colors.ts` with meaningful names and referenced via the palette/theme.
+- React Native styling lives in a <ComponentName>.styles.ts file next to the screen or component.
+- Styles are imported from the component-specific styles file.
+- Do not use a generic styles.ts file for new code.
+- Existing styles.ts files should not be migrated unless explicitly requested.
+- No raw hex colors in components or style files:
+    - All colors must be defined in colors.ts with meaningful names and referenced through the palette or theme.
 
 ---
 
