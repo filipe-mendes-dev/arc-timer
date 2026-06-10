@@ -36,6 +36,7 @@ export const ExerciseDefinitionDefaultFieldsSection = ({
                         description={t(
                             'exerciseDefinitions.emptyDefaultsDescription',
                         )}
+                        size="small"
                     />
                 ) : (
                     <FlatList

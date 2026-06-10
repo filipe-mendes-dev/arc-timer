@@ -30,6 +30,7 @@ export const ExerciseDefinitionStatsSection = ({
                         description={t(
                             'exerciseDefinitions.emptyStatsDescription',
                         )}
+                        size="small"
                     />
                 )}
 

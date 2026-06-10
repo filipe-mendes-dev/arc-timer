@@ -29,6 +29,7 @@ import { useState } from 'react';
 import { GymActiveSessionEndModal } from '../GymActiveSessionScreen/components/GymActiveSessionEndModal';
 import { Separator } from 'src/components/ui/Separator/Separator';
 import { ActionModal } from '@src/components/modals/ActionModal';
+import { ListEmptyState } from 'src/components/layout/ListEmptyState';
 
 const getSessionRoute = (
     kind: TrainingSessionKind,
@@ -237,9 +238,11 @@ const HomeScreen = () => {
                         />
                     )}
                     ListEmptyComponent={
-                        <AppText variant="bodySmall" tone="secondary">
-                            {t('home.noSessionsYet')}
-                        </AppText>
+                        <ListEmptyState
+                            title={t('history.emptyTitle')}
+                            description={t('history.emptyDescription')}
+                            size="small"
+                        />
                     }
                 />
             </ScreenSection>
