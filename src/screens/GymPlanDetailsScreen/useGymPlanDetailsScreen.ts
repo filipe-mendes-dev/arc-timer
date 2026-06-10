@@ -124,7 +124,7 @@ export const useGymPlanDetailsScreen = (): UseGymPlanDetailsScreenResult => {
         setExportErrorKey(null);
         setExporting(true);
 
-        const result = await exportGymPlanToFile(gymPlan);
+        const result = await exportGymPlanToFile(gymPlan, definitionNameById);
 
         if (!result.ok) {
             if (result.error === 'SHARING_UNAVAILABLE') {

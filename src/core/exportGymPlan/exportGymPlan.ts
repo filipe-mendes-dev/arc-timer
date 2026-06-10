@@ -2,13 +2,22 @@ import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 
 import type { GymPlan } from '@src/core/entities/gymPlan.interfaces';
-import { ARC_GYM_PLAN_MIME, type ExportedGymPlanFileV1 } from './exportTypes';
+import { getGymPlanExerciseTargetSets } from '@src/core/gyms/gymPlanTargetSets';
+import {
+    ARC_GYM_PLAN_MIME,
+    type ExportedGymPlanFileV1,
+    type ExportedGymPlanV1,
+} from './exportTypes';
 
 export type ExportGymPlanResult =
     | { ok: true }
     | {
           ok: false;
-          error: 'SHARING_UNAVAILABLE' | 'WRITE_FAILED' | 'SHARE_FAILED';
+          error:
+              | 'MISSING_EXERCISE_NAMES'
+              | 'SHARING_UNAVAILABLE'
+              | 'WRITE_FAILED'
+              | 'SHARE_FAILED';
       };
 
 const sanitizeFilename = (name: string): string => {
@@ -20,9 +29,63 @@ const sanitizeFilename = (name: string): string => {
     return safe.length > 0 ? safe : 'Gym Plan';
 };
 
+const getPortableExerciseName = (
+    gymPlanExerciseName: string | undefined,
+    exerciseDefinitionId: string,
+    exerciseNameById: ReadonlyMap<string, string>,
+): string =>
+    (gymPlanExerciseName ?? exerciseNameById.get(exerciseDefinitionId) ?? '')
+        .trim();
+
+export const gymPlanToExportedGymPlan = (
+    gymPlan: GymPlan,
+    exerciseNameById: ReadonlyMap<string, string>,
+): ExportedGymPlanV1 => ({
+    name: gymPlan.name,
+    description: gymPlan.description,
+    sections: gymPlan.sections.map((section, sectionIndex) => ({
+        title: section.title,
+        sortIndex: sectionIndex,
+        exercises: section.exercises.map((exercise, exerciseIndex) => ({
+            name: getPortableExerciseName(
+                exercise.name,
+                exercise.exerciseDefinitionId,
+                exerciseNameById,
+            ),
+            sortIndex: exerciseIndex,
+            notes: exercise.notes,
+            targetSets: getGymPlanExerciseTargetSets(exercise).map(
+                (targetSet, targetSetIndex) => ({
+                    setIndex: targetSetIndex,
+                    reps: targetSet.reps,
+                    weightGrams: targetSet.weightGrams,
+                    durationSec: targetSet.durationSec,
+                    distanceMeters: targetSet.distanceMeters,
+                    rpeTenths: targetSet.rpeTenths,
+                }),
+            ),
+        })),
+    })),
+});
+
+const hasMissingExerciseNames = (gymPlan: ExportedGymPlanV1): boolean =>
+    gymPlan.sections.some((section) =>
+        section.exercises.some((exercise) => exercise.name.length === 0),
+    );
+
 export const exportGymPlanToFile = async (
     gymPlan: GymPlan,
+    exerciseNameById: ReadonlyMap<string, string>,
 ): Promise<ExportGymPlanResult> => {
+    const exportedGymPlan = gymPlanToExportedGymPlan(
+        gymPlan,
+        exerciseNameById,
+    );
+
+    if (hasMissingExerciseNames(exportedGymPlan)) {
+        return { ok: false, error: 'MISSING_EXERCISE_NAMES' };
+    }
+
     const payload: ExportedGymPlanFileV1 = {
         version: 1,
         kind: 'arc-timer/gym-plan',
@@ -31,7 +94,7 @@ export const exportGymPlanToFile = async (
             name: 'ARC Timer',
             platform: 'mobile',
         },
-        gymPlan,
+        gymPlan: exportedGymPlan,
     };
 
     const json = JSON.stringify(payload, null, 2);

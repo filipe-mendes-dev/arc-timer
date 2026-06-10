@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { useDiscardGymPlanDraft, useDraftGymPlan } from '@src/data/gymPlans';
+import { dbServices } from '@src/db/dbServices';
 import { useGymPlanBuilderStore } from '@src/state/stores/useGymPlanBuilderStore';
 
 import { importGymPlanDraftFromFile } from '../GymPlansScreen.import';
@@ -71,6 +72,9 @@ export const useNewGymPlanFlow = (): UseNewGymPlanFlowResult => {
         setImporting(true);
 
         const result = await importGymPlanDraftFromFile({
+            resolveExerciseDefinitionIdByName: (name) =>
+                dbServices.exerciseDefinitionService
+                    .findOrCreateUserExerciseDefinitionByName(name)?.id ?? null,
             startImportedDraft: async (gymPlan) => {
                 startImportedDraft(gymPlan);
             },

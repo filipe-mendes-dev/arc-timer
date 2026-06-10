@@ -2,20 +2,19 @@ import * as DocumentPicker from 'expo-document-picker';
 import { File } from 'expo-file-system';
 
 import type {
-    GymPlan,
-    GymPlanExercise,
-    GymPlanExerciseTargetSet,
-    GymPlanSection,
-    GymPlanStatus,
-} from '../entities/gymPlan.interfaces';
+    ExportedGymPlanExerciseV1,
+    ExportedGymPlanFileV1,
+    ExportedGymPlanSectionV1,
+    ExportedGymPlanTargetSetV1,
+    ExportedGymPlanV1,
+} from '../exportGymPlan/exportTypes';
 import {
     ARC_GYM_PLAN_EXTENSION,
     ARC_GYM_PLAN_KIND,
-    type ExportedGymPlanFileV1,
 } from '../exportGymPlan/exportTypes';
 
 export type ImportGymPlanResult =
-    | { ok: true; gymPlan: GymPlan }
+    | { ok: true; gymPlan: ExportedGymPlanV1 }
     | {
           ok: false;
           error:
@@ -33,16 +32,12 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const isOptionalString = (value: unknown): value is string | undefined =>
     value === undefined || typeof value === 'string';
 
-const isGymPlanStatus = (value: unknown): value is GymPlanStatus =>
-    value === 'active' || value === 'archived' || value === 'draft';
-
-const isGymPlanExerciseTargetSet = (
+const isExportedGymPlanTargetSetV1 = (
     value: unknown,
-): value is GymPlanExerciseTargetSet => {
+): value is ExportedGymPlanTargetSetV1 => {
     if (!isRecord(value)) return false;
 
     return (
-        typeof value.id === 'string' &&
         typeof value.setIndex === 'number' &&
         (value.reps === undefined || typeof value.reps === 'number') &&
         (value.weightGrams === undefined ||
@@ -52,58 +47,45 @@ const isGymPlanExerciseTargetSet = (
         (value.distanceMeters === undefined ||
             typeof value.distanceMeters === 'number') &&
         (value.rpeTenths === undefined ||
-            typeof value.rpeTenths === 'number') &&
-        typeof value.createdAtMs === 'number' &&
-        typeof value.updatedAtMs === 'number'
+            typeof value.rpeTenths === 'number')
     );
 };
 
-const isGymPlanExercise = (value: unknown): value is GymPlanExercise => {
+const isExportedGymPlanExerciseV1 = (
+    value: unknown,
+): value is ExportedGymPlanExerciseV1 => {
     if (!isRecord(value)) return false;
-    const hasValidTargetSets =
-        value.targetSetDrafts === undefined ||
-        (Array.isArray(value.targetSetDrafts) &&
-            value.targetSetDrafts.every(isGymPlanExerciseTargetSet));
+    if (!Array.isArray(value.targetSets)) return false;
 
     return (
-        typeof value.id === 'string' &&
-        typeof value.exerciseDefinitionId === 'string' &&
+        typeof value.name === 'string' &&
         typeof value.sortIndex === 'number' &&
-        hasValidTargetSets &&
         isOptionalString(value.notes) &&
-        typeof value.createdAtMs === 'number' &&
-        typeof value.updatedAtMs === 'number'
+        value.targetSets.every(isExportedGymPlanTargetSetV1)
     );
 };
 
-const isGymPlanSection = (value: unknown): value is GymPlanSection => {
+const isExportedGymPlanSectionV1 = (
+    value: unknown,
+): value is ExportedGymPlanSectionV1 => {
     if (!isRecord(value)) return false;
     if (!Array.isArray(value.exercises)) return false;
 
     return (
-        typeof value.id === 'string' &&
         isOptionalString(value.title) &&
         typeof value.sortIndex === 'number' &&
-        value.exercises.every(isGymPlanExercise) &&
-        typeof value.createdAtMs === 'number' &&
-        typeof value.updatedAtMs === 'number'
+        value.exercises.every(isExportedGymPlanExerciseV1)
     );
 };
 
-const isGymPlan = (value: unknown): value is GymPlan => {
+const isExportedGymPlanV1 = (value: unknown): value is ExportedGymPlanV1 => {
     if (!isRecord(value)) return false;
     if (!Array.isArray(value.sections)) return false;
 
     return (
-        typeof value.id === 'string' &&
-        typeof value.name === 'string' &&
+        isOptionalString(value.name) &&
         isOptionalString(value.description) &&
-        value.sections.every(isGymPlanSection) &&
-        typeof value.createdAtMs === 'number' &&
-        typeof value.updatedAtMs === 'number' &&
-        typeof value.isFavorite === 'boolean' &&
-        isGymPlanStatus(value.status) &&
-        isOptionalString(value.draftTargetGymPlanId)
+        value.sections.every(isExportedGymPlanSectionV1)
     );
 };
 
@@ -120,7 +102,7 @@ const isExportedGymPlanFileV1 = (
     if (typeof value.app.name !== 'string') return false;
     if (value.app.platform !== 'mobile') return false;
 
-    return isGymPlan(value.gymPlan);
+    return isExportedGymPlanV1(value.gymPlan);
 };
 
 export const importGymPlanFromFile =
