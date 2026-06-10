@@ -48,6 +48,9 @@ export const useCommitGymPlanDraft = () => {
                 queryClient.invalidateQueries({
                     queryKey: exerciseDefinitionKeys.all,
                 }),
+                queryClient.invalidateQueries({
+                    queryKey: gymSessionKeys.all,
+                }),
             ]);
         },
     });
