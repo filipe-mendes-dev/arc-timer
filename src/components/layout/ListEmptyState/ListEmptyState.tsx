@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { Button } from '@src/components/ui/Button/Button';
 import { useListEmptyStateStyles } from './ListEmptyState.styles';
-import { TextVariant } from 'src/theme/typography';
+import type { TextVariant } from 'src/theme/typography';
 
 interface ListEmptyStateProps {
     actionLabel?: string;
