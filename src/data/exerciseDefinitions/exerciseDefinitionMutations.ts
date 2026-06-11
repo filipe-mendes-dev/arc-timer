@@ -12,6 +12,9 @@ import { dbServices } from '@src/db/dbServices';
 import { workoutSessionKeys } from '../workoutSessions';
 import { workoutKeys } from '../workouts/workoutKeys';
 import { exerciseDefinitionKeys } from './exerciseDefinitionKeys';
+import { gymSessionKeys } from '../gymSessions';
+import { gymPlanKeys } from '../gymPlans';
+import { trainingSessionKeys } from '../trainingSessions';
 
 export interface CreateExerciseDefinitionMutationArgs {
     availability?: ExerciseDefinitionAvailability;
@@ -97,6 +100,15 @@ export const useSaveExerciseDefinition = () => {
                 }),
                 queryClient.invalidateQueries({
                     queryKey: workoutSessionKeys.all,
+                }),
+                queryClient.invalidateQueries({
+                    queryKey: gymPlanKeys.all,
+                }),
+                queryClient.invalidateQueries({
+                    queryKey: gymSessionKeys.all,
+                }),
+                queryClient.invalidateQueries({
+                    queryKey: trainingSessionKeys.all,
                 }),
             ]);
         },

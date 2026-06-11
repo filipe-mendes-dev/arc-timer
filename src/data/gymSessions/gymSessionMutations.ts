@@ -14,8 +14,7 @@ import { gymPlanKeys } from '../gymPlans/gymPlanKeys';
 import { trainingSessionKeys } from '../trainingSessions/trainingSessionKeys';
 import { gymSessionKeys } from './gymSessionKeys';
 
-export interface AddGymExerciseRecordByNameInput
-    extends AddExerciseRecordToSessionInput {
+export interface AddGymExerciseRecordByNameInput extends AddExerciseRecordToSessionInput {
     name: string;
 }
 
@@ -96,7 +95,12 @@ export const useDiscardGymSession = () => {
         mutationFn: async (id: string) =>
             dbServices.gymSessionService.discardGymSession(id),
         onSuccess: async () => {
-            await invalidateGymSessionQueries(queryClient);
+            await Promise.all([
+                invalidateGymSessionQueries(queryClient),
+                queryClient.invalidateQueries({
+                    queryKey: exerciseDefinitionKeys.all,
+                }),
+            ]);
         },
     });
 };
