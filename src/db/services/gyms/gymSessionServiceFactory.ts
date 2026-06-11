@@ -397,7 +397,9 @@ export const createGymSessionService = ({
 
             planExercises.forEach((exercise, index) => {
                 const recordId = uid();
-                const sourceSection = sourceSectionByExerciseId.get(exercise.id);
+                const sourceSection = sourceSectionByExerciseId.get(
+                    exercise.id,
+                );
 
                 exerciseRecords.push({
                     id: recordId,
@@ -647,31 +649,43 @@ export const createGymSessionService = ({
             return gymExerciseRecordSetFromPersisted(set);
         },
 
-        updateExerciseRecordSet: ({
-            completedAtMs,
-            distanceMeters,
-            durationSec,
-            id,
-            isWarmup,
-            notes,
-            reps,
-            rpeTenths,
-            setIndex,
-            weightGrams,
-        }: UpdateExerciseRecordSetInput): GymExerciseRecordSet => {
-            const currentSet = getSetInActiveSessionOrThrow(id);
-
-            const nextSet = {
-                ...currentSet,
+        updateExerciseRecordSet: (
+            input: UpdateExerciseRecordSetInput,
+        ): GymExerciseRecordSet => {
+            const {
                 completedAtMs,
                 distanceMeters,
                 durationSec,
+                id,
                 isWarmup,
                 notes,
                 reps,
                 rpeTenths,
                 setIndex,
                 weightGrams,
+            } = input;
+            const currentSet = getSetInActiveSessionOrThrow(id);
+            let nextDistanceMeters: number | null | undefined =
+                currentSet.distanceMeters;
+            let nextDurationSec: number | null | undefined =
+                currentSet.durationSec;
+            let nextReps: number | null | undefined = currentSet.reps;
+            let nextRpeTenths: number | null | undefined = currentSet.rpeTenths;
+            let nextWeightGrams: number | null | undefined =
+                currentSet.weightGrams;
+
+            if ('distanceMeters' in input) nextDistanceMeters = distanceMeters;
+            if ('durationSec' in input) nextDurationSec = durationSec;
+            if ('reps' in input) nextReps = reps;
+            if ('rpeTenths' in input) nextRpeTenths = rpeTenths;
+            if ('weightGrams' in input) nextWeightGrams = weightGrams;
+
+            const nextSet: GymSetValidationInput = {
+                distanceMeters: nextDistanceMeters,
+                durationSec: nextDurationSec,
+                reps: nextReps,
+                rpeTenths: nextRpeTenths,
+                weightGrams: nextWeightGrams,
             };
 
             assertSetIsValid(nextSet);
@@ -782,8 +796,12 @@ export const createGymSessionService = ({
         },
 
         deleteExerciseRecord: (id: string): void => {
-            getRecordInActiveSessionOrThrow(id);
+            const record = getRecordInActiveSessionOrThrow(id);
+
             gymExerciseRecordRepository.deleteRecord(id);
+            exerciseDefinitionService.deleteUnreferencedUserExerciseDefinitions(
+                [record.exerciseDefinitionId],
+            );
         },
 
         deleteExerciseRecordSet: (id: string): void => {
