@@ -166,6 +166,71 @@ export const getSectionSummaries = (
     const exerciseSummaryByRecordId = new Map(
         exerciseSummaries.map((exercise) => [exercise.record.id, exercise]),
     );
+    const snapshotSectionSummaries: SectionSummary[] = [];
+    const fallbackExerciseSummaries = exerciseSummaries.filter(
+        (exercise) => exercise.record.sourceGymPlanSectionId === undefined,
+    );
+
+    exerciseSummaries.forEach((exercise) => {
+        const sectionId = exercise.record.sourceGymPlanSectionId;
+        if (sectionId === undefined) return;
+
+        let sectionSummary = snapshotSectionSummaries.find(
+            (section) => section.id === sectionId,
+        );
+        if (!sectionSummary) {
+            const sectionIndex = snapshotSectionSummaries.length + 1;
+            const trimmedTitle =
+                exercise.record.sourceGymPlanSectionTitle?.trim();
+            let label = t('gymPlanDetails.sectionFallback', {
+                index: sectionIndex,
+            });
+            if (trimmedTitle && trimmedTitle.length > 0) {
+                label = trimmedTitle;
+            }
+            sectionSummary = {
+                id: sectionId,
+                label,
+                records: [],
+                exerciseCount: 0,
+                setCount: 0,
+                completedSetCount: 0,
+            };
+            snapshotSectionSummaries.push(sectionSummary);
+        }
+
+        sectionSummary.records.push(exercise);
+        sectionSummary.exerciseCount += 1;
+        sectionSummary.setCount += exercise.record.sets.length;
+        sectionSummary.completedSetCount += exercise.completedSets.length;
+    });
+
+    if (snapshotSectionSummaries.length > 0) {
+        if (fallbackExerciseSummaries.length === 0) {
+            return snapshotSectionSummaries;
+        }
+
+        const fallbackIndex = snapshotSectionSummaries.length + 1;
+        snapshotSectionSummaries.push({
+            id: 'fallback-section',
+            label: t('gymPlanDetails.sectionFallback', {
+                index: fallbackIndex,
+            }),
+            records: fallbackExerciseSummaries,
+            exerciseCount: fallbackExerciseSummaries.length,
+            setCount: fallbackExerciseSummaries.reduce(
+                (total, exercise) => total + exercise.record.sets.length,
+                0,
+            ),
+            completedSetCount: fallbackExerciseSummaries.reduce(
+                (total, exercise) => total + exercise.completedSets.length,
+                0,
+            ),
+        });
+
+        return snapshotSectionSummaries;
+    }
+
     const usedRecordIds = new Set<string>();
     const sourceSections = sourceGymPlan?.sections ?? [];
     const sectionSummaries: SectionSummary[] = [];
