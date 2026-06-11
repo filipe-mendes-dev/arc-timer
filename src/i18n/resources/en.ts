@@ -150,9 +150,9 @@ export const en: I18nResource = {
         modal: {
             title: 'New gym plan',
             subtitle: 'Choose how you want to start:',
+            resumeDraft: 'Resume draft',
             createNew: 'Create new',
             importFromFile: 'Import from file',
-            resumeDraft: 'Resume draft',
             cancel: 'Cancel',
         },
         import: {
@@ -542,6 +542,9 @@ export const en: I18nResource = {
             message_other:
                 'This will permanently delete the {{count}} selected sessions.',
         },
+        errors: {
+            deleteFailed: 'Could not delete the selected session. Try again.',
+        },
     },
     historySession: {
         title: 'Session',
@@ -626,6 +629,11 @@ export const en: I18nResource = {
                 'This will permanently delete the block from this workout.',
             confirm: 'Remove',
             cancel: 'Cancel',
+        },
+        discardConfirm: {
+            title: 'Discard draft?',
+            message: 'This draft workout will be deleted.',
+            confirm: 'Discard',
         },
     },
     editBlock: {
@@ -756,6 +764,9 @@ export const en: I18nResource = {
                 readFailed: 'Could not read the selected file.',
                 unexpected: 'Import failed due to an unexpected error.',
             },
+        },
+        errors: {
+            deleteFailed: 'Could not delete the selected workout. Try again.',
         },
     },
     exerciseDefinitions: {

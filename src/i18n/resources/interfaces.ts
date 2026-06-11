@@ -514,6 +514,9 @@ export interface I18nResource {
             message_one: string;
             message_other: string;
         };
+        errors: {
+            deleteFailed: string;
+        };
     };
     historySession: {
         title: string;
@@ -596,6 +599,11 @@ export interface I18nResource {
             message: string;
             confirm: string;
             cancel: string;
+        };
+        discardConfirm: {
+            title: string;
+            message: string;
+            confirm: string;
         };
     };
     editBlock: {
@@ -723,6 +731,9 @@ export interface I18nResource {
                 readFailed: string;
                 unexpected: string;
             };
+        };
+        errors: {
+            deleteFailed: string;
         };
     };
     exerciseDefinitions: {

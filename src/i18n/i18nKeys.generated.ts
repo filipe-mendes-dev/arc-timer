@@ -524,6 +524,9 @@ export const i18nKeys = {
             message_one: 'history.confirmRemoveBulk.message_one',
             message_other: 'history.confirmRemoveBulk.message_other',
         },
+        errors: {
+            deleteFailed: 'history.errors.deleteFailed',
+        },
     },
     historySession: {
         title: 'historySession.title',
@@ -606,6 +609,11 @@ export const i18nKeys = {
             message: 'editWorkout.removeBlock.message',
             confirm: 'editWorkout.removeBlock.confirm',
             cancel: 'editWorkout.removeBlock.cancel',
+        },
+        discardConfirm: {
+            title: 'editWorkout.discardConfirm.title',
+            message: 'editWorkout.discardConfirm.message',
+            confirm: 'editWorkout.discardConfirm.confirm',
         },
     },
     editBlock: {
@@ -733,6 +741,9 @@ export const i18nKeys = {
                 readFailed: 'workouts.import.errors.readFailed',
                 unexpected: 'workouts.import.errors.unexpected',
             },
+        },
+        errors: {
+            deleteFailed: 'workouts.errors.deleteFailed',
         },
     },
     exerciseDefinitions: {

@@ -153,9 +153,9 @@ export const ptPT: I18nResource = {
         modal: {
             title: 'Novo plano de ginásio',
             subtitle: 'Escolhe como queres começar:',
+            resumeDraft: 'Retomar rascunho',
             createNew: 'Criar novo',
             importFromFile: 'Importar de ficheiro',
-            resumeDraft: 'Retomar rascunho',
             cancel: 'Cancelar',
         },
         import: {
@@ -561,6 +561,10 @@ export const ptPT: I18nResource = {
             message_other:
                 'As {{count}} sessões selecionadas serão eliminadas permanentemente.',
         },
+        errors: {
+            deleteFailed:
+                'Não foi possível eliminar a sessão selecionada. Tenta novamente.',
+        },
     },
     historySession: {
         title: 'Sessão',
@@ -646,6 +650,11 @@ export const ptPT: I18nResource = {
             message: 'Este bloco será removido permanentemente do treino.',
             confirm: 'Remover',
             cancel: 'Cancelar',
+        },
+        discardConfirm: {
+            title: 'Descartar rascunho?',
+            message: 'Este rascunho de treino será eliminado.',
+            confirm: 'Descartar',
         },
     },
     editBlock: {
@@ -777,6 +786,10 @@ export const ptPT: I18nResource = {
                 readFailed: 'Não foi possível ler o ficheiro selecionado.',
                 unexpected: 'A importação falhou devido a um erro inesperado.',
             },
+        },
+        errors: {
+            deleteFailed:
+                'Não foi possível remover o treino selecionado. Tenta novamente.',
         },
     },
     exerciseDefinitions: {
