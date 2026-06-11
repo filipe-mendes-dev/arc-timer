@@ -10,6 +10,8 @@ import {
     useActiveGymSession,
     useUpdateGymExerciseRecordSet,
     isGymError,
+    createGymError,
+    gymErrors,
 } from '@src/data/gymSessions';
 import { useListSelection } from '@src/hooks/useListSelection';
 
@@ -26,6 +28,8 @@ import {
 } from 'src/helpers/exerciseDefinition.helpers';
 import { getWeightGrams } from 'src/helpers/gymExerciseRecord.helpers';
 import type { UpdateExerciseRecordSetInput } from 'src/db/services/gyms/gymSessionServiceFactory';
+import type { GymError } from 'src/db/repositories/gyms/gymErrors';
+import { i18nKeys } from 'src/i18n/i18nKeys.generated';
 
 const getRecordIdParam = (recordId?: string | string[]): string | undefined => {
     if (Array.isArray(recordId)) {
@@ -148,6 +152,7 @@ export const useGymExerciseDataScreen = () => {
     const [pendingDeleteSets, setPendingDeleteSets] = useState<
         GymExerciseRecordSet[]
     >([]);
+    const [errorValue, setErrorValue] = useState<GymError | null>(null);
     const {
         enterSelectMode,
         exitSelectMode,
@@ -207,6 +212,12 @@ export const useGymExerciseDataScreen = () => {
             }
 
             return t('gymExerciseData.errors.deleteSetFailed');
+        }
+
+        if (errorValue) {
+            if (isGymError(errorValue)) {
+                return t(errorValue.message);
+            }
         }
 
         return '';
@@ -310,7 +321,10 @@ export const useGymExerciseDataScreen = () => {
             nextDistanceMeters !== undefined ||
             nextRpeTenths !== undefined;
 
-        if (!hasMeaningfulValue) return;
+        if (!hasMeaningfulValue) {
+            setErrorValue(createGymError(gymErrors.invalidGymSet));
+            return;
+        }
 
         let reps: number | undefined;
 
@@ -410,6 +424,7 @@ export const useGymExerciseDataScreen = () => {
         addSet.reset();
         updateSet.reset();
         deleteSet.reset();
+        setErrorValue(null);
     };
 
     return {
