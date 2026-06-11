@@ -54,8 +54,7 @@ interface ExerciseDefinitionBaseListItem {
     updatedAtMs: number;
 }
 
-interface ExerciseDefinitionRecentSessionRow
-    extends ExerciseDefinitionRecentSessionItem {
+interface ExerciseDefinitionRecentSessionRow extends ExerciseDefinitionRecentSessionItem {
     startedAtMs: number;
 }
 
@@ -111,7 +110,9 @@ export interface ExerciseDefinitionRepository {
     hasGymSessionExerciseReferences: (id: string) => boolean;
     hasGymPlanExerciseReferences: (id: string) => boolean;
     hasWorkoutExerciseReferences: (id: string) => boolean;
-    list: (params?: ExerciseDefinitionListParams) => ExerciseDefinitionListItem[];
+    list: (
+        params?: ExerciseDefinitionListParams,
+    ) => ExerciseDefinitionListItem[];
     replaceGymPlanExerciseDefinitionReferences: (input: {
         sourceId: string;
         targetId: string;
@@ -169,7 +170,9 @@ export const createExerciseDefinitionRepository = ({
         existingId?: string,
     ): void => {
         if (normalizedName.length === 0) {
-            throw new Error('Exercise definition normalized name cannot be blank');
+            throw new Error(
+                'Exercise definition normalized name cannot be blank',
+            );
         }
 
         const existing = repository.getByNormalizedName(normalizedName);
@@ -256,8 +259,7 @@ export const createExerciseDefinitionRepository = ({
 
     const getTrainingSessionKey = (
         item: ExerciseDefinitionRecentSessionRow,
-    ): string =>
-        `${item.kind}:${item.id}`;
+    ): string => `${item.kind}:${item.id}`;
 
     const uniqueTrainingSessionItems = (
         items: ExerciseDefinitionRecentSessionRow[],
@@ -276,16 +278,12 @@ export const createExerciseDefinitionRepository = ({
     };
 
     const repository: ExerciseDefinitionRepository = {
-        create: (
-            input: CreateExerciseDefinitionInput,
-        ): ExerciseDefinition => {
+        create: (input: CreateExerciseDefinitionInput): ExerciseDefinition => {
             assertUniqueNormalizedName(input.normalizedName);
 
             const definitionInsert: ExerciseDefinitionDbInsert = input;
 
-            db.insert(exerciseDefinitionsTable)
-                .values(definitionInsert)
-                .run();
+            db.insert(exerciseDefinitionsTable).values(definitionInsert).run();
 
             return exerciseDefinitionFromListItem(
                 withDeleteMetadata(input),
@@ -306,7 +304,9 @@ export const createExerciseDefinitionRepository = ({
                 .from(exerciseDefinitionsTable)
                 .orderBy(asc(exerciseDefinitionsTable.name))
                 .all()
-                .map((row) => withDeleteMetadata(exerciseDefinitionFromRow(row))),
+                .map((row) =>
+                    withDeleteMetadata(exerciseDefinitionFromRow(row)),
+                ),
 
         getById: (id: string): ExerciseDefinition | null => {
             const row = db
@@ -330,7 +330,9 @@ export const createExerciseDefinitionRepository = ({
             const row = db
                 .select()
                 .from(exerciseDefinitionsTable)
-                .where(eq(exerciseDefinitionsTable.normalizedName, normalizedName))
+                .where(
+                    eq(exerciseDefinitionsTable.normalizedName, normalizedName),
+                )
                 .get();
 
             return row
@@ -408,7 +410,8 @@ export const createExerciseDefinitionRepository = ({
                 .select({
                     id: gymSessionsTable.id,
                     startedAtMs: gymSessionsTable.startedAtMs,
-                    sourceGymPlanName: gymPlansTable.name,
+                    sourceGymPlanName: gymSessionsTable.sourceGymPlanName,
+                    gymPlanName: gymPlansTable.name,
                 })
                 .from(gymExerciseRecordsTable)
                 .innerJoin(
@@ -431,7 +434,8 @@ export const createExerciseDefinitionRepository = ({
                 .all();
             const gymItems: ExerciseDefinitionRecentSessionRow[] = gymRows.map(
                 (row) => {
-                    const title = row.sourceGymPlanName ?? '';
+                    const title =
+                        row.gymPlanName ?? row.sourceGymPlanName ?? '';
 
                     return {
                         id: row.id,
@@ -609,7 +613,9 @@ export const createExerciseDefinitionRepository = ({
         }): void => {
             db.update(gymExerciseRecordsTable)
                 .set({ exerciseDefinitionId: targetId })
-                .where(eq(gymExerciseRecordsTable.exerciseDefinitionId, sourceId))
+                .where(
+                    eq(gymExerciseRecordsTable.exerciseDefinitionId, sourceId),
+                )
                 .run();
         },
 
@@ -623,12 +629,12 @@ export const createExerciseDefinitionRepository = ({
                 .run();
         },
 
-        update: (
-            input: UpdateExerciseDefinitionInput,
-        ): ExerciseDefinition => {
+        update: (input: UpdateExerciseDefinitionInput): ExerciseDefinition => {
             const existing = repository.getById(input.id);
             if (!existing) {
-                throw new Error(`Exercise definition ${input.id} was not found`);
+                throw new Error(
+                    `Exercise definition ${input.id} was not found`,
+                );
             }
 
             if (

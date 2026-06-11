@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 import type { GymExerciseRecord } from '@src/core/entities/gymSession.interfaces';
 import { useGymExerciseDefinitions } from '@src/data/exerciseDefinitions';
-import { useGymPlan } from '@src/data/gymPlans';
 import {
     useActiveGymSession,
     useDeleteGymExerciseRecord,
@@ -22,7 +21,6 @@ export const useGymActiveSessionScreen = () => {
     const { i18n, t } = useTranslation();
     const router = useRouter();
     const { data: activeSession } = useActiveGymSession();
-    const { data: sourceGymPlan } = useGymPlan(activeSession?.sourceGymPlanId);
     const { data: exerciseDefinitions = [] } = useGymExerciseDefinitions();
     const finishGymSession = useFinishGymSession();
     const discardGymSession = useDiscardGymSession();
@@ -164,7 +162,6 @@ export const useGymActiveSessionScreen = () => {
         setCount,
         setEndSessionModalVisible,
         setPendingRemoveRecord,
-        sourceGymPlan,
         startedAtLabel: getStartedAtLabel(),
         t,
     };

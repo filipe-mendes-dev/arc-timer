@@ -210,6 +210,7 @@ export const gymSessionsTable = sqliteTable('gym_sessions', {
         () => gymPlansTable.id,
         { onDelete: 'set null' },
     ),
+    sourceGymPlanName: text('source_gym_plan_name'),
     notes: text('notes'),
     createdAtMs: integer('created_at_ms').notNull(),
     updatedAtMs: integer('updated_at_ms').notNull(),

@@ -5,8 +5,8 @@ import type { GymSessionListItem } from '@src/core/entities/gymSession.interface
 import {
     gymExerciseRecordsTable,
     gymExerciseRecordSetsTable,
-    gymPlansTable,
     gymSessionsTable,
+    gymPlansTable,
 } from '../../schema';
 import type { RepositoryDb } from '../workouts/workoutRepositoryFactory';
 
@@ -22,7 +22,11 @@ export interface UpdateGymSessionInput
         Partial<
             Pick<
                 GymSessionRow,
-                'endedAtMs' | 'notes' | 'sourceGymPlanId' | 'status'
+                | 'endedAtMs'
+                | 'notes'
+                | 'sourceGymPlanId'
+                | 'sourceGymPlanName'
+                | 'status'
             >
         > {}
 
@@ -40,9 +44,7 @@ export interface GymSessionRepository {
     hasActive: () => boolean;
     hasSession: (id: string) => boolean;
     insert: (input: GymSessionInsert) => void;
-    insertWithExerciseRecords: (
-        input: InsertGymSessionAggregateInput,
-    ) => void;
+    insertWithExerciseRecords: (input: InsertGymSessionAggregateInput) => void;
     update: (input: UpdateGymSessionInput) => void;
     delete: (id: string) => void;
 }
@@ -51,10 +53,7 @@ export interface CreateGymSessionRepositoryArgs {
     db: RepositoryDb;
 }
 
-const gymSessionStatuses: GymSessionRow['status'][] = [
-    'active',
-    'completed',
-];
+const gymSessionStatuses: GymSessionRow['status'][] = ['active', 'completed'];
 
 const assertNonEmptyId = (id: string, fieldName: string): void => {
     if (id.trim().length === 0) {
@@ -270,7 +269,8 @@ export const createGymSessionRepository = ({
                     endedAtMs: gymSessionsTable.endedAtMs,
                     status: gymSessionsTable.status,
                     sourceGymPlanId: gymSessionsTable.sourceGymPlanId,
-                    sourceGymPlanName: gymPlansTable.name,
+                    sourceGymPlanName: gymSessionsTable.sourceGymPlanName,
+                    gymPlanName: gymPlansTable.name,
                 })
                 .from(gymSessionsTable)
                 .leftJoin(
@@ -297,7 +297,8 @@ export const createGymSessionRepository = ({
                     endedAtMs: row.endedAtMs ?? undefined,
                     status: row.status,
                     sourceGymPlanId: row.sourceGymPlanId ?? undefined,
-                    sourceGymPlanName: row.sourceGymPlanName ?? undefined,
+                    sourceGymPlanName:
+                        row.gymPlanName ?? row.sourceGymPlanName ?? undefined,
                     exerciseRecordCount: counts.exerciseRecordCount,
                     setCount: counts.setCount,
                 };
@@ -338,6 +339,7 @@ export const createGymSessionRepository = ({
                     id: input.id,
                     notes: input.notes ?? null,
                     sourceGymPlanId: input.sourceGymPlanId ?? null,
+                    sourceGymPlanName: input.sourceGymPlanName ?? null,
                     startedAtMs: input.startedAtMs,
                     status: input.status,
                     updatedAtMs: input.updatedAtMs,
@@ -362,6 +364,7 @@ export const createGymSessionRepository = ({
                         id: session.id,
                         notes: session.notes ?? null,
                         sourceGymPlanId: session.sourceGymPlanId ?? null,
+                        sourceGymPlanName: session.sourceGymPlanName ?? null,
                         startedAtMs: session.startedAtMs,
                         status: session.status,
                         updatedAtMs: session.updatedAtMs,
@@ -395,6 +398,7 @@ export const createGymSessionRepository = ({
                     endedAtMs: input.endedAtMs,
                     notes: input.notes,
                     sourceGymPlanId: input.sourceGymPlanId,
+                    sourceGymPlanName: input.sourceGymPlanName ?? null,
                     status: input.status,
                     updatedAtMs: input.updatedAtMs,
                 })

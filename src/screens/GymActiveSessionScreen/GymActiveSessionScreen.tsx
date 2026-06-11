@@ -1,5 +1,6 @@
 import { View } from 'react-native';
 
+import type { GymExerciseRecord } from '@src/core/entities/gymSession.interfaces';
 import { ListEmptyState } from '@src/components/layout/ListEmptyState';
 import { MainContainer } from '@src/components/layout/MainContainer/MainContainer';
 import { ScreenSection } from '@src/components/layout/ScreenSection/ScreenSection';
@@ -13,6 +14,12 @@ import { GymActiveSessionHeader } from './components/GymActiveSessionHeader';
 import { GymExerciseCard } from './components/GymExerciseCard';
 import { useStyles } from './GymActiveSessionScreen.styles';
 import { useGymActiveSessionScreen } from './useGymActiveSessionScreen';
+
+interface SectionRecordGroup {
+    id: string;
+    title?: string;
+    records: GymExerciseRecord[];
+}
 
 const GymActiveSessionScreen = () => {
     const st = useStyles();
@@ -38,7 +45,6 @@ const GymActiveSessionScreen = () => {
         setCount,
         setEndSessionModalVisible,
         setPendingRemoveRecord,
-        sourceGymPlan,
         startedAtLabel,
         t,
     } = useGymActiveSessionScreen();
@@ -56,10 +62,29 @@ const GymActiveSessionScreen = () => {
         );
     }
 
-    const sourceSections = sourceGymPlan?.sections ?? [];
-    const firstSectionTitle = sourceSections[0]?.title?.trim();
+    const sectionGroups = activeSession.exerciseRecords.reduce<
+        SectionRecordGroup[]
+    >((groups, record) => {
+        const sectionKey = record.sourceGymPlanSectionId;
+        if (!sectionKey) return groups;
+
+        const existingGroup = groups.find((group) => group.id === sectionKey);
+        if (existingGroup) {
+            existingGroup.records.push(record);
+            return groups;
+        }
+
+        groups.push({
+            id: sectionKey,
+            title: record.sourceGymPlanSectionTitle,
+            records: [record],
+        });
+
+        return groups;
+    }, []);
+    const firstSectionTitle = sectionGroups[0]?.title?.trim();
     const shouldGroupBySection =
-        sourceSections.length > 1 ||
+        sectionGroups.length > 1 ||
         (firstSectionTitle !== undefined && firstSectionTitle.length > 0);
     const getExerciseName = (
         record: (typeof activeSession.exerciseRecords)[number],
@@ -75,34 +100,17 @@ const GymActiveSessionScreen = () => {
             })
         );
     };
-    const sectionRecordsById = new Map(
-        sourceSections.map((section) => {
-            const sourceExerciseIds = new Set(
-                section.exercises.map((exercise) => exercise.id),
-            );
-            const sectionRecords = activeSession.exerciseRecords.filter(
-                (record) =>
-                    record.sourceGymPlanExerciseId !== undefined &&
-                    sourceExerciseIds.has(record.sourceGymPlanExerciseId),
-            );
-
-            return [section.id, sectionRecords];
-        }),
-    );
     const sectionedRecordIds = new Set(
-        Array.from(sectionRecordsById.values()).flatMap((records) =>
-            records.map((record) => record.id),
+        sectionGroups.flatMap((section) =>
+            section.records.map((record) => record.id),
         ),
     );
     const unsectionedRecords = activeSession.exerciseRecords.filter(
         (record) => !sectionedRecordIds.has(record.id),
     );
-    const hasVisiblePlanSections = Array.from(
-        sectionRecordsById.values(),
-    ).some((records) => records.length > 0);
     const shouldRenderAddedExercisesSection =
         shouldGroupBySection &&
-        hasVisiblePlanSections &&
+        sectionGroups.length > 0 &&
         unsectionedRecords.length > 0;
 
     return (
@@ -123,12 +131,7 @@ const GymActiveSessionScreen = () => {
                 />
                 <View style={st.exerciseList}>
                     {shouldGroupBySection &&
-                        sourceSections.map((section, sectionIndex) => {
-                            const sectionRecords =
-                                sectionRecordsById.get(section.id) ?? [];
-
-                            if (sectionRecords.length === 0) return null;
-
+                        sectionGroups.map((section, sectionIndex) => {
                             const trimmedTitle = section.title?.trim();
                             let title = t('gymPlanDetails.sectionFallback', {
                                 index: sectionIndex + 1,
@@ -147,7 +150,7 @@ const GymActiveSessionScreen = () => {
                                     title={title}
                                     gap={8}
                                 >
-                                    {sectionRecords.map((record) => (
+                                    {section.records.map((record) => (
                                         <GymExerciseCard
                                             key={record.id}
                                             record={record}

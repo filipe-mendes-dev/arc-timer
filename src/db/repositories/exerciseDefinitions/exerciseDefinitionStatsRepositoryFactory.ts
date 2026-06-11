@@ -11,8 +11,8 @@ import {
     exerciseDefinitionStatsTable,
     gymExerciseRecordsTable,
     gymExerciseRecordSetsTable,
-    gymPlansTable,
     gymSessionsTable,
+    gymPlansTable,
 } from '../../schema';
 import type { RepositoryDb } from '../workouts/workoutRepositoryFactory';
 
@@ -66,8 +66,7 @@ const metricFromStatsRow = (
         kind === 'weight'
             ? row.weightPrGymSessionId
             : row.distancePrGymSessionId;
-    const value =
-        kind === 'weight' ? row.weightPrGrams : row.distancePrMeters;
+    const value = kind === 'weight' ? row.weightPrGrams : row.distancePrMeters;
 
     if (!gymExerciseRecordSetId || !gymSessionId || value === null) {
         return undefined;
@@ -79,12 +78,12 @@ const metricFromStatsRow = (
         value,
         reps:
             kind === 'weight'
-                ? row.weightPrReps ?? undefined
-                : row.distancePrReps ?? undefined,
+                ? (row.weightPrReps ?? undefined)
+                : (row.distancePrReps ?? undefined),
         completedAtMs:
             kind === 'weight'
-                ? row.weightPrCompletedAtMs ?? undefined
-                : row.distancePrCompletedAtMs ?? undefined,
+                ? (row.weightPrCompletedAtMs ?? undefined)
+                : (row.distancePrCompletedAtMs ?? undefined),
     };
 };
 
@@ -169,7 +168,8 @@ export const createExerciseDefinitionStatsRepository = ({
                 endedAtMs: gymSessionsTable.endedAtMs,
                 status: gymSessionsTable.status,
                 sourceGymPlanId: gymSessionsTable.sourceGymPlanId,
-                sourceGymPlanName: gymPlansTable.name,
+                sourceGymPlanName: gymSessionsTable.sourceGymPlanName,
+                gymPlanName: gymPlansTable.name,
             })
             .from(exerciseDefinitionRecentGymSessionsTable)
             .innerJoin(
@@ -207,7 +207,8 @@ export const createExerciseDefinitionStatsRepository = ({
                 endedAtMs: row.endedAtMs ?? undefined,
                 status: row.status,
                 sourceGymPlanId: row.sourceGymPlanId ?? undefined,
-                sourceGymPlanName: row.sourceGymPlanName ?? undefined,
+                sourceGymPlanName:
+                    row.gymPlanName ?? row.sourceGymPlanName ?? undefined,
                 exerciseRecordCount: counts.exerciseRecordCount,
                 setCount: counts.setCount,
             };
@@ -225,10 +226,7 @@ export const createExerciseDefinitionStatsRepository = ({
             .from(gymExerciseRecordsTable)
             .innerJoin(
                 gymSessionsTable,
-                eq(
-                    gymExerciseRecordsTable.gymSessionId,
-                    gymSessionsTable.id,
-                ),
+                eq(gymExerciseRecordsTable.gymSessionId, gymSessionsTable.id),
             )
             .where(
                 and(
@@ -283,10 +281,7 @@ export const createExerciseDefinitionStatsRepository = ({
             )
             .innerJoin(
                 gymSessionsTable,
-                eq(
-                    gymExerciseRecordsTable.gymSessionId,
-                    gymSessionsTable.id,
-                ),
+                eq(gymExerciseRecordsTable.gymSessionId, gymSessionsTable.id),
             )
             .where(
                 and(
@@ -336,9 +331,8 @@ export const createExerciseDefinitionStatsRepository = ({
         distancePr: CompletedSetMetricCandidate | undefined,
         updatedAtMs: number,
     ): void => {
-        const existing = repository.getByExerciseDefinitionId(
-            exerciseDefinitionId,
-        );
+        const existing =
+            repository.getByExerciseDefinitionId(exerciseDefinitionId);
         const row: ExerciseDefinitionStatsInsert = {
             exerciseDefinitionId,
             weightPrSetId: weightPr?.gymExerciseRecordSetId ?? null,
@@ -390,8 +384,7 @@ export const createExerciseDefinitionStatsRepository = ({
                         distancePrGymSessionId: row.distancePrGymSessionId,
                         distancePrMeters: row.distancePrMeters,
                         distancePrReps: row.distancePrReps,
-                        distancePrCompletedAtMs:
-                            row.distancePrCompletedAtMs,
+                        distancePrCompletedAtMs: row.distancePrCompletedAtMs,
                         lastCompletedGymSessionId:
                             row.lastCompletedGymSessionId,
                         updatedAtMs,
@@ -445,9 +438,8 @@ export const createExerciseDefinitionStatsRepository = ({
 
             if (!row) return null;
 
-            const recentCompletedGymSessions = getRecentSessions(
-                exerciseDefinitionId,
-            );
+            const recentCompletedGymSessions =
+                getRecentSessions(exerciseDefinitionId);
 
             return {
                 exerciseDefinitionId: row.exerciseDefinitionId,
@@ -468,7 +460,9 @@ export const createExerciseDefinitionStatsRepository = ({
             if (uniqueIds.length === 0) return;
 
             const existingIds = db
-                .select({ id: exerciseDefinitionStatsTable.exerciseDefinitionId })
+                .select({
+                    id: exerciseDefinitionStatsTable.exerciseDefinitionId,
+                })
                 .from(exerciseDefinitionStatsTable)
                 .where(
                     inArray(

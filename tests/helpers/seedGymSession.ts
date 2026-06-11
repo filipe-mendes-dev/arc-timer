@@ -23,6 +23,7 @@ export const seedGymSession = (
             id: gymSession.id,
             notes: gymSession.notes ?? null,
             sourceGymPlanId: gymSession.sourceGymPlanId ?? null,
+            sourceGymPlanName: gymSession.sourceGymPlanName ?? null,
             startedAtMs: gymSession.startedAtMs,
             status: gymSession.status,
             updatedAtMs: gymSession.updatedAtMs,
