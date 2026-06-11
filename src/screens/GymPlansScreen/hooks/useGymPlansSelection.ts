@@ -49,13 +49,16 @@ export const useGymPlansSelection = (): UseGymPlansSelectionResult => {
         setPendingRemovalIds([...selectedIds]);
     }, [selectedIds]);
 
-    const confirmRemoval = useCallback(() => {
-        for (const id of pendingRemovalIds) {
-            deleteGymPlan.mutate(id);
-        }
+    const confirmRemoval = useCallback(async () => {
+        const results = await Promise.allSettled(
+            pendingRemovalIds.map((id) => deleteGymPlan.mutateAsync(id)),
+        );
+        const failedIds = pendingRemovalIds.filter(
+            (_id, index) => results[index].status === 'rejected',
+        );
 
-        setPendingRemovalIds([]);
-        if (isSelectMode) {
+        setPendingRemovalIds(failedIds);
+        if (isSelectMode && failedIds.length === 0) {
             exitSelectMode();
         }
     }, [deleteGymPlan, exitSelectMode, isSelectMode, pendingRemovalIds]);

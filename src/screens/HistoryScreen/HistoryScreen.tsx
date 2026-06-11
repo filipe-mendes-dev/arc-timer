@@ -12,6 +12,7 @@ import { SearchField } from '@src/components/ui/SearchField/SearchField';
 import { useTranslation } from 'react-i18next';
 import { ListEmptyState } from '@src/components/layout/ListEmptyState';
 import { useHistorySelection } from './useHistorySelection';
+import { ErrorBanner } from '@src/components/ui/ErrorBanner/ErrorBanner';
 
 type HistoryFilterKind = TrainingSessionKind | 'all';
 type HistoryFilterKey = 'kind';
@@ -94,6 +95,8 @@ const HistoryScreen = () => {
         confirmMessage,
         confirmRemoval,
         cancelRemoval,
+        errorMessage,
+        handleCloseError,
     } = useHistorySelection();
 
     const filterOptions: HistoryFilterOption[] = [
@@ -151,6 +154,10 @@ const HistoryScreen = () => {
                                 onApply: (values) =>
                                     setSelectedKind(values.kind ?? 'all'),
                             }}
+                        />
+                        <ErrorBanner
+                            message={errorMessage}
+                            onClose={handleCloseError}
                         />
                     </View>
                 }

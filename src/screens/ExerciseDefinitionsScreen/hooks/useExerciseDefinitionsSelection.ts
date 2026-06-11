@@ -73,24 +73,40 @@ export const useExerciseDefinitionsSelection =
         }, [selectedIds]);
 
         const confirmRemoval = useCallback(async () => {
-            try {
-                setRemovalError(undefined);
-                for (const id of pendingRemovalIds) {
-                    await deleteExerciseDefinition.mutateAsync(id);
-                }
+            setRemovalError(undefined);
+            const results = await Promise.allSettled(
+                pendingRemovalIds.map((id) =>
+                    deleteExerciseDefinition.mutateAsync(id),
+                ),
+            );
+            const failedIds = pendingRemovalIds.filter(
+                (_id, index) => results[index].status === 'rejected',
+            );
 
+            if (failedIds.length === 0) {
                 setPendingRemovalIds([]);
                 if (isSelectMode) {
                     exitSelectMode();
                 }
-            } catch (e) {
-                if (isExerciseDefinitionError(e)) {
-                    setRemovalError(t(e.message));
-                    return;
-                }
-
-                setRemovalError(t('exerciseDefinitions.validation.deleteFailed'));
+                return;
             }
+
+            setPendingRemovalIds(failedIds);
+
+            const firstFailure = results.find(
+                (result) => result.status === 'rejected',
+            );
+            const reason: unknown =
+                firstFailure?.status === 'rejected'
+                    ? firstFailure.reason
+                    : undefined;
+
+            if (isExerciseDefinitionError(reason)) {
+                setRemovalError(t(reason.message));
+                return;
+            }
+
+            setRemovalError(t('exerciseDefinitions.validation.deleteFailed'));
         }, [
             deleteExerciseDefinition,
             exitSelectMode,

@@ -390,15 +390,18 @@ export const useGymExerciseDataScreen = () => {
         setPendingDeleteSets(sets.filter((set) => selectedIds.has(set.id)));
     };
 
-    const handleConfirmDeleteSets = () => {
+    const handleConfirmDeleteSets = async (): Promise<void> => {
         if (pendingDeleteSets.length === 0) return;
 
-        for (const set of pendingDeleteSets) {
-            deleteSet.mutate(set.id);
-        }
+        const results = await Promise.allSettled(
+            pendingDeleteSets.map((set) => deleteSet.mutateAsync(set.id)),
+        );
+        const failedSets = pendingDeleteSets.filter(
+            (_set, index) => results[index].status === 'rejected',
+        );
 
-        setPendingDeleteSets([]);
-        if (isSelectMode) {
+        setPendingDeleteSets(failedSets);
+        if (isSelectMode && failedSets.length === 0) {
             exitSelectMode();
         }
     };
