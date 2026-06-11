@@ -7,7 +7,6 @@ export const useOptionPillsStyles = createStyles((theme) =>
             flexDirection: 'row',
             flexWrap: 'wrap',
             gap: 8,
-            marginTop: 4,
         },
         pill: {
             paddingHorizontal: 16,
@@ -17,14 +16,15 @@ export const useOptionPillsStyles = createStyles((theme) =>
             borderColor: theme.palette.border.subtle,
             backgroundColor: 'transparent',
         },
+        pillActive: {
+            borderColor: theme.palette.accent.primary,
+            backgroundColor: theme.palette.accent.soft,
+        },
         pillContent: {
             flexDirection: 'row',
             alignItems: 'center',
             gap: 6,
         },
-        leftSlot: {
-            // Container for left slot content (e.g., flag emoji)
-        },
-    })
+        leftSlot: {},
+    }),
 );
-

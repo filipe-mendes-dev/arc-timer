@@ -10,19 +10,21 @@ import { useListSelection } from '@src/hooks/useListSelection';
 import { useTheme } from '@src/theme/ThemeProvider';
 
 interface UseWorkoutsSelectionResult {
-    screenTitle: string;
-    topBarOptions: readonly TopBarOption[];
-    topBarLeftAction?: TopBarDirectAction;
-    topBarRightAction?: TopBarDirectAction;
+    cancelRemoval: () => void;
+    confirmMessage: string;
+    confirmRemoval: () => Promise<void>;
+    confirmTitle: string;
+    errorMessage: string;
+    handleCloseError: () => void;
+    hasPendingRemoval: boolean;
     isSelectMode: boolean;
     isSelected: (id: string) => boolean;
-    toggleItem: (id: string) => void;
-    hasPendingRemoval: boolean;
-    confirmTitle: string;
-    confirmMessage: string;
     requestRemoval: (id: string) => void;
-    confirmRemoval: () => void;
-    cancelRemoval: () => void;
+    screenTitle: string;
+    toggleItem: (id: string) => void;
+    topBarLeftAction?: TopBarDirectAction;
+    topBarOptions: readonly TopBarOption[];
+    topBarRightAction?: TopBarDirectAction;
 }
 
 export const useWorkoutsSelection = (): UseWorkoutsSelectionResult => {
@@ -30,6 +32,7 @@ export const useWorkoutsSelection = (): UseWorkoutsSelectionResult => {
     const { theme } = useTheme();
     const removeWorkout = useRemoveWorkout();
     const [pendingRemovalIds, setPendingRemovalIds] = useState<string[]>([]);
+    const [removalError, setRemovalError] = useState('');
 
     const {
         isSelectMode,
@@ -43,27 +46,44 @@ export const useWorkoutsSelection = (): UseWorkoutsSelectionResult => {
     } = useListSelection();
 
     const requestRemoval = useCallback((id: string) => {
+        setRemovalError('');
         setPendingRemovalIds([id]);
     }, []);
 
     const requestSelectedRemoval = useCallback(() => {
+        setRemovalError('');
         setPendingRemovalIds([...selectedIds]);
     }, [selectedIds]);
 
-    const confirmRemoval = useCallback(() => {
-        for (const id of pendingRemovalIds) {
-            removeWorkout.mutate(id);
+    const confirmRemoval = useCallback(async () => {
+        setRemovalError('');
+        const results = await Promise.allSettled(
+            pendingRemovalIds.map((id) => removeWorkout.mutateAsync(id)),
+        );
+        const failedIds = pendingRemovalIds.filter(
+            (_id, index) => results[index].status === 'rejected',
+        );
+
+        setPendingRemovalIds(failedIds);
+        if (failedIds.length > 0) {
+            setRemovalError(t('workouts.errors.deleteFailed'));
+            return;
         }
 
-        setPendingRemovalIds([]);
         if (isSelectMode) {
             exitSelectMode();
         }
-    }, [exitSelectMode, isSelectMode, pendingRemovalIds, removeWorkout]);
+    }, [exitSelectMode, isSelectMode, pendingRemovalIds, removeWorkout, t]);
 
     const cancelRemoval = useCallback(() => {
+        setRemovalError('');
         setPendingRemovalIds([]);
     }, []);
+
+    const handleCloseError = useCallback(() => {
+        setRemovalError('');
+        removeWorkout.reset();
+    }, [removeWorkout]);
 
     const topBarOptions = useMemo<readonly TopBarOption[]>(() => {
         return [
@@ -108,18 +128,20 @@ export const useWorkoutsSelection = (): UseWorkoutsSelectionResult => {
     }
 
     return {
-        screenTitle,
-        topBarOptions,
-        topBarLeftAction,
-        topBarRightAction,
+        cancelRemoval,
+        confirmMessage,
+        confirmRemoval,
+        confirmTitle,
+        errorMessage: removalError,
+        handleCloseError,
+        hasPendingRemoval: pendingRemovalIds.length > 0,
         isSelectMode,
         isSelected,
-        toggleItem,
-        hasPendingRemoval: pendingRemovalIds.length > 0,
-        confirmTitle,
-        confirmMessage,
         requestRemoval,
-        confirmRemoval,
-        cancelRemoval,
+        screenTitle,
+        toggleItem,
+        topBarLeftAction,
+        topBarOptions,
+        topBarRightAction,
     };
 };

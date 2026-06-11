@@ -6,7 +6,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import type { Phase, Step } from '@src/core/timer';
-import type { WorkoutBlock } from '@src/core/entities/entities';
+import type { WorkoutBlock } from '@src/core/entities/workout.interfaces';
 import type { WorkoutSessionStats } from '@src/core/entities/workoutSession.interfaces';
 
 import { AppText } from '@src/components/ui/Typography/AppText';

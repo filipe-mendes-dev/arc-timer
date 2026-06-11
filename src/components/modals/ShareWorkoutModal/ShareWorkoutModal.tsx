@@ -9,7 +9,7 @@ import {
     ShareWorkoutCard,
     type ShareRunStats,
 } from '@src/screens/WorkoutRunScreen/components/ShareWorkoutCard/ShareWorkoutCard';
-import type { Workout } from '@src/core/entities/entities';
+import type { Workout } from '@src/core/entities/workout.interfaces';
 import { useShareWorkoutModalStyles } from './ShareWorkoutModal.styles';
 import { useTranslation } from 'react-i18next';
 

@@ -1,6 +1,5 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useRouter } from 'expo-router';
 
 import { Modal } from '@src/components/modals/Modal';
 import { AppText } from '@src/components/ui/Typography/AppText';
@@ -9,25 +8,21 @@ import { useNewWorkoutModalStyles } from './NewWorkoutModal.styles';
 import GuardedPressable from '@src/components/ui/GuardedPressable/GuardedPressable';
 import { useTranslation } from 'react-i18next';
 
-type NewWorkoutModalProps = {
+interface NewWorkoutModalProps {
     visible: boolean;
     closeModal: () => void;
     handleImportFromFile: () => Promise<void>;
-};
+    onCreateNew: () => void;
+}
 
 const NewWorkoutModal = ({
     visible,
     closeModal,
     handleImportFromFile,
+    onCreateNew,
 }: NewWorkoutModalProps) => {
     const { t } = useTranslation();
-    const router = useRouter();
     const st = useNewWorkoutModalStyles();
-
-    const handleCreateNew = () => {
-        closeModal();
-        router.push('/workouts/edit');
-    };
 
     const handleImport = async () => {
         await handleImportFromFile();
@@ -55,7 +50,7 @@ const NewWorkoutModal = ({
                     <Button
                         title={t('workouts.modal.createNew')}
                         variant="primary"
-                        onPress={handleCreateNew}
+                        onPress={onCreateNew}
                     />
 
                     <Button

@@ -14,6 +14,7 @@ const DrawerLayout = () => {
             screenOptions={{
                 headerShown: false,
                 drawerType: 'front',
+                lazy: false,
                 drawerStyle: {
                     backgroundColor: theme.palette.background.card,
                     width: 280,
@@ -29,7 +30,11 @@ const DrawerLayout = () => {
             <Drawer.Screen name="index" options={{ title: t('drawer.home') }} />
             <Drawer.Screen
                 name="workouts/index"
-                options={{ title: t('drawer.workouts') }}
+                options={{ title: t('drawer.hiit') }}
+            />
+            <Drawer.Screen
+                name="gym/index"
+                options={{ title: t('drawer.gym') }}
             />
             <Drawer.Screen
                 name="exercise-definitions/index"

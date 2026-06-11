@@ -42,6 +42,10 @@ export interface MetaCardProps {
      */
     showSelectionOutline?: boolean;
     /**
+     * Disables the card-level pressed opacity feedback.
+     */
+    isPressedFeedbackDisabled?: boolean;
+    /**
      * The main content of the card
      */
     children?: ReactNode;

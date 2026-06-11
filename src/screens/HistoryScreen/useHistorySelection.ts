@@ -5,30 +5,63 @@ import type {
     TopBarDirectAction,
     TopBarOption,
 } from '@src/components/navigation/TopBar/TopBar.interfaces';
+import type { TrainingSessionKind } from '@src/core/entities/trainingSession.interfaces';
+import { useDeleteGymSession } from '@src/data/gymSessions';
 import { useRemoveWorkoutSession } from '@src/data/workoutSessions';
 import { useListSelection } from '@src/hooks/useListSelection';
 import { useTheme } from '@src/theme/ThemeProvider';
 
+interface SelectedTrainingSession {
+    id: string;
+    kind: TrainingSessionKind;
+}
+
+interface PendingTrainingSessionRemoval {
+    key: string;
+    session: SelectedTrainingSession;
+}
+
 interface UseHistorySelectionResult {
-    screenTitle: string;
-    topBarOptions: readonly TopBarOption[];
-    topBarLeftAction?: TopBarDirectAction;
-    topBarRightAction?: TopBarDirectAction;
+    cancelRemoval: () => void;
+    confirmMessage: string;
+    confirmRemoval: () => Promise<void>;
+    confirmTitle: string;
+    errorMessage: string;
+    handleCloseError: () => void;
+    hasPendingRemoval: boolean;
     isSelectMode: boolean;
     isSelected: (id: string) => boolean;
+    screenTitle: string;
     toggleItem: (id: string) => void;
-    hasPendingRemoval: boolean;
-    confirmTitle: string;
-    confirmMessage: string;
-    confirmRemoval: () => void;
-    cancelRemoval: () => void;
+    topBarLeftAction?: TopBarDirectAction;
+    topBarOptions: readonly TopBarOption[];
+    topBarRightAction?: TopBarDirectAction;
 }
+
+const parseSelectedTrainingSession = (
+    value: string,
+): SelectedTrainingSession | null => {
+    const separatorIndex = value.indexOf(':');
+    if (separatorIndex <= 0) return null;
+
+    const kind = value.slice(0, separatorIndex);
+    const id = value.slice(separatorIndex + 1);
+    if (id.length === 0) return null;
+
+    if (kind === 'hiit' || kind === 'gym') {
+        return { id, kind };
+    }
+
+    return null;
+};
 
 export const useHistorySelection = (): UseHistorySelectionResult => {
     const { t } = useTranslation();
     const { theme } = useTheme();
     const removeWorkoutSession = useRemoveWorkoutSession();
+    const deleteGymSession = useDeleteGymSession();
     const [pendingRemovalIds, setPendingRemovalIds] = useState<string[]>([]);
+    const [removalError, setRemovalError] = useState('');
 
     const {
         isSelectMode,
@@ -42,23 +75,73 @@ export const useHistorySelection = (): UseHistorySelectionResult => {
     } = useListSelection();
 
     const requestSelectedRemoval = useCallback(() => {
+        setRemovalError('');
         setPendingRemovalIds([...selectedIds]);
     }, [selectedIds]);
 
-    const confirmRemoval = useCallback(() => {
-        for (const id of pendingRemovalIds) {
-            removeWorkoutSession.mutate(id);
+    const confirmRemoval = useCallback(async () => {
+        setRemovalError('');
+        const pendingRemovals: PendingTrainingSessionRemoval[] = [];
+        const failedIds: string[] = [];
+
+        for (const pendingRemovalId of pendingRemovalIds) {
+            const selectedSession =
+                parseSelectedTrainingSession(pendingRemovalId);
+            if (!selectedSession) {
+                failedIds.push(pendingRemovalId);
+                continue;
+            }
+
+            pendingRemovals.push({
+                key: pendingRemovalId,
+                session: selectedSession,
+            });
         }
 
-        setPendingRemovalIds([]);
+        const results = await Promise.allSettled(
+            pendingRemovals.map(({ session }) => {
+                if (session.kind === 'hiit') {
+                    return removeWorkoutSession.mutateAsync(session.id);
+                }
+
+                return deleteGymSession.mutateAsync(session.id);
+            }),
+        );
+
+        pendingRemovals.forEach((removal, index) => {
+            if (results[index].status === 'rejected') {
+                failedIds.push(removal.key);
+            }
+        });
+
+        setPendingRemovalIds(failedIds);
+        if (failedIds.length > 0) {
+            setRemovalError(t('history.errors.deleteFailed'));
+            return;
+        }
+
         if (isSelectMode) {
             exitSelectMode();
         }
-    }, [exitSelectMode, isSelectMode, pendingRemovalIds, removeWorkoutSession]);
+    }, [
+        deleteGymSession,
+        exitSelectMode,
+        isSelectMode,
+        pendingRemovalIds,
+        removeWorkoutSession,
+        t,
+    ]);
 
     const cancelRemoval = useCallback(() => {
+        setRemovalError('');
         setPendingRemovalIds([]);
     }, []);
+
+    const handleCloseError = useCallback(() => {
+        setRemovalError('');
+        removeWorkoutSession.reset();
+        deleteGymSession.reset();
+    }, [deleteGymSession, removeWorkoutSession]);
 
     const topBarOptions = useMemo<readonly TopBarOption[]>(() => {
         return [
@@ -103,17 +186,19 @@ export const useHistorySelection = (): UseHistorySelectionResult => {
     }
 
     return {
-        screenTitle,
-        topBarOptions,
-        topBarLeftAction,
-        topBarRightAction,
-        isSelectMode,
-        isSelected,
-        toggleItem,
-        hasPendingRemoval: pendingRemovalIds.length > 0,
-        confirmTitle,
+        cancelRemoval,
         confirmMessage,
         confirmRemoval,
-        cancelRemoval,
+        confirmTitle,
+        errorMessage: removalError,
+        handleCloseError,
+        hasPendingRemoval: pendingRemovalIds.length > 0,
+        isSelectMode,
+        isSelected,
+        screenTitle,
+        toggleItem,
+        topBarLeftAction,
+        topBarOptions,
+        topBarRightAction,
     };
 };

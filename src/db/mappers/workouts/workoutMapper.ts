@@ -1,4 +1,4 @@
-import type { Workout, WorkoutBlock } from '@src/core/entities/entities';
+import type { Workout, WorkoutBlock } from '@src/core/entities/workout.interfaces';
 import { uid } from '@src/core/id';
 
 import type {
@@ -150,13 +150,19 @@ export const workoutFromDbRows = (
     args?: { workoutId?: string; workoutName?: string; isFavorite?: boolean },
 ): Workout => {
     const workoutBlocks = workoutBlocksFromDbRows(blocks, exercisesByBlockId);
+    const exerciseCount = workoutBlocks.reduce(
+        (total, block) => total + block.exercises.length,
+        0,
+    );
 
     return {
         id: args?.workoutId ?? version.id,
         name: args?.workoutName ?? version.name,
         blocks: workoutBlocks,
         updatedAtMs: version.updatedAtMs,
-        isFavorite: args?.isFavorite,
+        isFavorite: args?.isFavorite ?? false,
+        blockCount: workoutBlocks.length,
+        exerciseCount,
     };
 };
 

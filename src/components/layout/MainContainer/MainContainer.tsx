@@ -9,7 +9,9 @@ import {
     Platform,
     ScrollView,
     View,
+    type StyleProp,
     type View as ReactNativeView,
+    type ViewStyle,
 } from 'react-native';
 
 import { TopBar } from '@src/components/navigation/TopBar/TopBar';
@@ -28,7 +30,9 @@ type MainContainerProps = {
     children: ReactNode;
     scroll?: boolean;
     gap?: number;
+    hasCustomHeader?: boolean;
     noPadding?: boolean;
+    containerStyle?: StyleProp<ViewStyle>;
     topBarOptions?: readonly TopBarOption[];
     topBarLeftMode?: TopBarLeftMode;
     topBarLeftAction?: TopBarDirectAction;
@@ -52,7 +56,9 @@ export const MainContainer = forwardRef<
             children,
             scroll = true,
             gap = 8,
+            hasCustomHeader = false,
             noPadding = false,
+            containerStyle,
             topBarOptions,
             topBarLeftMode,
             topBarLeftAction,
@@ -80,7 +86,7 @@ export const MainContainer = forwardRef<
         const content = scroll ? (
             <ScrollView
                 ref={scrollViewRef}
-                contentContainerStyle={st.content}
+                contentContainerStyle={[st.content, containerStyle]}
                 keyboardShouldPersistTaps="handled"
                 onScroll={monitorScroll}
                 scrollEventThrottle={16}
@@ -88,11 +94,11 @@ export const MainContainer = forwardRef<
                 {children}
             </ScrollView>
         ) : (
-            <View style={st.content}>{children}</View>
+            <View style={[st.content, containerStyle]}>{children}</View>
         );
 
         return (
-            <ScreenShell hasTopBar={!!title}>
+            <ScreenShell hasTopBar={!!title || hasCustomHeader}>
                 {title ? (
                     <TopBar
                         title={title}

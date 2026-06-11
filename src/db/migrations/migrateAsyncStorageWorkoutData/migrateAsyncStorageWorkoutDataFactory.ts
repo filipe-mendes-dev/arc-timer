@@ -1,4 +1,4 @@
-import type { Workout } from '@src/core/entities/entities';
+import type { Workout } from '@src/core/entities/workout.interfaces';
 import type { WorkoutSession } from '@src/core/entities/workoutSession.interfaces';
 import { uid } from '@src/core/id';
 
@@ -257,6 +257,7 @@ export const createAsyncStorageMigration =
                 id: session.id,
                 startedAtMs: session.startedAtMs,
                 endedAtMs: session.endedAtMs,
+                workoutName: workoutSnapshot.name,
                 workoutSnapshot,
                 workoutVersionId,
                 totalDurationSec: session.totalDurationSec,

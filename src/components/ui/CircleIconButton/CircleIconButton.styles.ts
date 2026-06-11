@@ -1,14 +1,15 @@
 import { StyleSheet } from 'react-native';
 import { createStyles } from '@src/theme/createStyles';
 import type { AppTheme } from '@src/theme/theme';
+import { colors } from '@src/theme/colors';
 
 export const useCircleIconButtonStyles = createStyles((theme: AppTheme) =>
     StyleSheet.create({
         primaryCircle: {
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: theme.palette.accent.surface,
-            shadowColor: '#000000',
+            backgroundColor: theme.palette.accent.primary,
+            shadowColor: colors.black.main,
             shadowOffset: { width: 0, height: 6 },
             shadowOpacity: 0.35,
             shadowRadius: 10,
@@ -20,5 +21,5 @@ export const useCircleIconButtonStyles = createStyles((theme: AppTheme) =>
             justifyContent: 'center',
             backgroundColor: theme.palette.button.secondary,
         },
-    })
+    }),
 );

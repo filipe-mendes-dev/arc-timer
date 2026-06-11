@@ -1,19 +1,39 @@
-import { and, asc, eq, exists, like, or } from 'drizzle-orm';
+import { and, asc, eq, exists, like, ne, or } from 'drizzle-orm';
 import type { BaseSQLiteDatabase } from 'drizzle-orm/sqlite-core';
 
 import type {
     ExerciseDefinition,
     ExerciseDefinitionAvailability,
+    ExerciseDefinitionDeleteBlockReason,
+    ExerciseDefinitionListItem,
+    ExerciseDefinitionRecentSessionItem,
+    ExerciseDefinitionReferenceItem,
+    ExerciseDefinitionReferenceKind,
+    ExerciseDefinitionReferences,
     ExerciseDefinitionSource,
-} from '@src/core/entities/entities';
+} from '@src/core/entities/exerciseDefinition.interfaces';
 import { normalizeExerciseName } from '@src/core/exercises/normalizeExerciseName';
 
 import {
     exerciseDefinitionsTable,
+    gymExerciseRecordsTable,
+    gymSessionsTable,
+    gymPlanSectionsTable,
+    gymPlanExercisesTable,
+    gymPlansTable,
+    workoutBlocksTable,
     workoutExercisesTable,
+    workoutSessionsTable,
+    workoutVersionsTable,
+    workoutsTable,
 } from '../../schema';
-import { buildExerciseDefinitionError } from './exerciseDefinitionErrors';
+import {
+    createExerciseDefinitionError,
+    exerciseDefinitionErrors,
+} from './exerciseDefinitionErrors';
 import type * as schema from '../../schema';
+import type { ExerciseDefinitionDataRepository } from './exerciseDefinitionDataRepositoryFactory';
+import type { ExerciseDefinitionStatsRepository } from './exerciseDefinitionStatsRepositoryFactory';
 
 export type ExerciseDefinitionRepositoryDb = BaseSQLiteDatabase<
     'sync',
@@ -23,6 +43,20 @@ export type ExerciseDefinitionRepositoryDb = BaseSQLiteDatabase<
 
 type ExerciseDefinitionDbInsert = typeof exerciseDefinitionsTable.$inferInsert;
 type ExerciseDefinitionDbRow = typeof exerciseDefinitionsTable.$inferSelect;
+
+interface ExerciseDefinitionBaseListItem {
+    id: string;
+    name: string;
+    normalizedName: string;
+    source: ExerciseDefinitionSource;
+    availability: ExerciseDefinitionAvailability;
+    createdAtMs: number;
+    updatedAtMs: number;
+}
+
+interface ExerciseDefinitionRecentSessionRow extends ExerciseDefinitionRecentSessionItem {
+    startedAtMs: number;
+}
 
 export interface CreateExerciseDefinitionInput {
     availability: ExerciseDefinitionAvailability;
@@ -65,11 +99,28 @@ export interface ExerciseDefinitionListParams {
 export interface ExerciseDefinitionRepository {
     create: (input: CreateExerciseDefinitionInput) => ExerciseDefinition;
     deleteById: (id: string) => void;
-    getAll: () => ExerciseDefinition[];
+    getAll: () => ExerciseDefinitionListItem[];
     getById: (id: string) => ExerciseDefinition | null;
     getByNormalizedName: (normalizedName: string) => ExerciseDefinition | null;
+    getReferences: (id: string) => ExerciseDefinitionReferences;
+    getRecentTrainingSessions: (
+        id: string,
+        limit: number,
+    ) => ExerciseDefinitionRecentSessionItem[];
+    hasGymSessionExerciseReferences: (id: string) => boolean;
+    hasGymPlanExerciseReferences: (id: string) => boolean;
     hasWorkoutExerciseReferences: (id: string) => boolean;
-    list: (params?: ExerciseDefinitionListParams) => ExerciseDefinition[];
+    list: (
+        params?: ExerciseDefinitionListParams,
+    ) => ExerciseDefinitionListItem[];
+    replaceGymPlanExerciseDefinitionReferences: (input: {
+        sourceId: string;
+        targetId: string;
+    }) => void;
+    replaceGymSessionExerciseDefinitionReferences: (input: {
+        sourceId: string;
+        targetId: string;
+    }) => void;
     replaceWorkoutExerciseDefinitionReferences: (input: {
         sourceId: string;
         targetId: string;
@@ -79,11 +130,13 @@ export interface ExerciseDefinitionRepository {
 
 export interface CreateExerciseDefinitionRepositoryArgs {
     db: ExerciseDefinitionRepositoryDb;
+    exerciseDefinitionDataRepository: ExerciseDefinitionDataRepository;
+    exerciseDefinitionStatsRepository: ExerciseDefinitionStatsRepository;
 }
 
 const exerciseDefinitionFromRow = (
     row: ExerciseDefinitionDbRow,
-): ExerciseDefinition => ({
+): ExerciseDefinitionBaseListItem => ({
     id: row.id,
     name: row.name,
     normalizedName: row.normalizedName,
@@ -93,22 +146,39 @@ const exerciseDefinitionFromRow = (
     updatedAtMs: row.updatedAtMs,
 });
 
+const exerciseDefinitionFromListItem = (
+    item: ExerciseDefinitionListItem,
+    exerciseDefinitionDataRepository: ExerciseDefinitionDataRepository,
+    exerciseDefinitionStatsRepository: ExerciseDefinitionStatsRepository,
+): ExerciseDefinition => ({
+    ...item,
+    data:
+        exerciseDefinitionDataRepository.getByExerciseDefinitionId(item.id) ??
+        undefined,
+    stats:
+        exerciseDefinitionStatsRepository.getByExerciseDefinitionId(item.id) ??
+        undefined,
+});
+
 export const createExerciseDefinitionRepository = ({
     db,
+    exerciseDefinitionDataRepository,
+    exerciseDefinitionStatsRepository,
 }: CreateExerciseDefinitionRepositoryArgs): ExerciseDefinitionRepository => {
     const assertUniqueNormalizedName = (
         normalizedName: string,
         existingId?: string,
     ): void => {
         if (normalizedName.length === 0) {
-            throw new Error('Exercise definition normalized name cannot be blank');
+            throw new Error(
+                'Exercise definition normalized name cannot be blank',
+            );
         }
 
         const existing = repository.getByNormalizedName(normalizedName);
         if (existing && existing.id !== existingId) {
-            throw buildExerciseDefinitionError(
-                'DUPLICATE_NAME',
-                `Exercise definition already exists for normalized name "${normalizedName}"`,
+            throw createExerciseDefinitionError(
+                exerciseDefinitionErrors.duplicateName,
             );
         }
     };
@@ -126,17 +196,100 @@ export const createExerciseDefinitionRepository = ({
         return normalizedName.length > 0 ? normalizedName : undefined;
     };
 
+    const getDeleteBlockReason = (
+        item: ExerciseDefinitionBaseListItem,
+    ): ExerciseDefinitionDeleteBlockReason | undefined => {
+        if (item.source === 'system') return 'system';
+
+        const hasReferences =
+            repository.hasWorkoutExerciseReferences(item.id) ||
+            repository.hasGymSessionExerciseReferences(item.id) ||
+            repository.hasGymPlanExerciseReferences(item.id);
+
+        return hasReferences ? 'referenced' : undefined;
+    };
+
+    const withDeleteMetadata = (
+        item: ExerciseDefinitionBaseListItem,
+    ): ExerciseDefinitionListItem => {
+        const deleteBlockReason = getDeleteBlockReason(item);
+
+        if (deleteBlockReason) {
+            return {
+                ...item,
+                canDelete: false,
+                deleteBlockReason,
+            };
+        }
+
+        return {
+            ...item,
+            canDelete: true,
+        };
+    };
+
+    const getReferenceKey = (item: ExerciseDefinitionReferenceItem): string =>
+        `${item.kind}:${item.id}`;
+
+    const toReferenceItems = (
+        items: { id: string; name: string }[],
+        kind: ExerciseDefinitionReferenceKind,
+    ): ExerciseDefinitionReferenceItem[] =>
+        items.map((item) => ({
+            ...item,
+            kind,
+        }));
+
+    const uniqueReferenceItems = (
+        items: ExerciseDefinitionReferenceItem[],
+    ): ExerciseDefinitionReferenceItem[] => {
+        const itemById = new Map<string, ExerciseDefinitionReferenceItem>();
+
+        items.forEach((item) => {
+            itemById.set(getReferenceKey(item), item);
+        });
+
+        return Array.from(itemById.values()).sort((left, right) =>
+            left.name.localeCompare(right.name),
+        );
+    };
+
+    const normalizeRecentSessionLimit = (limit: number): number =>
+        Number.isInteger(limit) && limit > 0 ? limit : 5;
+
+    const getTrainingSessionKey = (
+        item: ExerciseDefinitionRecentSessionRow,
+    ): string => `${item.kind}:${item.id}`;
+
+    const uniqueTrainingSessionItems = (
+        items: ExerciseDefinitionRecentSessionRow[],
+        limit: number,
+    ): ExerciseDefinitionRecentSessionItem[] => {
+        const itemByKey = new Map<string, ExerciseDefinitionRecentSessionRow>();
+
+        items.forEach((item) => {
+            itemByKey.set(getTrainingSessionKey(item), item);
+        });
+
+        return Array.from(itemByKey.values())
+            .sort((left, right) => right.startedAtMs - left.startedAtMs)
+            .slice(0, normalizeRecentSessionLimit(limit))
+            .map(({ id, kind, title }) => ({ id, kind, title }));
+    };
+
     const repository: ExerciseDefinitionRepository = {
         create: (input: CreateExerciseDefinitionInput): ExerciseDefinition => {
             assertUniqueNormalizedName(input.normalizedName);
 
             const definitionInsert: ExerciseDefinitionDbInsert = input;
 
-            db.insert(exerciseDefinitionsTable)
-                .values(definitionInsert)
-                .run();
+            db.insert(exerciseDefinitionsTable).values(definitionInsert).run();
 
-            return input;
+            return exerciseDefinitionFromListItem(
+                withDeleteMetadata(input),
+                exerciseDefinitionDataRepository,
+                exerciseDefinitionStatsRepository,
+            );
         },
 
         deleteById: (id: string): void => {
@@ -145,13 +298,15 @@ export const createExerciseDefinitionRepository = ({
                 .run();
         },
 
-        getAll: (): ExerciseDefinition[] =>
+        getAll: (): ExerciseDefinitionListItem[] =>
             db
                 .select()
                 .from(exerciseDefinitionsTable)
                 .orderBy(asc(exerciseDefinitionsTable.name))
                 .all()
-                .map(exerciseDefinitionFromRow),
+                .map((row) =>
+                    withDeleteMetadata(exerciseDefinitionFromRow(row)),
+                ),
 
         getById: (id: string): ExerciseDefinition | null => {
             const row = db
@@ -160,7 +315,13 @@ export const createExerciseDefinitionRepository = ({
                 .where(eq(exerciseDefinitionsTable.id, id))
                 .get();
 
-            return row ? exerciseDefinitionFromRow(row) : null;
+            return row
+                ? exerciseDefinitionFromListItem(
+                      withDeleteMetadata(exerciseDefinitionFromRow(row)),
+                      exerciseDefinitionDataRepository,
+                      exerciseDefinitionStatsRepository,
+                  )
+                : null;
         },
 
         getByNormalizedName: (
@@ -169,10 +330,183 @@ export const createExerciseDefinitionRepository = ({
             const row = db
                 .select()
                 .from(exerciseDefinitionsTable)
-                .where(eq(exerciseDefinitionsTable.normalizedName, normalizedName))
+                .where(
+                    eq(exerciseDefinitionsTable.normalizedName, normalizedName),
+                )
                 .get();
 
-            return row ? exerciseDefinitionFromRow(row) : null;
+            return row
+                ? exerciseDefinitionFromListItem(
+                      withDeleteMetadata(exerciseDefinitionFromRow(row)),
+                      exerciseDefinitionDataRepository,
+                      exerciseDefinitionStatsRepository,
+                  )
+                : null;
+        },
+
+        getReferences: (id: string): ExerciseDefinitionReferences => {
+            const workoutReferences = db
+                .select({
+                    id: workoutsTable.id,
+                    name: workoutsTable.name,
+                })
+                .from(workoutExercisesTable)
+                .innerJoin(
+                    workoutBlocksTable,
+                    eq(workoutExercisesTable.blockId, workoutBlocksTable.id),
+                )
+                .innerJoin(
+                    workoutsTable,
+                    eq(
+                        workoutBlocksTable.workoutVersionId,
+                        workoutsTable.currentVersionId,
+                    ),
+                )
+                .where(eq(workoutExercisesTable.exerciseDefinitionId, id))
+                .orderBy(asc(workoutsTable.name))
+                .all();
+
+            const gymPlanReferences = db
+                .select({
+                    id: gymPlansTable.id,
+                    name: gymPlansTable.name,
+                })
+                .from(gymPlanExercisesTable)
+                .innerJoin(
+                    gymPlanSectionsTable,
+                    eq(
+                        gymPlanExercisesTable.gymPlanSectionId,
+                        gymPlanSectionsTable.id,
+                    ),
+                )
+                .innerJoin(
+                    gymPlansTable,
+                    eq(gymPlanSectionsTable.gymPlanId, gymPlansTable.id),
+                )
+                .where(
+                    and(
+                        eq(gymPlanExercisesTable.exerciseDefinitionId, id),
+                        ne(gymPlansTable.status, 'draft'),
+                    ),
+                )
+                .orderBy(asc(gymPlansTable.name))
+                .all();
+
+            const references = [
+                ...toReferenceItems(workoutReferences, 'workout'),
+                ...toReferenceItems(gymPlanReferences, 'gymPlan'),
+            ];
+
+            return {
+                items: uniqueReferenceItems(references),
+            };
+        },
+
+        getRecentTrainingSessions: (
+            id: string,
+            limit: number,
+        ): ExerciseDefinitionRecentSessionItem[] => {
+            const gymRows = db
+                .select({
+                    id: gymSessionsTable.id,
+                    startedAtMs: gymSessionsTable.startedAtMs,
+                    sourceGymPlanName: gymSessionsTable.sourceGymPlanName,
+                    gymPlanName: gymPlansTable.name,
+                })
+                .from(gymExerciseRecordsTable)
+                .innerJoin(
+                    gymSessionsTable,
+                    eq(
+                        gymExerciseRecordsTable.gymSessionId,
+                        gymSessionsTable.id,
+                    ),
+                )
+                .leftJoin(
+                    gymPlansTable,
+                    eq(gymSessionsTable.sourceGymPlanId, gymPlansTable.id),
+                )
+                .where(
+                    and(
+                        eq(gymExerciseRecordsTable.exerciseDefinitionId, id),
+                        eq(gymSessionsTable.status, 'completed'),
+                    ),
+                )
+                .all();
+            const gymItems: ExerciseDefinitionRecentSessionRow[] = gymRows.map(
+                (row) => {
+                    const title = row.sourceGymPlanName ?? '';
+
+                    return {
+                        id: row.id,
+                        kind: 'gym',
+                        title,
+                        sourceGymPlanName: row.sourceGymPlanName ?? undefined,
+                        startedAtMs: row.startedAtMs,
+                    };
+                },
+            );
+
+            const hiitRows = db
+                .select({
+                    id: workoutSessionsTable.id,
+                    startedAtMs: workoutSessionsTable.startedAtMs,
+                    workoutName: workoutVersionsTable.name,
+                })
+                .from(workoutSessionsTable)
+                .innerJoin(
+                    workoutBlocksTable,
+                    eq(
+                        workoutSessionsTable.workoutVersionId,
+                        workoutBlocksTable.workoutVersionId,
+                    ),
+                )
+                .innerJoin(
+                    workoutExercisesTable,
+                    eq(workoutBlocksTable.id, workoutExercisesTable.blockId),
+                )
+                .innerJoin(
+                    workoutVersionsTable,
+                    eq(
+                        workoutSessionsTable.workoutVersionId,
+                        workoutVersionsTable.id,
+                    ),
+                )
+                .where(eq(workoutExercisesTable.exerciseDefinitionId, id))
+                .all();
+            const hiitItems: ExerciseDefinitionRecentSessionRow[] =
+                hiitRows.map((row) => ({
+                    id: row.id,
+                    kind: 'hiit',
+                    title: row.workoutName,
+                    startedAtMs: row.startedAtMs,
+                }));
+
+            return uniqueTrainingSessionItems(
+                [...gymItems, ...hiitItems],
+                limit,
+            );
+        },
+
+        hasGymSessionExerciseReferences: (id: string): boolean => {
+            const reference = db
+                .select({ id: gymExerciseRecordsTable.id })
+                .from(gymExerciseRecordsTable)
+                .where(eq(gymExerciseRecordsTable.exerciseDefinitionId, id))
+                .limit(1)
+                .get();
+
+            return reference !== undefined;
+        },
+
+        hasGymPlanExerciseReferences: (id: string): boolean => {
+            const reference = db
+                .select({ id: gymPlanExercisesTable.id })
+                .from(gymPlanExercisesTable)
+                .where(eq(gymPlanExercisesTable.exerciseDefinitionId, id))
+                .limit(1)
+                .get();
+
+            return reference !== undefined;
         },
 
         hasWorkoutExerciseReferences: (id: string): boolean => {
@@ -190,7 +524,7 @@ export const createExerciseDefinitionRepository = ({
             filters,
             pagination,
             scope = 'active',
-        }: ExerciseDefinitionListParams = {}): ExerciseDefinition[] => {
+        }: ExerciseDefinitionListParams = {}): ExerciseDefinitionListItem[] => {
             const normalizedNameFilter = normalizeNameFilter(filters?.name);
             const normalizedNamePrefixFilter = normalizeNameFilter(
                 filters?.namePrefix,
@@ -206,6 +540,17 @@ export const createExerciseDefinitionRepository = ({
                                   .where(
                                       eq(
                                           workoutExercisesTable.exerciseDefinitionId,
+                                          exerciseDefinitionsTable.id,
+                                      ),
+                                  ),
+                          ),
+                          exists(
+                              db
+                                  .select({ id: gymPlanExercisesTable.id })
+                                  .from(gymPlanExercisesTable)
+                                  .where(
+                                      eq(
+                                          gymPlanExercisesTable.exerciseDefinitionId,
                                           exerciseDefinitionsTable.id,
                                       ),
                                   ),
@@ -247,7 +592,31 @@ export const createExerciseDefinitionRepository = ({
             const rows =
                 limit === undefined ? query.all() : query.limit(limit).all();
 
-            return rows.map(exerciseDefinitionFromRow);
+            return rows.map((row) =>
+                withDeleteMetadata(exerciseDefinitionFromRow(row)),
+            );
+        },
+
+        replaceGymPlanExerciseDefinitionReferences: ({
+            sourceId,
+            targetId,
+        }): void => {
+            db.update(gymPlanExercisesTable)
+                .set({ exerciseDefinitionId: targetId })
+                .where(eq(gymPlanExercisesTable.exerciseDefinitionId, sourceId))
+                .run();
+        },
+
+        replaceGymSessionExerciseDefinitionReferences: ({
+            sourceId,
+            targetId,
+        }): void => {
+            db.update(gymExerciseRecordsTable)
+                .set({ exerciseDefinitionId: targetId })
+                .where(
+                    eq(gymExerciseRecordsTable.exerciseDefinitionId, sourceId),
+                )
+                .run();
         },
 
         replaceWorkoutExerciseDefinitionReferences: ({
@@ -263,19 +632,25 @@ export const createExerciseDefinitionRepository = ({
         update: (input: UpdateExerciseDefinitionInput): ExerciseDefinition => {
             const existing = repository.getById(input.id);
             if (!existing) {
-                throw new Error(`Exercise definition ${input.id} was not found`);
+                throw new Error(
+                    `Exercise definition ${input.id} was not found`,
+                );
             }
 
-            if (input.normalizedName !== undefined) {
+            if (
+                input.normalizedName !== undefined &&
+                input.normalizedName !== existing.normalizedName
+            ) {
                 assertUniqueNormalizedName(input.normalizedName, input.id);
             }
 
-            const next: ExerciseDefinition = {
-                ...existing,
+            const next: ExerciseDefinitionBaseListItem = {
+                id: existing.id,
                 name: input.name ?? existing.name,
                 normalizedName: input.normalizedName ?? existing.normalizedName,
                 source: input.source ?? existing.source,
                 availability: input.availability ?? existing.availability,
+                createdAtMs: existing.createdAtMs,
                 updatedAtMs: input.updatedAtMs,
             };
             const updateValues: Partial<ExerciseDefinitionDbInsert> = {
@@ -291,7 +666,11 @@ export const createExerciseDefinitionRepository = ({
                 .where(eq(exerciseDefinitionsTable.id, input.id))
                 .run();
 
-            return next;
+            return exerciseDefinitionFromListItem(
+                withDeleteMetadata(next),
+                exerciseDefinitionDataRepository,
+                exerciseDefinitionStatsRepository,
+            );
         },
     };
 

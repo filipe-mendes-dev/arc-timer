@@ -10,6 +10,7 @@ import { Button } from '@src/components/ui/Button/Button';
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import { CircleIconButton } from '@src/components/ui/CircleIconButton/CircleIconButton';
+import { WorkoutBlockItem } from '@src/screens/EditWorkoutScreen/components/WorkoutBlockItem/WorkoutBlockItem';
 import { type ShareRunStats } from '@src/screens/WorkoutRunScreen/components/ShareWorkoutCard/ShareWorkoutCard';
 import { ShareWorkoutModal } from '@src/components/modals/ShareWorkoutModal/ShareWorkoutModal';
 import ConfirmDialog from '@src/components/modals/ConfirmDialog/ConfirmDialog';
@@ -140,46 +141,7 @@ const HistorySessionScreen = () => {
         completedSetsByBlock: stats?.completedSetsByBlock ?? [],
     };
 
-    const perBlock = (() => {
-        if (!stats) return [];
-        const blocks = session.workoutSnapshot.blocks;
-
-        const setsByBlock = stats.completedSetsByBlock ?? [];
-        const exByBlock = stats.completedExercisesByBlock ?? [];
-        const workByBlock = stats.workSecByBlock ?? [];
-        const restByBlock = stats.restSecByBlock ?? [];
-
-        const count = Math.max(
-            blocks.length,
-            setsByBlock.length,
-            exByBlock.length,
-            workByBlock.length,
-            restByBlock.length,
-        );
-
-        return Array.from({ length: count }, (_, i) => {
-            const rawTitle = blocks[i]?.title?.trim();
-            const title =
-                rawTitle && rawTitle.length > 0
-                    ? rawTitle
-                    : t('common.labels.blockWithIndex', { index: i + 1 });
-            const isAutoTitle = !(rawTitle && rawTitle.length > 0);
-
-            return {
-                blockIndex: i,
-                title,
-                isAutoTitle,
-                completedSets: setsByBlock[i] ?? 0,
-                completedExercises: exByBlock[i] ?? 0,
-                workSec: workByBlock[i] ?? 0,
-                restSec: restByBlock[i] ?? 0,
-            };
-        });
-    })();
-
-    const hasCompletedBlocks = perBlock.some(
-        (b) => b.completedSets > 0 || b.completedExercises > 0,
-    );
+    const hasSnapshotBlocks = session.workoutSnapshot.blocks.length > 0;
 
     const metrics: SessionStatsMetric[] = [
         {
@@ -275,6 +237,10 @@ const HistorySessionScreen = () => {
     };
 
     const canOpenWorkout = !!session.workoutSnapshot;
+
+    const handleOpenExerciseDefinition = (exerciseDefinitionId: string) => {
+        router.push(`/exercise-definitions/${exerciseDefinitionId}`);
+    };
 
     const openSharePreview = () => {
         setShareVisible(true);
@@ -459,147 +425,27 @@ const HistorySessionScreen = () => {
                     />
                 </ScreenSection>
 
-                {/* Blocks Breakdown */}
-                {hasCompletedBlocks ? (
-                    <ScreenSection
-                        title={t('historySession.byBlock')}
-                        topSpacing="large"
-                        gap={theme.layout.listItem.gap}
-                    >
-                        {perBlock
-                            .filter(
-                                (b) =>
-                                    b.completedSets > 0 ||
-                                    b.completedExercises > 0,
-                            )
-                            .map((b) => (
-                                <MetaCard
-                                    key={`block-${b.blockIndex}`}
-                                    containerStyle={st.blockCard}
-                                    topLeftContent={{
-                                        text: b.title,
-                                        icon: (
-                                            <AppIcon
-                                                id="block"
-                                                size={14}
-                                                color={
-                                                    theme.palette.metaCard
-                                                        .topLeftContent.text
-                                                }
-                                            />
-                                        ),
-                                        backgroundColor:
-                                            theme.palette.metaCard
-                                                .topLeftContent.background,
-                                        color: theme.palette.metaCard
-                                            .topLeftContent.text,
-                                        borderColor:
-                                            theme.palette.metaCard
-                                                .topLeftContent.border,
-                                    }}
-                                    summaryContent={
-                                        <View style={st.blockStatsRow}>
-                                            <View style={st.blockStatItem}>
-                                                <AppText
-                                                    variant="bodySmall"
-                                                    tone="secondary"
-                                                    style={st.blockStatLabel}
-                                                >
-                                                    {t(
-                                                        'historySession.blockStats.sets',
-                                                    )}
-                                                </AppText>
-                                                <AppText
-                                                    variant="bodySmall"
-                                                    tone={
-                                                        b.completedSets === 0
-                                                            ? 'muted'
-                                                            : 'primary'
-                                                    }
-                                                >
-                                                    {b.completedSets}
-                                                </AppText>
-                                            </View>
-
-                                            <View style={st.blockStatItem}>
-                                                <AppText
-                                                    variant="bodySmall"
-                                                    tone="secondary"
-                                                    style={st.blockStatLabel}
-                                                >
-                                                    {t(
-                                                        'historySession.blockStats.exercises',
-                                                    )}
-                                                </AppText>
-                                                <AppText
-                                                    variant="bodySmall"
-                                                    tone={
-                                                        b.completedExercises ===
-                                                        0
-                                                            ? 'muted'
-                                                            : 'primary'
-                                                    }
-                                                >
-                                                    {b.completedExercises}
-                                                </AppText>
-                                            </View>
-
-                                            <View style={st.blockStatItem}>
-                                                <AppText
-                                                    variant="bodySmall"
-                                                    tone="secondary"
-                                                    style={st.blockStatLabel}
-                                                >
-                                                    {t(
-                                                        'historySession.blockStats.work',
-                                                    )}
-                                                </AppText>
-                                                <AppText
-                                                    variant="bodySmall"
-                                                    tone={
-                                                        b.workSec === 0
-                                                            ? 'muted'
-                                                            : 'primary'
-                                                    }
-                                                >
-                                                    {formatWorkoutDuration(
-                                                        b.workSec,
-                                                    )}
-                                                </AppText>
-                                            </View>
-
-                                            <View style={st.blockStatItem}>
-                                                <AppText
-                                                    variant="bodySmall"
-                                                    tone="secondary"
-                                                    style={st.blockStatLabel}
-                                                >
-                                                    {t(
-                                                        'historySession.blockStats.rest',
-                                                    )}
-                                                </AppText>
-                                                <AppText variant="bodySmall">
-                                                    {formatWorkoutDuration(
-                                                        b.restSec,
-                                                    )}
-                                                </AppText>
-                                            </View>
-                                        </View>
-                                    }
-                                />
-                            ))}
-                    </ScreenSection>
-                ) : (
-                    <ScreenSection
-                        title={t('historySession.byBlock')}
-                        topSpacing="large"
-                        gap={theme.layout.listItem.gap}
-                    >
+                <ScreenSection
+                    title={t('historySession.exercises')}
+                    topSpacing="large"
+                    gap={theme.layout.listItem.gap}
+                >
+                    {hasSnapshotBlocks ? (
+                        session.workoutSnapshot.blocks.map((block, index) => (
+                            <WorkoutBlockItem
+                                key={block.id}
+                                block={block}
+                                index={index}
+                                initiallyExpanded
+                                onExercisePress={handleOpenExerciseDefinition}
+                            />
+                        ))
+                    ) : (
                         <AppText variant="bodySmall" tone="muted">
-                            {t('historySession.noCompletedBlocks')}
+                            {t('historySession.noExercises')}
                         </AppText>
-                    </ScreenSection>
-                )}
+                    )}
+                </ScreenSection>
 
                 {/* Actions */}
                 <ScreenSection topSpacing="medium" gap={8}>

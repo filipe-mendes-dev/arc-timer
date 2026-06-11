@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Pressable, View, type LayoutChangeEvent } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@src/components/ui/Typography/AppText';
+import { AppIcon, type IconId } from '@src/components/ui/Icon/AppIcon';
 import { useTheme } from '@src/theme/ThemeProvider';
 import { Watermark } from '@src/components/ui/Watermark/Watermark';
 import { useStyles } from './HomeActionTile.styles';
 
-export type HomeActionTileProps = {
+export interface HomeActionTileProps {
     title: string;
     subtitle?: string;
-    icon: React.ComponentProps<typeof Ionicons>['name'];
+    icon: IconId;
     variant?: 'primary' | 'secondary';
     onPress: () => void;
-};
+}
 
 export const HomeActionTile = ({
     title,
@@ -24,6 +24,15 @@ export const HomeActionTile = ({
     const { theme } = useTheme();
     const st = useStyles({ variant });
     const [tileHeight, setTileHeight] = useState<number | null>(null);
+    let iconSize = 22;
+    let iconColor = theme.palette.text.primary;
+    let titleVariant: 'body' | 'title3' = 'body';
+
+    if (variant === 'primary') {
+        iconSize = 26;
+        iconColor = theme.palette.text.inverted;
+        titleVariant = 'title3';
+    }
 
     const handleLayout = (event: LayoutChangeEvent) => {
         const { height } = event.nativeEvent.layout;
@@ -49,26 +58,22 @@ export const HomeActionTile = ({
                     sizeScale={0.9}
                 />
             )}
-            <Ionicons
-                name={icon}
-                size={variant === 'primary' ? 26 : 22}
-                color={
-                    variant === 'primary'
-                        ? theme.palette.text.inverted
-                        : theme.palette.text.primary
-                }
+            <AppIcon
+                id={icon}
+                size={iconSize}
+                color={iconColor}
             />
 
             <View style={st.textBlock}>
                 <AppText
-                    variant={variant === 'primary' ? 'title3' : 'body'}
+                    variant={titleVariant}
                     style={st.title}
                 >
                     {title}
                 </AppText>
 
                 {subtitle ? (
-                    <AppText variant="bodySmall" tone="inverted">
+                    <AppText variant="bodySmall" style={st.subtitle}>
                         {subtitle}
                     </AppText>
                 ) : null}

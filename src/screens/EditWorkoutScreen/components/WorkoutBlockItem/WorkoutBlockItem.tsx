@@ -1,20 +1,12 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { View } from 'react-native';
-import Animated, {
-    cancelAnimation,
-    Easing,
-    useAnimatedStyle,
-    useSharedValue,
-    withDelay,
-    withRepeat,
-    withSequence,
-    withTiming,
-} from 'react-native-reanimated';
-import { Ionicons } from '@expo/vector-icons';
 
-import type { WorkoutBlock } from '@src/core/entities/entities';
+import type { WorkoutBlock } from '@src/core/entities/workout.interfaces';
+import { AppIcon } from '@src/components/ui/Icon/AppIcon';
+import { IndexedListItem } from '@src/components/ui/IndexedListItem';
 import { MetaCard } from '@src/components/ui/MetaCard/MetaCard';
 import { AppText } from '@src/components/ui/Typography/AppText';
+import { WiggleView } from '@src/components/ui/WiggleView';
 import { useTheme } from '@src/theme/ThemeProvider';
 import { useWorkoutBlockItemStyles } from './WorkoutBlockItem.styles';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 type WorkoutBlockItemProps = {
     index: number;
     block: WorkoutBlock;
+    onExercisePress?: (exerciseDefinitionId: string) => void;
     onPress?: (id: string) => void;
     onRemove?: (id: string) => void;
     expanded?: boolean;
@@ -30,14 +23,10 @@ type WorkoutBlockItemProps = {
     isWiggling?: boolean;
 };
 
-const SHAKE_DISTANCE = 1;
-const SHAKE_STEP_MS = 300;
-const PAUSE_BETWEEN_SHAKES_MS = 500;
-const INITIAL_DELAY_STAGGER_MS = 90;
-
 export const WorkoutBlockItem = ({
     index,
     block,
+    onExercisePress,
     onPress,
     onRemove,
     expanded = false,
@@ -48,56 +37,6 @@ export const WorkoutBlockItem = ({
     const { theme } = useTheme();
     const st = useWorkoutBlockItemStyles();
     const { sets, exercises } = block;
-
-    const wiggleValue = useSharedValue<number>(0);
-
-    const wiggleAnimatedStyle = useAnimatedStyle(() => ({
-        transform: [{ translateX: wiggleValue.value }],
-    }));
-
-    useEffect(() => {
-        if (!isWiggling) {
-            cancelAnimation(wiggleValue);
-            wiggleValue.value = 0;
-            return;
-        }
-
-        const initialDelayMs = index * INITIAL_DELAY_STAGGER_MS;
-        const easing = Easing.inOut(Easing.quad);
-
-        wiggleValue.value = withDelay(
-            initialDelayMs,
-            withRepeat(
-                withSequence(
-                    withTiming(SHAKE_DISTANCE, {
-                        duration: SHAKE_STEP_MS,
-                        easing,
-                    }),
-                    withTiming(-SHAKE_DISTANCE, {
-                        duration: SHAKE_STEP_MS,
-                        easing,
-                    }),
-                    withTiming(SHAKE_DISTANCE, {
-                        duration: SHAKE_STEP_MS,
-                        easing,
-                    }),
-                    withTiming(0, {
-                        duration: SHAKE_STEP_MS,
-                        easing,
-                    }),
-                    withDelay(
-                        PAUSE_BETWEEN_SHAKES_MS,
-                        withTiming(0, {
-                            duration: 0,
-                            easing,
-                        })
-                    )
-                ),
-                -1
-            )
-        );
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [index, isWiggling]);
 
     const exerciseSummary = useMemo(() => {
         if (exercises.length === 0) return '';
@@ -148,12 +87,19 @@ export const WorkoutBlockItem = ({
     };
 
     const handlePress = onPress ? () => onPress(block.id) : undefined;
+    const getExercisePressHandler = (
+        exerciseDefinitionId?: string,
+    ): (() => void) | undefined => {
+        if (!exerciseDefinitionId || !onExercisePress) return undefined;
+
+        return () => onExercisePress(exerciseDefinitionId);
+    };
 
     const actionStrip = onRemove
         ? {
               icon: (
-                  <Ionicons
-                      name="trash-outline"
+                  <AppIcon
+                      id="trash"
                       size={18}
                       color={theme.palette.metaCard.actionStrip.icon}
                   />
@@ -172,14 +118,14 @@ export const WorkoutBlockItem = ({
     ].join(':');
 
     return (
-        <Animated.View style={isWiggling ? wiggleAnimatedStyle : undefined}>
+        <WiggleView index={index} isWiggling={isWiggling}>
             <MetaCard
                 measureKey={measureKey}
                 topLeftContent={{
                     text: blockLabel,
                     icon: (
-                        <Ionicons
-                            name="layers-outline"
+                        <AppIcon
+                            id="block"
                             size={14}
                             color={theme.palette.metaCard.topLeftContent.text}
                         />
@@ -198,8 +144,8 @@ export const WorkoutBlockItem = ({
                 summaryContent={
                     <View style={st.body}>
                         <View style={st.blockInfoRow}>
-                            <Ionicons
-                                name="timer-outline"
+                            <AppIcon
+                                id="duration"
                                 size={14}
                                 color={theme.palette.text.secondary}
                             />
@@ -212,49 +158,38 @@ export const WorkoutBlockItem = ({
                 collapsibleContent={
                     <View style={st.body}>
                         <View style={st.exercisesContainer}>
-                            {exercises.map((ex, i) => (
-                                <View key={ex.id} style={st.exerciseRow}>
-                                    <View style={st.exerciseIndexBubble}>
-                                        <AppText
-                                            variant="caption"
-                                            style={st.exerciseIndexText}
-                                        >
-                                            {i + 1}
-                                        </AppText>
-                                    </View>
+                            {exercises.map((ex, i) => {
+                                const mainContent =
+                                    ex.name ??
+                                    t(
+                                        'workoutBlockItem.labels.exerciseWithIndex',
+                                        {
+                                            index: i + 1,
+                                        },
+                                    );
+                                const secondaryContent = formatExerciseMeta(
+                                    ex.mode,
+                                    ex.value,
+                                );
+                                const handleExercisePress =
+                                    getExercisePressHandler(
+                                        ex.exerciseDefinitionId,
+                                    );
 
-                                    <View style={st.exerciseTexts}>
-                                        <AppText
-                                            variant="bodySmall"
-                                            tone="primary"
-                                            numberOfLines={1}
-                                        >
-                                            {ex.name ??
-                                                t(
-                                                    'workoutBlockItem.labels.exerciseWithIndex',
-                                                    {
-                                                        index: i + 1,
-                                                    }
-                                                )}
-                                        </AppText>
-
-                                        <AppText
-                                            variant="caption"
-                                            tone="muted"
-                                            numberOfLines={1}
-                                        >
-                                            {formatExerciseMeta(
-                                                ex.mode,
-                                                ex.value
-                                            )}
-                                        </AppText>
-                                    </View>
-                                </View>
-                            ))}
+                                return (
+                                    <IndexedListItem
+                                        key={ex.id}
+                                        index={i}
+                                        mainContent={mainContent}
+                                        onPress={handleExercisePress}
+                                        secondaryContent={secondaryContent}
+                                    />
+                                );
+                            })}
                         </View>
                     </View>
                 }
             />
-        </Animated.View>
+        </WiggleView>
     );
 };

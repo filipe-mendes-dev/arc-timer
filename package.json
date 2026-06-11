@@ -4,6 +4,7 @@
     "main": "expo-router/entry",
     "scripts": {
         "start": "expo start",
+        "db:generate": "drizzle-kit generate --name",
         "ios": "npm run guard:dev-variant && expo run:ios -d",
         "ios:build:dev": "npm run guard:dev-variant && expo run:ios -d --configuration Release",
         "android": "npm run guard:dev-variant && expo run:android -d",
@@ -32,6 +33,7 @@
         "android:release:aab": "npm run guard:prod-variant && cd android && ./gradlew bundleRelease",
         "android:install:release": "adb install -r android/app/build/outputs/apk/release/app-release.apk",
         "assets:classic": "node scripts/generate-classic-assets.js",
+        "i18n:keys": "node scripts/generate-i18n-keys.js",
         "cleaner": "node scripts/cleaner.js",
         "cleaner:hard": "node scripts/cleaner.js --hard"
     },
@@ -98,7 +100,8 @@
     },
     "private": true,
     "engines": {
-        "npm": ">=11.10.0"
+        "npm": ">=11.10.0",
+        "node": "22.12.0"
     },
     "devEngines": {
         "packageManager": {
@@ -111,5 +114,9 @@
         "esbuild": "0.25.12",
         "postcss": "8.5.10"
     },
-    "packageManager": "npm@11.14.1"
+    "packageManager": "npm@11.14.1",
+    "volta": {
+        "node": "22.12.0",
+        "npm": "11.14.1"
+    }
 }

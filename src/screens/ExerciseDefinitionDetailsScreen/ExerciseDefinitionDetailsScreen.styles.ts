@@ -4,7 +4,7 @@ import { createStyles } from '@src/theme/createStyles';
 import type { AppTheme } from '@src/theme/theme';
 
 export const useExerciseDefinitionDetailsScreenStyles = createStyles(
-    (_theme: AppTheme) =>
+    (theme: AppTheme) =>
         StyleSheet.create({
             center: {
                 flex: 1,
@@ -20,23 +20,64 @@ export const useExerciseDefinitionDetailsScreenStyles = createStyles(
             },
             overviewContainer: {
                 flexDirection: 'row',
-                alignItems: 'stretch',
-                justifyContent: 'space-between',
                 gap: 14,
             },
-            metricCard: {
-                flex: 1,
-                justifyContent: 'center',
+            detailGrid: {
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                gap: 14,
+                backgroundColor: theme.palette.background.card,
+                borderRadius: theme.layout.card.borderRadius,
+                padding: theme.layout.card.padding,
             },
-            metricCardWide: {
-                flex: 1.35,
-                justifyContent: 'center',
+            editableMetricValue: {
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 6,
+                minWidth: 0,
             },
-            metricLabel: {
-                marginBottom: 2,
+            flatList: {
+                gap: 14,
             },
-            metricValue: {
+            editableMetricText: {
+                flexShrink: 1,
                 fontWeight: '700',
+            },
+            sessionRow: {
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12,
+                paddingVertical: 10,
+                paddingHorizontal: 12,
+                borderRadius: theme.layout.card.borderRadius,
+                borderWidth: theme.layout.card.borderWidth,
+                borderColor: theme.palette.border.subtle,
+                backgroundColor: theme.palette.background.primary,
+            },
+            sessionInfo: {
+                flex: 1,
+                minWidth: 0,
+                gap: 4,
+            },
+            sessionTitle: {
+                color: theme.palette.text.primary,
+                fontWeight: '700',
+            },
+            sessionDurationPill: {
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 6,
+                paddingVertical: 6,
+                paddingHorizontal: 10,
+                borderRadius: 999,
+                backgroundColor: theme.palette.metaCard.datePill.background,
+            },
+            sessionDurationText: {
+                color: theme.palette.metaCard.datePill.icon,
+            },
+            availabilityModalOptions: {
+                gap: 8,
             },
         }),
 );

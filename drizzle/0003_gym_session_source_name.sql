@@ -1,0 +1,1 @@
+ALTER TABLE `gym_sessions` ADD `source_gym_plan_name` text;

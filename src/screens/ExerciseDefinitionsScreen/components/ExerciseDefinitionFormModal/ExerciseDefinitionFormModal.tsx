@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'expo-router';
 
 import type {
     ExerciseDefinition,
     ExerciseDefinitionAvailability,
-} from '@src/core/entities/entities';
+} from '@src/core/entities/exerciseDefinition.interfaces';
 import { Modal } from '@src/components/modals/Modal';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { Button } from '@src/components/ui/Button/Button';
@@ -34,6 +35,7 @@ export const ExerciseDefinitionFormModal = ({
     visible,
 }: ExerciseDefinitionFormModalProps) => {
     const { t } = useTranslation();
+    const router = useRouter();
     const st = useExerciseDefinitionFormModalStyles();
     const saveExerciseDefinition = useSaveExerciseDefinition();
 
@@ -113,33 +115,30 @@ export const ExerciseDefinitionFormModal = ({
                 return;
             }
 
-            await saveExerciseDefinition.mutateAsync({
+            const savedDefinition = await saveExerciseDefinition.mutateAsync({
                 availability,
                 intent: 'create',
                 name: trimmedName,
             });
             onClose();
+            router.push(`/exercise-definitions/${savedDefinition.id}`);
         } catch (e) {
             if (isExerciseDefinitionError(e)) {
                 switch (e.code) {
                     case 'DUPLICATE_NAME':
-                        setNameError(
-                            t('exerciseDefinitions.validation.duplicateName'),
-                        );
+                        setNameError(t(e.message));
                         return;
                     case 'GYM_ONLY_RESTRICTED':
-                        setAvailabilityError(
-                            t(
-                                'exerciseDefinitions.validation.gymOnlyRestricted',
-                            ),
-                        );
+                        setAvailabilityError(t(e.message));
+                        return;
+                    case 'WORKOUT_ONLY_RESTRICTED':
+                        setAvailabilityError(t(e.message));
                         return;
                     case 'DELETE_REFERENCED':
                     case 'DELETE_SYSTEM_FORBIDDEN':
                     case 'MERGE_GYM_ONLY_CONFLICT':
-                        setSaveError(
-                            t('exerciseDefinitions.validation.saveFailed'),
-                        );
+                    case 'MERGE_WORKOUT_ONLY_CONFLICT':
+                        setSaveError(t(e.message));
                         return;
                 }
             }

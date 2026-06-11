@@ -4,7 +4,7 @@ import type { WorkoutSession } from '@src/core/entities/workoutSession.interface
 import {
     workoutSessionFromDbRow,
     workoutSessionToDbRow,
-} from '@src/db/mappers/workoutSessionMapper';
+} from '@src/db/mappers/workouts/workoutSessionMapper';
 import {
     createSessionRowFixture,
     createSessionStatsFixture,
@@ -20,6 +20,7 @@ describe('workoutSessionToDbRow', () => {
             id: 'session-1',
             startedAtMs: 1_700_000_000_000,
             endedAtMs: 1_700_000_300_000,
+            workoutName: workoutSnapshot.name,
             workoutVersionId: 'version-1',
             workoutSnapshot,
             totalDurationSec: 300,
@@ -44,6 +45,7 @@ describe('workoutSessionToDbRow', () => {
             id: 'session-1',
             startedAtMs: 1_700_000_000_000,
             endedAtMs: 1_700_000_300_000,
+            workoutName: workoutSnapshot.name,
             workoutVersionId: 'version-1',
             workoutSnapshot,
         };
@@ -69,6 +71,7 @@ describe('workoutSessionFromDbRow', () => {
             endedAtMs: row.endedAtMs,
             activeWorkoutId: undefined,
             workoutVersionId: row.workoutVersionId,
+            workoutName: workoutSnapshot.name,
             workoutSnapshot,
             totalDurationSec: row.totalDurationSec ?? undefined,
             stats,

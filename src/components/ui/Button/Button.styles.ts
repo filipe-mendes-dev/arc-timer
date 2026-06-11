@@ -49,7 +49,8 @@ export const useButtonStyles = createStyles((theme: AppTheme) =>
             color: theme.palette.button.text.danger,
         },
         text_ghost: {
-            color: theme.palette.accent.primary,
+            color: theme.palette.text.muted,
+            fontWeight: '400',
         },
 
         // States
@@ -59,5 +60,5 @@ export const useButtonStyles = createStyles((theme: AppTheme) =>
         pressed: {
             opacity: 0.85,
         },
-    })
+    }),
 );

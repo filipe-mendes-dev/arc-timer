@@ -2,7 +2,7 @@ import type {
     Workout,
     WorkoutBlock,
     WorkoutExercise,
-} from '@src/core/entities/entities';
+} from '@src/core/entities/workout.interfaces';
 
 interface CanonicalExerciseContent {
     exerciseDefinitionId?: string;

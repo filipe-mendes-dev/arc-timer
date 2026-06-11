@@ -13,7 +13,10 @@ module.exports = {
         '<rootDir>/tests/**/*.test.tsx',
     ],
     moduleNameMapper: {
+        '^src/(.*)$': '<rootDir>/src/$1',
+        '^tests/(.*)$': '<rootDir>/tests/$1',
         '^@src/(.*)$': '<rootDir>/src/$1',
+        '^@tests/(.*)$': '<rootDir>/tests/$1',
         '^expo-modules-core/(.*)$':
             '<rootDir>/node_modules/expo/node_modules/expo-modules-core/$1',
         '^expo-modules-core$':

@@ -8,27 +8,31 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- Add SQLite persistence for workouts, workout sessions and exercise definitions using Drizzle and Expo SQLite
-- Add exercise definitions as a first-class workout concept with system seeding, user-created definitions, availability settings and reusable workout references
-- Add exercise definition list and detail screens with search, create, edit and workout block suggestion flows
+- Add a complete gym training mode with gym plans, active strength sessions, exercise set tracking, session summaries, gym history and plan-based session starts
+- Add gym plan management with import/export, section editing, exercise target sets and reusable exercise definitions
+- Add exercise definition tracking with default fields, personal records, references, recent training sessions, search, create/edit flows and workout block suggestions
+- Add SQLite persistence for workouts, workout sessions, gym plans, gym sessions, exercise definitions and training history using Drizzle and Expo SQLite
 - Add one-time migration from the previous AsyncStorage workout and history stores
-- Add workout version tracking so historical sessions keep stable workout snapshots after edits or deletion
-- Add React Query data hooks for workout, session and exercise definition reads, mutations and cache invalidation
-- Add Jest setup, service-focused integration tests, seed helpers and mapper unit tests for the SQLite data layer
-- Add selection mode UI for workouts and history sessions with selected item outlines and bulk removal confirmations
-- Add reusable top bar direct actions and shared selection state for list selection flows
+- Add workout version tracking so completed sessions keep stable workout snapshots after edits or deletion
+- Add React Query hooks, repositories, services, seed helpers, mapper tests and service-focused integration tests for the SQLite data layer
+- Add selection mode UI for workouts and history sessions with selected item outlines, shared selection state, reusable top bar actions and bulk removal confirmations
 
 ### Changed
 
-- Improve workout and workout session repositories, services and tests to support exercise definitions and stronger version-based data integrity
-- Add a main scroll controller for keyboard-aware scrolling, input dropdown coordination and validation target scrolling
-- Improve validation feedback by scrolling to the first invalid workout block field
+- Expand history to support both HIIT workout sessions and gym training sessions
 - Replace persisted workout and history Zustand stores with repository-backed data access and a draft-only workout store
+- Improve workout, gym, exercise definition and session data integrity with typed app errors, generated i18n keys and version-based persistence rules
+- Improve shared list, modal, search, metric, icon and pressed-state UI components across workout and gym flows
+- Improve workout editing UX with keyboard-aware scrolling, input dropdown coordination and automatic scrolling to the first invalid block field
 - Replace app JSON configuration with variant-aware Expo config and guarded native build scripts
-- Replace custom ID generation with `nanoid`
+- Replace custom ID generation with nanoid
 - Revamp the light theme palette for neutral card, field, button and meta-card surfaces
 
 ### Fixed
+
+- Prevent completed gym exercise sets from being edited
+- Improve gym session discard and delete behavior so related records and unreferenced user exercise definitions are cleaned up correctly
+- Improve gym localization consistency in English and Portuguese
 
 ## [v1.0.1] - 2026-05-08
 

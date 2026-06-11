@@ -8,6 +8,8 @@ You are working in a React Native / Expo Router project (Arc Timer). Follow thes
 
 - Prefer **clarity and correctness** over speed.
 - Do **not** propose large refactors unless explicitly requested.
+- Keep changes as the smallest reasonable diff. Before adding helpers, view-model types, new translation keys, or new styles, check whether the request can be handled directly with existing components, existing data, and existing copy.
+- If a small-looking change needs more than ~20-30 lines, pause and explain why before continuing.
 - When code changes are needed, provide them **file-by-file**.
 - Do **not** create or update tests unless explicitly requested.
 - If **no changes** are needed for a file, reply exactly:
@@ -35,7 +37,7 @@ You are working in a React Native / Expo Router project (Arc Timer). Follow thes
 ## 2.1) Comments
 
 - Keep comments **short and single-line**. The code should be clear enough on its own.
-- Use comments only to provide context that the code cannot express: *why* a non-obvious choice was made, or an important caveat (e.g. a platform gotcha, a workaround, a performance reason).
+- Use comments only to provide context that the code cannot express: _why_ a non-obvious choice was made, or an important caveat (e.g. a platform gotcha, a workaround, a performance reason).
 - Do **not** restate what the code does — if a comment would just paraphrase the next line, delete it.
 
 ---
@@ -48,6 +50,7 @@ You are working in a React Native / Expo Router project (Arc Timer). Follow thes
     - ✅ put styles in the styles file or a hook.
 - Keep logic stable and predictable:
     - Don’t change existing logic the user didn’t ask to modify unless you **explicitly call it out** and justify why.
+- Keep JSX in the component return unless there is a clear reason to extract it. If JSX must be extracted for readability or reuse, move it to a separate component instead of hiding it in local render helpers.
 - **Never use multi-line ternaries** — they trigger a TypeScript LSP panic (`semantic tokens: token spans multiple lines`). This applies to JSX, TypeScript expressions, and JSX props:
     - ❌ `{condition ? (\n  <Component />\n) : null}`
     - ✅ `{condition && <Component />}`
@@ -61,12 +64,12 @@ You are working in a React Native / Expo Router project (Arc Timer). Follow thes
 
 ## 4) Styling Rules
 
-- React Native styling lives in a **`styles.ts`** file next to the screen/component.
-- Styles are imported as:
-    - `import { st } from './styles';`
-- Do not use `.styles.ts` suffix (unless the project already does in some older areas and you’re not asked to migrate).
-- No raw hex colors in components:
-    - All colors must be defined in `colors.ts` with meaningful names and referenced via the palette/theme.
+- React Native styling lives in a <ComponentName>.styles.ts file next to the screen or component.
+- Styles are imported from the component-specific styles file.
+- Do not use a generic styles.ts file for new code.
+- Existing styles.ts files should not be migrated unless explicitly requested.
+- No raw hex colors in components or style files:
+    - All colors must be defined in colors.ts with meaningful names and referenced through the palette or theme.
 
 ---
 
@@ -185,6 +188,7 @@ Allowed exception:
 
 - Don’t add new dependencies without a clear reason.
 - Don’t introduce complex abstractions if a simple approach is correct.
+- Don’t introduce abstractions or derived view models for presentational wrapping when an existing component can be used directly.
 - Don’t “clean up” unrelated code while doing a requested change.
 
 ---

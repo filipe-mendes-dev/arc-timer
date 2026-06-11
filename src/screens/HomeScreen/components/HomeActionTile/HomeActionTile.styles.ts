@@ -3,15 +3,22 @@ import { createStyles } from '@src/theme/createStyles';
 import type { AppTheme } from '@src/theme/theme';
 
 export const useStyles = createStyles(
-    (theme: AppTheme, { variant }: { variant: 'primary' | 'secondary' }) =>
-        StyleSheet.create({
+    (theme: AppTheme, { variant }: { variant: 'primary' | 'secondary' }) => {
+        let rootBackgroundColor = theme.palette.background.card;
+        let textColor = theme.palette.text.primary;
+        let subtitleColor = theme.palette.text.secondary;
+
+        if (variant === 'primary') {
+            rootBackgroundColor = theme.palette.accent.primary;
+            textColor = theme.palette.text.inverted;
+            subtitleColor = theme.palette.text.inverted;
+        }
+
+        return StyleSheet.create({
             root: {
                 borderRadius: theme.layout.tile.borderRadius,
                 padding: 16,
-                backgroundColor:
-                    variant === 'primary'
-                        ? theme.palette.accent.primary
-                        : theme.palette.background.card,
+                backgroundColor: rootBackgroundColor,
                 justifyContent: 'space-between',
                 gap: 24,
                 position: 'relative',
@@ -19,7 +26,7 @@ export const useStyles = createStyles(
             },
 
             pressed: {
-                opacity: 0.9,
+                opacity: 0.8,
             },
 
             textBlock: {
@@ -27,10 +34,12 @@ export const useStyles = createStyles(
             },
 
             title: {
-                color:
-                    variant === 'primary'
-                        ? theme.palette.text.inverted
-                        : theme.palette.text.primary,
+                color: textColor,
             },
-        })
+
+            subtitle: {
+                color: subtitleColor,
+            },
+        });
+    },
 );

@@ -45,6 +45,7 @@ export const MetaCard: FC<MetaCardProps> = ({
     containerStyle,
     selectionOutlineColor,
     showSelectionOutline = false,
+    isPressedFeedbackDisabled = false,
     date,
     topLeftContent,
     children,
@@ -141,7 +142,12 @@ export const MetaCard: FC<MetaCardProps> = ({
     return (
         <GuardedPressable
             onPress={onPress}
-            style={[st.cardContainer, containerStyle]}
+            style={({ pressed }) => [
+                st.cardContainer,
+                containerStyle,
+                pressed && onPress && !isPressedFeedbackDisabled && st.pressed,
+            ]}
+            isPressedFeedbackDisabled={isPressedFeedbackDisabled}
         >
             {/* Top header */}
             <View style={st.cardHeader}>

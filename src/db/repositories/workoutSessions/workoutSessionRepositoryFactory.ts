@@ -6,7 +6,7 @@ import { workoutSessionsTable } from '../../schema';
 import {
     workoutSessionToDbRow,
     type WorkoutSessionRow,
-} from '../../mappers/workoutSessionMapper';
+} from '../../mappers/workouts/workoutSessionMapper';
 import type { RepositoryDb } from '../workouts/workoutRepositoryFactory';
 
 export interface WorkoutSessionRepository {

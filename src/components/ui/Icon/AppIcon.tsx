@@ -19,9 +19,29 @@ type IconDefinition =
       };
 
 const ICON_MAP = {
+    home: {
+        lib: 'ion',
+        name: 'home-outline',
+        defaultSize: 18,
+    },
     workout: {
         lib: 'ion',
-        name: 'walk-outline',
+        name: 'fitness-outline',
+        defaultSize: 18,
+    },
+    gym: {
+        lib: 'ion',
+        name: 'barbell-outline',
+        defaultSize: 18,
+    },
+    gymPlan: {
+        lib: 'ion',
+        name: 'barbell-outline',
+        defaultSize: 18,
+    },
+    gymSession: {
+        lib: 'ion',
+        name: 'barbell-outline',
         defaultSize: 18,
     },
     block: {
@@ -29,15 +49,35 @@ const ICON_MAP = {
         name: 'layers-outline',
         defaultSize: 16,
     },
+    section: {
+        lib: 'ion',
+        name: 'layers-outline',
+        defaultSize: 16,
+    },
     exercise: {
         lib: 'ion',
-        name: 'barbell-outline',
+        name: 'body-outline',
         defaultSize: 16,
     },
     time: {
         lib: 'ion',
         name: 'timer-outline',
         defaultSize: 16,
+    },
+    duration: {
+        lib: 'ion',
+        name: 'timer-outline',
+        defaultSize: 16,
+    },
+    history: {
+        lib: 'ion',
+        name: 'time-outline',
+        defaultSize: 18,
+    },
+    quickSession: {
+        lib: 'ion',
+        name: 'play',
+        defaultSize: 22,
     },
     sets: {
         lib: 'feather',
@@ -109,10 +149,20 @@ const ICON_MAP = {
         name: 'information-circle-outline',
         defaultSize: 20,
     },
+    settings: {
+        lib: 'ion',
+        name: 'settings-outline',
+        defaultSize: 20,
+    },
     back: {
         lib: 'ion',
         name: 'chevron-back',
         defaultSize: 22,
+    },
+    forwardCircle: {
+        lib: 'ion',
+        name: 'arrow-forward-circle-outline',
+        defaultSize: 16,
     },
     menu: {
         lib: 'ion',
@@ -129,9 +179,19 @@ const ICON_MAP = {
         name: 'trash-outline',
         defaultSize: 18,
     },
+    lock: {
+        lib: 'ion',
+        name: 'lock-closed-outline',
+        defaultSize: 18,
+    },
     edit: {
         lib: 'ion',
         name: 'create-outline',
+        defaultSize: 18,
+    },
+    note: {
+        lib: 'ion',
+        name: 'document-text-outline',
         defaultSize: 18,
     },
     star: {
@@ -148,6 +208,11 @@ const ICON_MAP = {
         lib: 'ion',
         name: 'close-outline',
         defaultSize: 22,
+    },
+    add: {
+        lib: 'ion',
+        name: 'add',
+        defaultSize: 24,
     },
     checkmarkCircle: {
         lib: 'ion',

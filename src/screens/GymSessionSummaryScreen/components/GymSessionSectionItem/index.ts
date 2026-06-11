@@ -1,0 +1,1 @@
+export { GymSessionSectionItem } from './GymSessionSectionItem';

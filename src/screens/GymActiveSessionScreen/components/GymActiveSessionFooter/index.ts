@@ -1,0 +1,1 @@
+export { GymActiveSessionFooter } from './GymActiveSessionFooter';

@@ -72,7 +72,7 @@ export const useRunTopSectionStyles = createStyles(
             titleRow: {
                 flexDirection: 'row',
                 alignItems: 'center',
-                gap: 6,
+                gap: 8,
             },
             headerIcon: {
                 marginRight: 2,

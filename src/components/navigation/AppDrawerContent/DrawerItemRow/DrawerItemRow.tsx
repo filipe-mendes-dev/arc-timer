@@ -1,17 +1,16 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
+import { AppIcon, type IconId } from '@src/components/ui/Icon/AppIcon';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { useDrawerItemRowStyles } from './DrawerItemRow.styles';
-import { getDrawerIconName } from '../helpers';
 
 export type DrawerItemRowProps = {
     label: string;
     focused: boolean;
     onPress: () => void;
 
-    iconName?: React.ComponentProps<typeof Ionicons>['name'];
+    iconId?: IconId;
 
     activeTintColor: string;
     inactiveTintColor: string;
@@ -22,15 +21,13 @@ export const DrawerItemRow = ({
     label,
     focused,
     onPress,
-    iconName,
+    iconId,
     activeTintColor,
     inactiveTintColor,
 }: DrawerItemRowProps) => {
     const st = useDrawerItemRowStyles();
 
     const tint = focused ? activeTintColor : inactiveTintColor;
-
-    const icon = getDrawerIconName(iconName, focused);
 
     return (
         <Pressable
@@ -41,7 +38,7 @@ export const DrawerItemRow = ({
             ]}
         >
             <View style={st.contentRow}>
-                {icon ? <Ionicons name={icon} size={18} color={tint} /> : null}
+                {iconId ? <AppIcon id={iconId} size={18} color={tint} /> : null}
 
                 <AppText
                     variant="subtitle"

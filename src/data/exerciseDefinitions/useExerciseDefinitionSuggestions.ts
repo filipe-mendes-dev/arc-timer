@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { useDebouncedValue } from '@src/hooks/useDebouncedValue';
 import type { ExerciseDefinitionListParams } from '@src/db/services/exerciseDefinitions/exerciseDefinitionServiceFactory';
+import type { ExerciseDefinitionAvailability } from '@src/core/entities/exerciseDefinition.interfaces';
 
 import { useExerciseDefinitions } from './exerciseDefinitionQueries';
 
@@ -9,7 +10,14 @@ const DEBOUNCE_DELAY_MS = 150;
 const QUERY_LIMIT = 25;
 const DISPLAY_LIMIT = 6;
 
-export const useExerciseDefinitionSuggestions = (input: string) => {
+interface UseExerciseDefinitionSuggestionsOptions {
+    availability?: ExerciseDefinitionAvailability;
+}
+
+export const useExerciseDefinitionSuggestions = (
+    input: string,
+    { availability = 'workout' }: UseExerciseDefinitionSuggestionsOptions = {},
+) => {
     const trimmedInput = input.trim();
     const debouncedInput = useDebouncedValue(trimmedInput, DEBOUNCE_DELAY_MS);
     const hasQuery = debouncedInput.length > 0;
@@ -17,7 +25,7 @@ export const useExerciseDefinitionSuggestions = (input: string) => {
     const params = useMemo<ExerciseDefinitionListParams>(
         () => ({
             filters: {
-                availability: 'workout',
+                availability,
                 namePrefix: debouncedInput,
             },
             pagination: {
@@ -25,7 +33,7 @@ export const useExerciseDefinitionSuggestions = (input: string) => {
             },
             scope: 'all',
         }),
-        [debouncedInput],
+        [availability, debouncedInput],
     );
 
     const { data = [] } = useExerciseDefinitions(params, {

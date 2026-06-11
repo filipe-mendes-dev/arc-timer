@@ -7,8 +7,9 @@ export const useListEmptyStateStyles = createStyles(() =>
         container: {
             alignItems: 'center',
             justifyContent: 'center',
-            paddingVertical: 40,
+            paddingVertical: 12,
             gap: 8,
+            width: '100%',
         },
         description: {
             textAlign: 'center',

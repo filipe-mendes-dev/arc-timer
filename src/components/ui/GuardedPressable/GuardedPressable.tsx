@@ -1,8 +1,17 @@
 import React, { useCallback, useRef } from 'react';
-import { Pressable, type PressableProps, type View } from 'react-native';
+import {
+    Pressable,
+    StyleSheet,
+    type PressableProps,
+    type PressableStateCallbackType,
+    type StyleProp,
+    type View,
+    type ViewStyle,
+} from 'react-native';
 
 export interface GuardedPressableProps extends PressableProps {
     cooldownMs?: number;
+    isPressedFeedbackDisabled?: boolean;
     preventDoublePress?: boolean;
 }
 
@@ -10,9 +19,11 @@ export const GuardedPressable = React.forwardRef<View, GuardedPressableProps>(
     (
         {
             cooldownMs = 300,
+            isPressedFeedbackDisabled = false,
             preventDoublePress = true,
             onPress,
             disabled,
+            style,
             ...props
         },
         ref,
@@ -47,12 +58,28 @@ export const GuardedPressable = React.forwardRef<View, GuardedPressableProps>(
             [onPress, disabled, cooldownMs, preventDoublePress],
         );
 
+        const getStyle = useCallback(
+            (state: PressableStateCallbackType): StyleProp<ViewStyle> => {
+                if (typeof style === 'function') {
+                    return style(state);
+                }
+
+                if (isPressedFeedbackDisabled || !state.pressed) {
+                    return style;
+                }
+
+                return [style, st.pressed];
+            },
+            [isPressedFeedbackDisabled, style],
+        );
+
         return (
             <Pressable
                 {...props}
                 ref={ref}
                 disabled={disabled}
                 onPress={handlePress}
+                style={getStyle}
             />
         );
     },
@@ -61,3 +88,9 @@ export const GuardedPressable = React.forwardRef<View, GuardedPressableProps>(
 GuardedPressable.displayName = 'GuardedPressable';
 
 export default GuardedPressable;
+
+const st = StyleSheet.create({
+    pressed: {
+        opacity: 0.8,
+    },
+});

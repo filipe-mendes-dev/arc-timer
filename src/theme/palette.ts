@@ -183,8 +183,8 @@ export const buildLightPalette = (accent: AccentTokens): ThemePalette => ({
     accent: {
         primary: accent.primary,
         primaryStrong: accent.primaryStrong,
-        soft: colors.gray[200],
-        surface: colors.gray[100],
+        soft: accent.soft,
+        surface: accent.surface,
         darkInk: accent.darkInk,
     },
     button: {
@@ -262,7 +262,7 @@ export const buildDarkPalette = (accent: AccentTokens): ThemePalette => ({
     accent: {
         primary: accent.primary,
         primaryStrong: accent.primaryStrong,
-        soft: colors.gray[900],
+        soft: accent.darkInk,
         surface: colors.gray[900],
         darkInk: accent.darkInk,
     },

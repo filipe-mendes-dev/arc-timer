@@ -1,13 +1,21 @@
 export { exerciseDefinitionKeys } from './exerciseDefinitionKeys';
-export { useSaveExerciseDefinition } from './exerciseDefinitionMutations';
+export {
+    useDeleteExerciseDefinition,
+    useFindOrCreateGymExerciseDefinitionByName,
+    useSaveExerciseDefinitionData,
+    useSaveExerciseDefinition,
+} from './exerciseDefinitionMutations';
 export {
     useExerciseDefinition,
     useExerciseDefinitions,
+    useGymExerciseDefinitions,
 } from './exerciseDefinitionQueries';
 export { useExerciseDefinitionSuggestions } from './useExerciseDefinitionSuggestions';
 export type {
     CreateExerciseDefinitionMutationArgs,
+    FindOrCreateExerciseDefinitionByNameArgs,
     MergeExerciseDefinitionMutationArgs,
+    SaveExerciseDefinitionDataArgs,
     SaveExerciseDefinitionArgs,
     UpdateExerciseDefinitionChanges,
     UpdateExerciseDefinitionMutationArgs,

@@ -2,7 +2,7 @@ import type { ExerciseDefinitionListParams } from '@src/db/services/exerciseDefi
 
 export const exerciseDefinitionKeys = {
     all: ['exerciseDefinitions'] as const,
-    detail: (id?: string) => ['exerciseDefinitions', id] as const,
-    list: (params?: ExerciseDefinitionListParams) =>
-        ['exerciseDefinitions', params] as const,
+    detail: (id?: string) => ['exerciseDefinitions', 'detail', id ?? ''] as const,
+    listItems: (params?: ExerciseDefinitionListParams) =>
+        ['exerciseDefinitions', 'listItems', params] as const,
 };

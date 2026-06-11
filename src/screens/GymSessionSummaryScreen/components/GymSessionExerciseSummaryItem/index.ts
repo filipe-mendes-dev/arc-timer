@@ -1,0 +1,1 @@
+export { GymSessionExerciseSummaryItem } from './GymSessionExerciseSummaryItem';

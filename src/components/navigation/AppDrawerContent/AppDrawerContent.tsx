@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import type { DrawerContentComponentProps } from '@react-navigation/drawer';
-import type { Ionicons } from '@expo/vector-icons';
+import type { IconId } from '@src/components/ui/Icon/AppIcon';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { useTheme } from '@src/theme/ThemeProvider';
 import DrawerItemRow from './DrawerItemRow/DrawerItemRow';
@@ -12,22 +12,20 @@ import { useTranslation } from 'react-i18next';
 
 const resolveLabel = (
     routeName: string,
-    options?: { title?: string; drawerLabel?: unknown }
+    options?: { title?: string; drawerLabel?: unknown },
 ) => {
     if (typeof options?.title === 'string') return options.title;
     if (typeof options?.drawerLabel === 'string') return options.drawerLabel;
     return routeName;
 };
 
-const ICONS_BY_ROUTE: Record<
-    string,
-    React.ComponentProps<typeof Ionicons>['name']
-> = {
-    index: 'home-outline',
-    'workouts/index': 'barbell-outline',
-    'exercise-definitions/index': 'fitness-outline',
-    'history/index': 'time-outline',
-    'settings/index': 'settings-outline',
+const ICONS_BY_ROUTE: Record<string, IconId> = {
+    index: 'home',
+    'workouts/index': 'workout',
+    'gym/index': 'gym',
+    'exercise-definitions/index': 'exercise',
+    'history/index': 'history',
+    'settings/index': 'settings',
 };
 
 const DrawerHeader = () => {
@@ -86,14 +84,14 @@ const AppDrawerContent = ({
                         drawerLabel: options.drawerLabel,
                     });
 
-                    const iconName = ICONS_BY_ROUTE[route.name];
+                    const iconId = ICONS_BY_ROUTE[route.name];
 
                     return (
                         <DrawerItemRow
                             key={route.key}
                             label={label}
                             focused={focused}
-                            iconName={iconName}
+                            iconId={iconId}
                             activeTintColor={activeTintColor}
                             inactiveTintColor={inactiveTintColor}
                             activeBgColor={activeBgColor}

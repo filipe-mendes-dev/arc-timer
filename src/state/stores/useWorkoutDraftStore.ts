@@ -1,12 +1,15 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 
-import type { Workout, WorkoutBlock } from '@src/core/entities/entities';
+import type { Workout, WorkoutBlock } from '@src/core/entities/workout.interfaces';
 import { uid } from '@src/core/id';
 import i18next from '@src/i18n';
 
+export type WorkoutDraftMode = 'create' | 'edit' | 'import';
+
 interface WorkoutDraftState {
     draft: Workout | null;
+    mode: WorkoutDraftMode | null;
     sourceWorkoutVersionId: string | null;
 
     startDraftNew: () => void;
@@ -53,6 +56,9 @@ const starterWorkout = (): Workout => ({
     name: 'New Workout',
     blocks: [starterBlock()],
     updatedAtMs: Date.now(),
+    isFavorite: false,
+    blockCount: 1,
+    exerciseCount: 3,
 });
 
 const quickWorkout = (): Workout => ({
@@ -65,22 +71,28 @@ const quickWorkout = (): Workout => ({
         },
     ],
     updatedAtMs: Date.now(),
+    isFavorite: false,
+    blockCount: 1,
+    exerciseCount: 3,
 });
 
 export const useWorkoutDraftStore = create<WorkoutDraftState>()(
     immer((set, get) => ({
         draft: null,
+        mode: null,
         sourceWorkoutVersionId: null,
 
         startDraftNew: () =>
             set(() => ({
                 draft: starterWorkout(),
+                mode: 'create',
                 sourceWorkoutVersionId: null,
             })),
 
         startDraftQuick: () =>
             set(() => ({
                 draft: quickWorkout(),
+                mode: 'create',
                 sourceWorkoutVersionId: null,
             })),
 
@@ -92,6 +104,7 @@ export const useWorkoutDraftStore = create<WorkoutDraftState>()(
 
             set(() => ({
                 draft: clone,
+                mode: 'edit',
                 sourceWorkoutVersionId: null,
             }));
         },
@@ -107,6 +120,7 @@ export const useWorkoutDraftStore = create<WorkoutDraftState>()(
 
                 return {
                     draft: clone,
+                    mode: 'import',
                     sourceWorkoutVersionId: sourceWorkoutVersionId ?? null,
                 };
             }),
@@ -148,6 +162,7 @@ export const useWorkoutDraftStore = create<WorkoutDraftState>()(
         clearDraft: () =>
             set((state) => {
                 state.draft = null;
+                state.mode = null;
                 state.sourceWorkoutVersionId = null;
             }),
     }))

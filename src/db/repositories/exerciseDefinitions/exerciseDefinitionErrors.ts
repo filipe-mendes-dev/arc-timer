@@ -1,26 +1,67 @@
-export type ExerciseDefinitionErrorCode =
-    | 'DELETE_REFERENCED'
-    | 'DELETE_SYSTEM_FORBIDDEN'
-    | 'DUPLICATE_NAME'
-    | 'GYM_ONLY_RESTRICTED'
-    | 'MERGE_GYM_ONLY_CONFLICT';
+import {
+    isAppErrorCode,
+    type AppError,
+    type AppErrorDefinition,
+} from '@src/core/errors/appError';
 
-export interface ExerciseDefinitionError extends Error {
-    readonly code: ExerciseDefinitionErrorCode;
+export const exerciseDefinitionErrors = {
+    deleteReferenced: {
+        code: 'DELETE_REFERENCED',
+        message: 'exerciseDefinitions.validation.deleteReferenced',
+    },
+    deleteSystemForbidden: {
+        code: 'DELETE_SYSTEM_FORBIDDEN',
+        message: 'exerciseDefinitions.validation.deleteSystemForbidden',
+    },
+    duplicateName: {
+        code: 'DUPLICATE_NAME',
+        message: 'exerciseDefinitions.validation.duplicateName',
+    },
+    gymOnlyRestricted: {
+        code: 'GYM_ONLY_RESTRICTED',
+        message: 'exerciseDefinitions.validation.gymOnlyRestricted',
+    },
+    workoutOnlyRestricted: {
+        code: 'WORKOUT_ONLY_RESTRICTED',
+        message: 'exerciseDefinitions.validation.workoutOnlyRestricted',
+    },
+    mergeGymOnlyConflict: {
+        code: 'MERGE_GYM_ONLY_CONFLICT',
+        message: 'exerciseDefinitions.validation.mergeGymOnlyConflict',
+    },
+    mergeWorkoutOnlyConflict: {
+        code: 'MERGE_WORKOUT_ONLY_CONFLICT',
+        message: 'exerciseDefinitions.validation.mergeWorkoutOnlyConflict',
+    },
+} as const satisfies Record<string, AppErrorDefinition<string>>;
+
+export type ExerciseDefinitionErrorCode =
+    (typeof exerciseDefinitionErrors)[keyof typeof exerciseDefinitionErrors]['code'];
+
+export type ExerciseDefinitionErrorMessage =
+    (typeof exerciseDefinitionErrors)[keyof typeof exerciseDefinitionErrors]['message'];
+
+export interface ExerciseDefinitionError
+    extends AppError<ExerciseDefinitionErrorCode> {
+    readonly message: ExerciseDefinitionErrorMessage;
 }
 
-export const buildExerciseDefinitionError = (
-    code: ExerciseDefinitionErrorCode,
-    message: string,
-): ExerciseDefinitionError => Object.assign(new Error(message), { code });
+export interface ExerciseDefinitionErrorDefinition
+    extends AppErrorDefinition<ExerciseDefinitionErrorCode> {
+    readonly message: ExerciseDefinitionErrorMessage;
+}
+
+const exerciseDefinitionErrorCodes = Object.values(
+    exerciseDefinitionErrors,
+).map((definition) => definition.code);
+
+export const createExerciseDefinitionError = (
+    definition: ExerciseDefinitionErrorDefinition,
+    message: ExerciseDefinitionErrorMessage = definition.message,
+): ExerciseDefinitionError =>
+    Object.assign(new Error(message), { code: definition.code, message });
 
 export const isExerciseDefinitionError = (
     e: unknown,
 ): e is ExerciseDefinitionError =>
-    e instanceof Error &&
-    'code' in e &&
-    (e.code === 'DELETE_REFERENCED' ||
-        e.code === 'DELETE_SYSTEM_FORBIDDEN' ||
-        e.code === 'DUPLICATE_NAME' ||
-        e.code === 'GYM_ONLY_RESTRICTED' ||
-        e.code === 'MERGE_GYM_ONLY_CONFLICT');
+    isAppErrorCode(e, exerciseDefinitionErrorCodes);

@@ -1,6 +1,7 @@
 export interface ThemeLayout {
     screen: {
         padding: number;
+        fullScreenHorizontalPadding: number;
         paddingVertical: number;
         paddingHorizontal: number;
     };
@@ -8,6 +9,9 @@ export interface ThemeLayout {
         gap: number;
     };
     section: {
+        gap: number;
+    };
+    grid: {
         gap: number;
     };
     card: {
@@ -25,11 +29,15 @@ export interface ThemeLayout {
     footer: {
         padding: number;
     };
+    modal: {
+        padding: number;
+    };
 }
 
 const BASE_LAYOUT: ThemeLayout = {
     screen: {
         padding: 16,
+        fullScreenHorizontalPadding: 28,
         paddingHorizontal: 16,
         paddingVertical: 16,
     },
@@ -38,6 +46,9 @@ const BASE_LAYOUT: ThemeLayout = {
     },
     section: {
         gap: 16,
+    },
+    grid: {
+        gap: 14,
     },
     card: {
         padding: 14,
@@ -52,11 +63,17 @@ const BASE_LAYOUT: ThemeLayout = {
     footer: {
         padding: 12,
     },
+    modal: {
+        padding: 20,
+    },
 };
 
 export const createLayout = (scale: number): ThemeLayout => ({
     screen: {
         padding: Math.round(BASE_LAYOUT.screen.padding * scale),
+        fullScreenHorizontalPadding: Math.round(
+            BASE_LAYOUT.screen.fullScreenHorizontalPadding * scale,
+        ),
         paddingVertical: Math.round(BASE_LAYOUT.screen.padding * scale),
         paddingHorizontal: Math.round(BASE_LAYOUT.screen.padding * scale),
     },
@@ -65,6 +82,9 @@ export const createLayout = (scale: number): ThemeLayout => ({
     },
     section: {
         gap: Math.round(BASE_LAYOUT.section.gap * scale),
+    },
+    grid: {
+        gap: Math.round(BASE_LAYOUT.grid.gap * scale),
     },
     card: {
         padding: Math.round(BASE_LAYOUT.card.padding * scale),
@@ -82,5 +102,8 @@ export const createLayout = (scale: number): ThemeLayout => ({
     },
     footer: {
         padding: Math.round(BASE_LAYOUT.footer.padding * scale),
+    },
+    modal: {
+        padding: Math.round(BASE_LAYOUT.modal.padding * scale),
     },
 });

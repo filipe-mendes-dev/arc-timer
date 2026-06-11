@@ -1,10 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
-import type { WorkoutBlock } from '@src/core/entities/entities';
+import type { WorkoutBlock } from '@src/core/entities/workout.interfaces';
 import { uid } from '@src/core/id';
 import { useWorkoutDraftStore } from '@src/state/stores/useWorkoutDraftStore';
-import { useUpsertWorkout, useWorkout } from '@src/data/workouts';
+import {
+    isWorkoutError,
+    useUpsertWorkout,
+    useWorkout,
+} from '@src/data/workouts';
 
 import { WorkoutBlockItem } from './components/WorkoutBlockItem/WorkoutBlockItem';
 import { Button } from '@src/components/ui/Button/Button';
@@ -29,6 +33,7 @@ import type {
 } from './EditWorkoutScreen.interfaces';
 import { useTranslation } from 'react-i18next';
 import { useValidationScroll } from '@src/hooks/useValidationScroll';
+import { useSystemBackHandler } from '@src/hooks/navigation/useSystemBackHandler';
 
 const createEmptyBlock = (): WorkoutBlock => ({
     id: uid(),
@@ -47,13 +52,13 @@ const createEmptyBlock = (): WorkoutBlock => ({
 
 const EditWorkoutScreen = () => {
     const { t } = useTranslation();
-    const { id, fromImport } = useLocalSearchParams<{
+    const { id } = useLocalSearchParams<{
         id?: string;
-        fromImport?: string;
     }>();
     const router = useRouter();
 
     const draft = useWorkoutDraftStore((state) => state.draft);
+    const draftMode = useWorkoutDraftStore((state) => state.mode);
     const sourceWorkoutVersionId = useWorkoutDraftStore(
         (state) => state.sourceWorkoutVersionId,
     );
@@ -77,6 +82,7 @@ const EditWorkoutScreen = () => {
     const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState<WorkoutEditError[]>([]);
     const [blockToRemove, setBlockToRemove] = useState<string | null>(null);
+    const [isLeaveConfirmVisible, setLeaveConfirmVisible] = useState(false);
     const mainContainerRef = useRef<MainContainerHandle | null>(null);
     const [dismissalKey, setDismissalKey] = useState(0);
 
@@ -92,36 +98,52 @@ const EditWorkoutScreen = () => {
             },
         });
 
-    // initialise / cleanup draft
     useEffect(() => {
-        // If we are importing, DO NOT touch the draft.
-        if (fromImport === '1') return;
-        if (draft) return;
-
         if (id) {
-            if (savedWorkout) {
+            const hasMatchingEditDraft =
+                draft?.id === id && draftMode === 'edit';
+
+            if (savedWorkout && !hasMatchingEditDraft) {
                 startDraftFromWorkout(savedWorkout);
             }
             return;
-        } else {
-            startDraftNew();
         }
+
+        if (draft) return;
+
+        startDraftNew();
     }, [
         draft,
+        draftMode,
         id,
-        fromImport,
         savedWorkout,
         startDraftFromWorkout,
         startDraftNew,
     ]);
 
-    useEffect(() => {
-        if (fromImport === '1') return;
+    const requestLeave = useCallback((): boolean => {
+        if (!draft) return false;
 
-        return () => {
-            clearDraft();
-        };
-    }, [clearDraft, fromImport]);
+        setLeaveConfirmVisible(true);
+        return true;
+    }, [draft]);
+
+    const { allowNextBack } = useSystemBackHandler({
+        onSystemBack: requestLeave,
+    });
+
+    const leaveEditor = useCallback(() => {
+        if (requestLeave()) return;
+
+        allowNextBack();
+        router.back();
+    }, [allowNextBack, requestLeave, router]);
+
+    const confirmDiscardAndLeave = useCallback(() => {
+        clearDraft();
+        allowNextBack();
+        router.back();
+    }, [allowNextBack, clearDraft, router]);
 
     const name = draft?.name ?? t('editWorkout.defaults.newWorkout');
     const blocks = draft?.blocks ?? [];
@@ -207,17 +229,20 @@ const EditWorkoutScreen = () => {
                 sourceWorkoutVersionId: sourceWorkoutVersionId ?? undefined,
             });
             clearDraft();
+            allowNextBack();
 
             if (isEditingSavedWorkout) {
                 router.back();
             } else {
                 router.replace(`/workouts/${workout.id}`);
             }
-        } catch {
+        } catch (e) {
             const saveErrors: WorkoutEditError[] = [
                 {
                     field: 'blocks',
-                    message: t('editWorkout.validation.saveFailed'),
+                    message: isWorkoutError(e)
+                        ? t(e.message)
+                        : t('editWorkout.validation.saveFailed'),
                     targetId: 'blocks',
                 },
             ];
@@ -301,7 +326,7 @@ const EditWorkoutScreen = () => {
                 <Button
                     title={t('editWorkout.actions.cancel')}
                     variant="secondary"
-                    onPress={() => router.back()}
+                    onPress={leaveEditor}
                     flex={1}
                 />
                 <Button
@@ -331,6 +356,17 @@ const EditWorkoutScreen = () => {
                     setBlockToRemove(null);
                 }}
                 onCancel={() => setBlockToRemove(null)}
+            />
+
+            <ConfirmDialog
+                visible={isLeaveConfirmVisible}
+                title={t('editWorkout.discardConfirm.title')}
+                message={t('editWorkout.discardConfirm.message')}
+                confirmLabel={t('editWorkout.discardConfirm.confirm')}
+                cancelLabel={t('common.actions.cancel')}
+                destructive
+                onConfirm={confirmDiscardAndLeave}
+                onCancel={() => setLeaveConfirmVisible(false)}
             />
         </>
     );

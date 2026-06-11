@@ -1,0 +1,1 @@
+export { GymExerciseDataFooter } from './GymExerciseDataFooter';
