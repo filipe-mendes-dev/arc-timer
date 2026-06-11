@@ -2,9 +2,12 @@ import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 
 import type { Workout } from '@src/core/entities/workout.interfaces';
-import type { ExportedWorkoutFileV1 } from './exportTypes';
-
-export const ARC_WORKOUT_MIME = 'application/vnd.arctimer.workout+json';
+import {
+    ARC_WORKOUT_MIME,
+    type ExportedWorkoutExerciseV2,
+    type ExportedWorkoutFileV2,
+    type ExportedWorkoutV2,
+} from './exportTypes';
 
 export type ExportResult =
     | { ok: true }
@@ -21,18 +24,38 @@ const sanitizeFilename = (name: string): string => {
     return safe.length > 0 ? safe : 'Workout';
 };
 
+export const workoutToExportedWorkout = (
+    workout: Workout,
+): ExportedWorkoutV2 => ({
+    name: workout.name,
+    blocks: workout.blocks.map((block) => ({
+        title: block.title,
+        sets: block.sets,
+        restBetweenSetsSec: block.restBetweenSetsSec,
+        restBetweenExercisesSec: block.restBetweenExercisesSec,
+        exercises: block.exercises.map(
+            (exercise): ExportedWorkoutExerciseV2 => ({
+                name: exercise.name,
+                value: exercise.value,
+                mode: exercise.mode,
+                tempo: exercise.tempo,
+            }),
+        ),
+    })),
+});
+
 export const exportWorkoutToFile = async (
-    workout: Workout
+    workout: Workout,
 ): Promise<ExportResult> => {
-    const payload: ExportedWorkoutFileV1 = {
-        version: 1,
+    const payload: ExportedWorkoutFileV2 = {
+        version: 2,
         kind: 'arc-timer/workout',
         exportedAt: new Date().toISOString(),
         app: {
             name: 'ARC Timer',
             platform: 'mobile',
         },
-        workout,
+        workout: workoutToExportedWorkout(workout),
     };
 
     const json = JSON.stringify(payload, null, 2);
