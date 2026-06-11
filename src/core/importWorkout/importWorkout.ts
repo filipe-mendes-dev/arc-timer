@@ -222,8 +222,30 @@ export const exportedWorkoutToWorkout = ({
     };
 };
 
+interface ParseImportedWorkoutOptions {
+    createId?: () => string;
+    nowMs?: number;
+}
+
+export const parseImportedWorkoutFileContent = (
+    contents: string,
+    options?: ParseImportedWorkoutOptions,
+): ImportResult => {
+    let parsedUnknown: unknown;
+
+    try {
+        parsedUnknown = JSON.parse(contents) as unknown;
+    } catch (error: unknown) {
+        console.warn('PARSE_FAILED', error);
+        return { ok: false, error: 'PARSE_FAILED' };
+    }
+
+    return parseImportedWorkoutUnknown(parsedUnknown, options);
+};
+
 export const parseImportedWorkoutUnknown = (
     parsedUnknown: unknown,
+    options?: ParseImportedWorkoutOptions,
 ): ImportResult => {
     if (isRecord(parsedUnknown) && 'kind' in parsedUnknown) {
         if (parsedUnknown.kind !== ARC_WORKOUT_KIND) {
@@ -237,6 +259,8 @@ export const parseImportedWorkoutUnknown = (
             ok: true,
             workout: exportedWorkoutToWorkout({
                 workout: parsedUnknown.workout,
+                createId: options?.createId,
+                nowMs: options?.nowMs,
             }),
         };
     }
@@ -248,27 +272,14 @@ export const parseImportedWorkoutUnknown = (
                 workout: exportedWorkoutV1ToExportedWorkoutV2(
                     parsedUnknown.workout,
                 ),
+                createId: options?.createId,
+                nowMs: options?.nowMs,
             }),
         };
     }
 
     console.warn('INVALID_SHAPE');
     return { ok: false, error: 'INVALID_SHAPE' };
-};
-
-export const parseImportedWorkoutFileContent = (
-    contents: string,
-): ImportResult => {
-    let parsedUnknown: unknown;
-
-    try {
-        parsedUnknown = JSON.parse(contents) as unknown;
-    } catch (error: unknown) {
-        console.warn('PARSE_FAILED', error);
-        return { ok: false, error: 'PARSE_FAILED' };
-    }
-
-    return parseImportedWorkoutUnknown(parsedUnknown);
 };
 
 export const importWorkoutFromFile = async (): Promise<ImportResult> => {
