@@ -12,8 +12,8 @@ export interface ExportedWorkoutV1 {
     id: UUID;
     name: string;
     blocks: ExportedWorkoutBlockV1[];
-    updatedAtMs: number;
-    isFavorite: boolean;
+    updatedAtMs?: number;
+    isFavorite?: boolean;
 }
 
 export interface ExportedWorkoutBlockV1 {

@@ -49,6 +49,12 @@ const isNonNegativeNumber = (value: unknown): value is number =>
 const isPositiveNumber = (value: unknown): value is number =>
     isFiniteNumber(value) && value > 0;
 
+const isOptionalNumber = (value: unknown): value is number | undefined =>
+    value === undefined || typeof value === 'number';
+
+const isOptionalBoolean = (value: unknown): value is boolean | undefined =>
+    value === undefined || typeof value === 'boolean';
+
 const isExportedWorkoutExerciseV1 = (
     value: unknown,
 ): value is ExportedWorkoutExerciseV1 => {
@@ -86,8 +92,8 @@ const isExportedWorkoutV1 = (value: unknown): value is ExportedWorkoutV1 => {
     return (
         typeof value.id === 'string' &&
         typeof value.name === 'string' &&
-        typeof value.updatedAtMs === 'number' &&
-        typeof value.isFavorite === 'boolean' &&
+        isOptionalNumber(value.updatedAtMs) &&
+        isOptionalBoolean(value.isFavorite) &&
         value.blocks.every(isExportedWorkoutBlockV1)
     );
 };
