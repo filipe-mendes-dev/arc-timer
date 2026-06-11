@@ -44,7 +44,7 @@ const scheme =
 const config: Config = {
     name,
     slug: 'arc-timer',
-    version: '1.0.1',
+    version: '1.1.0',
     orientation: 'portrait',
     icon: './assets/generated/classic/icon-light.png',
     userInterfaceStyle: 'automatic',
@@ -57,7 +57,7 @@ const config: Config = {
             tinted: './assets/generated/classic/icon-tinted.png',
         },
         bundleIdentifier: bundleId,
-        buildNumber: '2',
+        buildNumber: '3',
         supportsTablet: false,
         infoPlist: {
             ITSAppUsesNonExemptEncryption: false,
@@ -66,7 +66,7 @@ const config: Config = {
     android: {
         icon: './assets/generated/classic/icon-light.png',
         package: bundleId,
-        versionCode: 2,
+        versionCode: 3,
         adaptiveIcon: {
             foregroundImage:
                 './assets/generated/classic/adaptive-foreground.png',

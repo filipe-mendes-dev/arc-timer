@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## Unreleased
+## [v1.1.0] - 2026-06-11
 
 ### Added
 
@@ -30,9 +30,9 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- Prevent completed gym exercise sets from being edited
 - Improve gym session discard and delete behavior so related records and unreferenced user exercise definitions are cleaned up correctly
-- Improve gym localization consistency in English and Portuguese
+- Improve localization consistency in English and Portuguese
+- Improve theme color palette
 
 ## [v1.0.1] - 2026-05-08
 
