@@ -7,6 +7,7 @@ const VARIANTS = {
   production:  { id: BASE_ID,                regenCmd: 'npm run native:generate' },
   development: { id: `${BASE_ID}.dev`,       regenCmd: 'npm run native:generate:dev' },
   preview:     { id: `${BASE_ID}.preview`,   regenCmd: 'npm run native:generate:preview' },
+  screenshots: { id: `${BASE_ID}.screenshots`, regenCmd: 'npm run native:generate:screenshots' },
 };
 
 const target = process.argv[2] ?? 'production';

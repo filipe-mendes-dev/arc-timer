@@ -23,15 +23,19 @@
         "release:android:check": "npm run release:check && npm run export:android",
         "native:generate": "rm -rf ios android && APP_VARIANT=production npx expo prebuild --clean",
         "native:generate:dev": "rm -rf ios android && APP_VARIANT=development npx expo prebuild --clean",
+        "native:generate:screenshots": "APP_VARIANT=screenshots expo prebuild --clean",
         "guard:prod-variant": "node scripts/check-variant.js production",
         "guard:dev-variant": "node scripts/check-variant.js development",
+        "guard:screenshots-variant": "node scripts/check-variant.js screenshots",
         "ios:open": "open ios/*.xcworkspace",
         "ios:release": "npm run guard:prod-variant && expo run:ios -d --configuration Release",
+        "ios:screenshots": "APP_VARIANT=screenshots expo run:ios -d --configuration Release",
         "android:clean": "cd android && ./gradlew clean",
         "android:release:device": "npm run guard:prod-variant && expo run:android -d --variant release",
         "android:release:apk": "npm run guard:prod-variant && cd android && ./gradlew assembleRelease",
         "android:release:aab": "npm run guard:prod-variant && cd android && ./gradlew bundleRelease",
         "android:install:release": "adb install -r android/app/build/outputs/apk/release/app-release.apk",
+        "android:screenshots": "APP_VARIANT=screenshots expo run:android -d --variant release",
         "assets:classic": "node scripts/generate-classic-assets.js",
         "i18n:keys": "node scripts/generate-i18n-keys.js",
         "cleaner": "node scripts/cleaner.js",
@@ -47,7 +51,7 @@
         "base-64": "^1.0.0",
         "date-fns": "^4.1.0",
         "drizzle-orm": "^0.45.2",
-        "expo": "^55.0.23",
+        "expo": "~55.0.26",
         "expo-application": "~55.0.15",
         "expo-asset": "~55.0.17",
         "expo-audio": "~55.0.14",
@@ -116,7 +120,7 @@
     },
     "packageManager": "npm@11.14.1",
     "volta": {
-        "node": "22.12.0",
+        "node": "22.13.0",
         "npm": "11.14.1"
     }
 }

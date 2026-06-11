@@ -1,6 +1,11 @@
 import type { ExpoConfig } from 'expo/config';
 
-const VARIANTS = ['development', 'preview', 'production'] as const;
+const VARIANTS = [
+    'development',
+    'preview',
+    'production',
+    'screenshots',
+] as const;
 type Variant = (typeof VARIANTS)[number];
 
 const rawVariant = process.env.APP_VARIANT ?? 'production';
@@ -20,26 +25,34 @@ type Config = Omit<ExpoConfig, 'android'> & {
 };
 
 const baseId = 'dev.filipemendes.arctimer';
-const bundleId =
-    variant === 'development'
-        ? `${baseId}.dev`
-        : variant === 'preview'
-          ? `${baseId}.preview`
-          : baseId;
 
-const name =
-    variant === 'development'
-        ? 'Arc Timer (Dev)'
-        : variant === 'preview'
-          ? 'Arc Timer (Preview)'
-          : 'Arc Timer';
+const getBundleId = (): string => {
+    if (variant === 'development') return `${baseId}.dev`;
+    if (variant === 'preview') return `${baseId}.preview`;
+    if (variant === 'screenshots') return `${baseId}.screenshots`;
 
-const scheme =
-    variant === 'development'
-        ? 'arctimer-dev'
-        : variant === 'preview'
-          ? 'arctimer-preview'
-          : 'arctimer';
+    return baseId;
+};
+
+const getName = (): string => {
+    if (variant === 'development') return 'Arc Timer (Dev)';
+    if (variant === 'preview') return 'Arc Timer (Preview)';
+    if (variant === 'screenshots') return 'Arc Timer (Screenshots)';
+
+    return 'Arc Timer';
+};
+
+const getScheme = (): string => {
+    if (variant === 'development') return 'arctimer-dev';
+    if (variant === 'preview') return 'arctimer-preview';
+    if (variant === 'screenshots') return 'arctimer-screenshots';
+
+    return 'arctimer';
+};
+
+const bundleId = getBundleId();
+const name = getName();
+const scheme = getScheme();
 
 const config: Config = {
     name,
@@ -66,7 +79,7 @@ const config: Config = {
     android: {
         icon: './assets/generated/classic/icon-light.png',
         package: bundleId,
-        versionCode: 3,
+        versionCode: 4,
         adaptiveIcon: {
             foregroundImage:
                 './assets/generated/classic/adaptive-foreground.png',
@@ -77,11 +90,16 @@ const config: Config = {
         blockedPermissions: [
             'android.permission.RECORD_AUDIO',
             'android.permission.SYSTEM_ALERT_WINDOW',
+            'android.permission.FOREGROUND_SERVICE',
+            'android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK',
         ],
         predictiveBackGestureEnabled: false,
     },
     web: {
         favicon: './assets/favicon.png',
+    },
+    extra: {
+        appVariant: variant,
     },
     plugins: [
         'expo-router',
