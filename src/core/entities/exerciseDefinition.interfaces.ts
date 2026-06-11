@@ -43,6 +43,7 @@ export interface ExerciseDefinitionRecentSessionItem {
     id: UUID;
     kind: TrainingSessionKind;
     title: string;
+    sourceGymPlanName?: string;
 }
 
 export interface ExerciseDefinitionTargetSetData {

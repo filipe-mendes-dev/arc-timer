@@ -207,8 +207,7 @@ export const createExerciseDefinitionStatsRepository = ({
                 endedAtMs: row.endedAtMs ?? undefined,
                 status: row.status,
                 sourceGymPlanId: row.sourceGymPlanId ?? undefined,
-                sourceGymPlanName:
-                    row.gymPlanName ?? row.sourceGymPlanName ?? undefined,
+                sourceGymPlanName: row.sourceGymPlanName ?? undefined,
                 exerciseRecordCount: counts.exerciseRecordCount,
                 setCount: counts.setCount,
             };

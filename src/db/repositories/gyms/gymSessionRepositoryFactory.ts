@@ -297,8 +297,7 @@ export const createGymSessionRepository = ({
                     endedAtMs: row.endedAtMs ?? undefined,
                     status: row.status,
                     sourceGymPlanId: row.sourceGymPlanId ?? undefined,
-                    sourceGymPlanName:
-                        row.gymPlanName ?? row.sourceGymPlanName ?? undefined,
+                    sourceGymPlanName: row.sourceGymPlanName ?? undefined,
                     exerciseRecordCount: counts.exerciseRecordCount,
                     setCount: counts.setCount,
                 };
@@ -398,7 +397,7 @@ export const createGymSessionRepository = ({
                     endedAtMs: input.endedAtMs,
                     notes: input.notes,
                     sourceGymPlanId: input.sourceGymPlanId,
-                    sourceGymPlanName: input.sourceGymPlanName ?? null,
+                    sourceGymPlanName: input.sourceGymPlanName,
                     status: input.status,
                     updatedAtMs: input.updatedAtMs,
                 })

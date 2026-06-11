@@ -56,12 +56,14 @@ export const createTrainingSessionService = ({
         const gymItems: TrainingSessionListItem[] = gymSessionService
             .listGymSessionItems({ limit: DEFAULT_GYM_SESSION_READ_LIMIT })
             .map((session) => {
-                const title = session.sourceGymPlanName ?? '';
+                const sourceGymPlanName = session.sourceGymPlanName;
+                const title = sourceGymPlanName ?? '';
 
                 return {
                     id: session.id,
                     kind: 'gym',
                     title,
+                    sourceGymPlanName,
                     startedAtMs: session.startedAtMs,
                     endedAtMs: session.endedAtMs,
                     durationSec: resolveDurationSec(

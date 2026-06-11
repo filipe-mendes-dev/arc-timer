@@ -37,7 +37,7 @@ const GymSessionSummaryScreen = () => {
         sectionSummaries,
         session,
         setDeleteConfirmVisible,
-        sourceGymPlan,
+        sourceGymPlanTitle,
         startedAtLabel,
         t,
     } = useGymSessionSummaryScreen();
@@ -63,7 +63,7 @@ const GymSessionSummaryScreen = () => {
     return (
         <>
             <MainContainer
-                title={sourceGymPlan?.name ?? t('gymSessionSummary.title')}
+                title={sourceGymPlanTitle ?? t('gymSessionSummary.title')}
                 gap={0}
                 topBarOptions={[
                     {
@@ -83,7 +83,7 @@ const GymSessionSummaryScreen = () => {
                                 numberOfLines={2}
                                 style={st.headerTitle}
                             >
-                                {sourceGymPlan?.name ??
+                                {sourceGymPlanTitle ??
                                     t('gymHistory.sessionTitle')}
                             </AppText>
 

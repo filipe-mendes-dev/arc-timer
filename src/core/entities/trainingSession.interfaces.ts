@@ -6,6 +6,7 @@ export interface TrainingSessionListItem {
     id: UUID;
     kind: TrainingSessionKind;
     title: string;
+    sourceGymPlanName?: string;
     startedAtMs: number;
     endedAtMs?: number;
     durationSec?: number;

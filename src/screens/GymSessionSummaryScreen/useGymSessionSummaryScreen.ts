@@ -35,6 +35,7 @@ export const useGymSessionSummaryScreen = () => {
     const locale = i18n.resolvedLanguage ?? i18n.language;
     const sourceGymPlanId =
         sourceGymPlan?.status === 'active' ? sourceGymPlan.id : undefined;
+    const sourceGymPlanTitle = session?.sourceGymPlanName;
     const canOpenSourceGymPlan = sourceGymPlanId !== undefined;
     const isStartingSession = startSessionFromSnapshot.isPending;
     const actionErrorMessage = isGymError(startSessionFromSnapshot.error)
@@ -105,6 +106,7 @@ export const useGymSessionSummaryScreen = () => {
             session,
             setDeleteConfirmVisible,
             sourceGymPlan,
+            sourceGymPlanTitle,
             startedAtLabel: '',
             t,
         };
@@ -146,6 +148,7 @@ export const useGymSessionSummaryScreen = () => {
         session,
         setDeleteConfirmVisible,
         sourceGymPlan,
+        sourceGymPlanTitle,
         startedAtLabel,
         t,
     };

@@ -434,13 +434,13 @@ export const createExerciseDefinitionRepository = ({
                 .all();
             const gymItems: ExerciseDefinitionRecentSessionRow[] = gymRows.map(
                 (row) => {
-                    const title =
-                        row.gymPlanName ?? row.sourceGymPlanName ?? '';
+                    const title = row.sourceGymPlanName ?? '';
 
                     return {
                         id: row.id,
                         kind: 'gym',
                         title,
+                        sourceGymPlanName: row.sourceGymPlanName ?? undefined,
                         startedAtMs: row.startedAtMs,
                     };
                 },

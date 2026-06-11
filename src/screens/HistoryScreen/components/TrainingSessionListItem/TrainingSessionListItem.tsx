@@ -57,6 +57,9 @@ export const TrainingSessionListItem = ({
     }
 
     let title = session.title;
+    if (title.length === 0 && session.sourceGymPlanName != null) {
+        title = session.sourceGymPlanName;
+    }
     if (title.length === 0 && session.kind === 'gym') {
         title = t('gymHistory.sessionTitle');
     }
