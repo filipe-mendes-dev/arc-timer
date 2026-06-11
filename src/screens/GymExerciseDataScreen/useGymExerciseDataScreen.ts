@@ -29,7 +29,6 @@ import {
 import { getWeightGrams } from 'src/helpers/gymExerciseRecord.helpers';
 import type { UpdateExerciseRecordSetInput } from 'src/db/services/gyms/gymSessionServiceFactory';
 import type { GymError } from 'src/db/repositories/gyms/gymErrors';
-import { i18nKeys } from 'src/i18n/i18nKeys.generated';
 
 const getRecordIdParam = (recordId?: string | string[]): string | undefined => {
     if (Array.isArray(recordId)) {
