@@ -34,6 +34,8 @@ const WorkoutsScreen = () => {
     const router = useRouter();
     const { data: list = [] } = useWorkouts();
     const toggleFavoriteWorkout = useToggleFavoriteWorkout();
+    const clearDraft = useWorkoutDraftStore((state) => state.clearDraft);
+    const startDraftNew = useWorkoutDraftStore((state) => state.startDraftNew);
     const startDraftFromImported = useWorkoutDraftStore(
         (state) => state.startDraftFromImported
     );
@@ -67,10 +69,19 @@ const WorkoutsScreen = () => {
         requestRemoval,
         confirmRemoval,
         cancelRemoval,
+        errorMessage: removalErrorMessage,
+        handleCloseError: handleCloseRemovalError,
     } = useWorkoutsSelection();
 
     const closeModal = () => {
         setModalVisible(false);
+    };
+
+    const handleCreateNewWorkout = () => {
+        clearDraft();
+        startDraftNew();
+        closeModal();
+        router.push('/workouts/edit');
     };
 
     const handleImportFromFile = async () => {
@@ -102,10 +113,7 @@ const WorkoutsScreen = () => {
 
             startDraftFromImported(result.workout);
 
-            router.push({
-                pathname: '/workouts/edit',
-                params: { fromImport: '1' },
-            });
+            router.push('/workouts/edit');
         } catch (err) {
             console.warn('Import failed (unexpected)', err);
             setImportError(t('workouts.import.errors.unexpected'));
@@ -148,8 +156,11 @@ const WorkoutsScreen = () => {
                             )}
                         </View>
                         <ErrorBanner
-                            message={importError ?? ''}
-                            onClose={() => setImportError(null)}
+                            message={importError ?? removalErrorMessage}
+                            onClose={() => {
+                                setImportError(null);
+                                handleCloseRemovalError();
+                            }}
                         />
                     </View>
                 }
@@ -196,6 +207,7 @@ const WorkoutsScreen = () => {
                 visible={modalVisible}
                 closeModal={closeModal}
                 handleImportFromFile={handleImportFromFile}
+                onCreateNew={handleCreateNewWorkout}
             />
 
             <ConfirmDialog
