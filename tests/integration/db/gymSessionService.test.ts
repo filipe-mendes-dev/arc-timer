@@ -11,6 +11,7 @@ import {
     gymExerciseRecordSetsTable,
     gymSessionsTable,
     exerciseDefinitionsTable,
+    gymPlansTable,
 } from '@src/db/schema';
 
 import { createExerciseDefinitionFixture } from '../../fixtures/exerciseDefinitions';
@@ -207,6 +208,109 @@ describe('gymSessionService integration', () => {
 
             expect(hydrated).toEqual(session);
         });
+        it('hydrates the original plan name after the source plan is renamed', () => {
+            const { gymSessionService } = context.testDb.dbServices;
+
+            const definition = seedExerciseDefinition(
+                context.testDb,
+                createExerciseDefinitionFixture({
+                    id: 'definition-renamed-source-plan',
+                    name: 'Gym Test Renamed Plan Press',
+                    availability: 'gym',
+                }),
+            );
+
+            const gymPlan = seedGymPlan(
+                context.testDb,
+                createGymPlanFixture({
+                    id: 'renamed-source-plan',
+                    name: 'Original Push Plan',
+                    sections: [
+                        createGymPlanSectionFixture({
+                            exercises: [
+                                createGymPlanExerciseFixture({
+                                    exerciseDefinitionId: definition.id,
+                                }),
+                            ],
+                        }),
+                    ],
+                }),
+            );
+
+            const session = seedGymSession(
+                context.testDb,
+                createGymSessionFixture({
+                    id: 'renamed-source-plan-session',
+                    startedAtMs: FIXED_NOW_MS - 1_000,
+                    status: 'completed',
+                    endedAtMs: FIXED_NOW_MS,
+                    sourceGymPlanId: gymPlan.id,
+                    sourceGymPlanName: gymPlan.name,
+                }),
+            );
+
+            context.testDb.db
+                .update(gymPlansTable)
+                .set({ name: 'Renamed Push Plan', updatedAtMs: FIXED_NOW_MS })
+                .where(eq(gymPlansTable.id, gymPlan.id))
+                .run();
+
+            const hydrated = gymSessionService.getGymSessionById(session.id);
+
+            expect(hydrated?.sourceGymPlanName).toBe(gymPlan.name);
+        });
+
+        it('hydrates the original plan name after the source plan is deleted', () => {
+            const { gymSessionService } = context.testDb.dbServices;
+
+            const definition = seedExerciseDefinition(
+                context.testDb,
+                createExerciseDefinitionFixture({
+                    id: 'definition-renamed-source-plan',
+                    name: 'Gym Test Renamed Plan Press',
+                    availability: 'gym',
+                }),
+            );
+
+            const gymPlan = seedGymPlan(
+                context.testDb,
+                createGymPlanFixture({
+                    id: 'renamed-source-plan',
+                    name: 'Original Push Plan',
+                    sections: [
+                        createGymPlanSectionFixture({
+                            exercises: [
+                                createGymPlanExerciseFixture({
+                                    exerciseDefinitionId: definition.id,
+                                }),
+                            ],
+                        }),
+                    ],
+                }),
+            );
+
+            const session = seedGymSession(
+                context.testDb,
+                createGymSessionFixture({
+                    id: 'deleted-source-plan-session',
+                    startedAtMs: FIXED_NOW_MS - 1_000,
+                    status: 'completed',
+                    endedAtMs: FIXED_NOW_MS,
+                    sourceGymPlanId: gymPlan.id,
+                    sourceGymPlanName: gymPlan.name,
+                }),
+            );
+
+            context.testDb.db
+                .delete(gymPlansTable)
+                .where(eq(gymPlansTable.id, gymPlan.id))
+                .run();
+
+            const hydrated = gymSessionService.getGymSessionById(session.id);
+
+            expect(hydrated?.sourceGymPlanId).toBeUndefined();
+            expect(hydrated?.sourceGymPlanName).toBe(gymPlan.name);
+        });
     });
 
     describe('listGymSessionItems', () => {
@@ -323,6 +427,7 @@ describe('gymSessionService integration', () => {
                         createGymPlanSectionFixture({
                             id: 'session-plan-second-section',
                             sortIndex: 1,
+                            title: 'Second',
                             exercises: [
                                 createGymPlanExerciseFixture({
                                     id: 'session-plan-row',
@@ -335,6 +440,7 @@ describe('gymSessionService integration', () => {
                         createGymPlanSectionFixture({
                             id: 'session-plan-first-section',
                             sortIndex: 0,
+                            title: 'First',
                             exercises: [
                                 createGymPlanExerciseFixture({
                                     id: 'session-plan-press',
@@ -389,6 +495,7 @@ describe('gymSessionService integration', () => {
             expect(sessionRow).toMatchObject({
                 id: session.id,
                 sourceGymPlanId: gymPlan.id,
+                sourceGymPlanName: gymPlan.name,
                 startedAtMs: session.startedAtMs,
                 status: 'active',
                 notes: session.notes ?? null,
@@ -396,6 +503,7 @@ describe('gymSessionService integration', () => {
                 updatedAtMs: FIXED_NOW_MS,
             });
 
+            expect(session.sourceGymPlanName).toBe(gymPlan.name);
             expect(recordRows).toHaveLength(2);
 
             expect(
@@ -404,6 +512,12 @@ describe('gymSessionService integration', () => {
                 gymPlan.sections[1].exercises[0].id,
                 gymPlan.sections[0].exercises[0].id,
             ]);
+            expect(
+                recordRows.map((record) => record.sourceGymPlanSectionId),
+            ).toEqual([gymPlan.sections[1].id, gymPlan.sections[0].id]);
+            expect(
+                recordRows.map((record) => record.sourceGymPlanSectionTitle),
+            ).toEqual([gymPlan.sections[1].title, gymPlan.sections[0].title]);
 
             expect(
                 recordRows.map((record) => record.exerciseDefinitionId),
@@ -438,6 +552,62 @@ describe('gymSessionService integration', () => {
             expect(session.exerciseRecords.map((record) => record.id)).toEqual(
                 recordRows.map((record) => record.id),
             );
+        });
+
+        it('snapshots source section metadata when creating a session from a plan', () => {
+            const { gymSessionService } = context.testDb.dbServices;
+
+            const definition = seedExerciseDefinition(
+                context.testDb,
+                createExerciseDefinitionFixture({
+                    id: 'definition-section-snapshot',
+                    name: 'Gym Test Section Snapshot Press',
+                    availability: 'gym',
+                }),
+            );
+
+            const gymPlan = seedGymPlan(
+                context.testDb,
+                createGymPlanFixture({
+                    id: 'section-snapshot-plan',
+                    sections: [
+                        createGymPlanSectionFixture({
+                            id: 'section-snapshot-original-section',
+                            title: 'Original Push',
+                            exercises: [
+                                createGymPlanExerciseFixture({
+                                    id: 'section-snapshot-original-exercise',
+                                    exerciseDefinitionId: definition.id,
+                                }),
+                            ],
+                        }),
+                    ],
+                }),
+            );
+
+            const session = gymSessionService.startGymSessionFromPlan({
+                gymPlanId: gymPlan.id,
+            });
+
+            const recordRows = context.testDb.db
+                .select()
+                .from(gymExerciseRecordsTable)
+                .where(eq(gymExerciseRecordsTable.gymSessionId, session.id))
+                .all();
+
+            expect(recordRows).toHaveLength(1);
+
+            expect(recordRows[0]).toMatchObject({
+                sourceGymPlanSectionId: gymPlan.sections[0].id,
+                sourceGymPlanSectionTitle: gymPlan.sections[0].title,
+                sourceGymPlanExerciseId: gymPlan.sections[0].exercises[0].id,
+            });
+
+            expect(session.exerciseRecords[0]).toMatchObject({
+                sourceGymPlanSectionId: gymPlan.sections[0].id,
+                sourceGymPlanSectionTitle: gymPlan.sections[0].title,
+                sourceGymPlanExerciseId: gymPlan.sections[0].exercises[0].id,
+            });
         });
 
         it('rejects starting from a missing gym plan', () => {
@@ -521,6 +691,150 @@ describe('gymSessionService integration', () => {
                     gymPlanId: gymPlan.id,
                 });
             }, 'INVALID_GYM_PLAN');
+        });
+    });
+
+    describe('startGymSessionFromSessionSnapshot', () => {
+        it('creates a new active session from a completed session snapshot', () => {
+            const { gymSessionService } = context.testDb.dbServices;
+
+            const definition = seedExerciseDefinition(
+                context.testDb,
+                createExerciseDefinitionFixture({
+                    id: 'definition-rerun-session',
+                    name: 'Gym Test Rerun Press',
+                    availability: 'gym',
+                }),
+            );
+
+            const sourceSession = seedGymSession(
+                context.testDb,
+                createGymSessionFixture({
+                    id: 'rerun-source-session',
+                    startedAtMs: FIXED_NOW_MS - 10_000,
+                    endedAtMs: FIXED_NOW_MS - 5_000,
+                    status: 'completed',
+                    sourceGymPlanName: 'Snapshot Source Plan',
+                    exerciseRecords: [
+                        createGymExerciseRecordFixture({
+                            id: 'rerun-source-record',
+                            exerciseDefinitionId: definition.id,
+                            sourceGymPlanSectionId: 'rerun-section-source',
+                            sourceGymPlanSectionTitle: 'Snapshot Push',
+                            sets: [
+                                createGymExerciseRecordSetFixture({
+                                    id: 'rerun-source-set',
+                                    reps: 8,
+                                    completedAtMs: FIXED_NOW_MS - 6_000,
+                                }),
+                            ],
+                        }),
+                    ],
+                }),
+            );
+
+            const session =
+                gymSessionService.startGymSessionFromSessionSnapshot({
+                    sessionId: sourceSession.id,
+                });
+
+            expect(session).toMatchObject({
+                status: 'active',
+                startedAtMs: FIXED_NOW_MS,
+                endedAtMs: undefined,
+                sourceGymPlanId: sourceSession.sourceGymPlanId,
+                sourceGymPlanName: sourceSession.sourceGymPlanName,
+            });
+        });
+
+        it('preserves section snapshot metadata from the source session', () => {
+            const { gymSessionService } = context.testDb.dbServices;
+
+            const definition = seedExerciseDefinition(
+                context.testDb,
+                createExerciseDefinitionFixture({
+                    id: 'definition-rerun-section-snapshot',
+                    name: 'Gym Test Rerun Section Snapshot Press',
+                    availability: 'gym',
+                }),
+            );
+
+            const sourceSession = seedGymSession(
+                context.testDb,
+                createGymSessionFixture({
+                    id: 'rerun-section-source-session',
+                    startedAtMs: FIXED_NOW_MS - 10_000,
+                    endedAtMs: FIXED_NOW_MS - 5_000,
+                    status: 'completed',
+                    exerciseRecords: [
+                        createGymExerciseRecordFixture({
+                            id: 'rerun-section-source-record',
+                            exerciseDefinitionId: definition.id,
+                            sourceGymPlanSectionId: 'rerun-section-source',
+                            sourceGymPlanSectionTitle: 'Snapshot Push',
+                        }),
+                    ],
+                }),
+            );
+
+            const session =
+                gymSessionService.startGymSessionFromSessionSnapshot({
+                    sessionId: sourceSession.id,
+                });
+
+            expect(session.exerciseRecords[0]).toMatchObject({
+                exerciseDefinitionId: definition.id,
+                sourceGymPlanSectionId: 'rerun-section-source',
+                sourceGymPlanSectionTitle: 'Snapshot Push',
+            });
+        });
+
+        it('copies sets and clears completion state', () => {
+            const { gymSessionService } = context.testDb.dbServices;
+
+            const definition = seedExerciseDefinition(
+                context.testDb,
+                createExerciseDefinitionFixture({
+                    id: 'definition-rerun-set-copy',
+                    name: 'Gym Test Rerun Set Copy Press',
+                    availability: 'gym',
+                }),
+            );
+
+            const sourceSession = seedGymSession(
+                context.testDb,
+                createGymSessionFixture({
+                    id: 'rerun-set-source-session',
+                    startedAtMs: FIXED_NOW_MS - 10_000,
+                    endedAtMs: FIXED_NOW_MS - 5_000,
+                    status: 'completed',
+                    exerciseRecords: [
+                        createGymExerciseRecordFixture({
+                            id: 'rerun-set-source-record',
+                            exerciseDefinitionId: definition.id,
+                            sets: [
+                                createGymExerciseRecordSetFixture({
+                                    id: 'rerun-set-source-set',
+                                    reps: 8,
+                                    completedAtMs: FIXED_NOW_MS - 6_000,
+                                }),
+                            ],
+                        }),
+                    ],
+                }),
+            );
+
+            const session =
+                gymSessionService.startGymSessionFromSessionSnapshot({
+                    sessionId: sourceSession.id,
+                });
+
+            expect(session.exerciseRecords[0].sets).toMatchObject([
+                {
+                    reps: 8,
+                    completedAtMs: undefined,
+                },
+            ]);
         });
     });
 
@@ -795,6 +1109,42 @@ describe('gymSessionService integration', () => {
             });
 
             expect(rows.map((row) => row.setIndex)).toEqual([0, 1]);
+        });
+
+        it('accepts RPE-only sets as meaningful effort values', () => {
+            const { gymSessionService } = context.testDb.dbServices;
+            const definition = seedExerciseDefinition(
+                context.testDb,
+                createExerciseDefinitionFixture({
+                    name: 'Gym Test RPE Only Set',
+                    availability: 'gym',
+                }),
+            );
+            const session = seedGymSession(
+                context.testDb,
+                createGymSessionFixture({
+                    id: 'active-session',
+                    startedAtMs: FIXED_NOW_MS - 1_000,
+                    status: 'active',
+                    exerciseRecords: [
+                        createGymExerciseRecordFixture({
+                            id: 'active-record',
+                            exerciseDefinitionId: definition.id,
+                        }),
+                    ],
+                }),
+            );
+
+            const set = gymSessionService.addSetToExerciseRecord({
+                exerciseRecordId: session.exerciseRecords[0].id,
+                rpeTenths: 80,
+            });
+
+            expect(set).toMatchObject({
+                rpeTenths: 80,
+                createdAtMs: FIXED_NOW_MS,
+                updatedAtMs: FIXED_NOW_MS,
+            });
         });
 
         it('rejects set rows without a measurable effort value', () => {
