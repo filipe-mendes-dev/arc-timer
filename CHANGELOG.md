@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- Add a dedicated screenshot build variant with separate bundle/package identifiers, runtime variant detection and deterministic seeded demo data for store screenshots
+- Add screenshot demo content with populated HIIT workouts, gym plans, completed history, exercise definitions, personal records and recent exercise sessions
+
 ## [v1.1.0] - 2026-06-11
 
 ### Added
