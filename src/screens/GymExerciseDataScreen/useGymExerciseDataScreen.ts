@@ -447,7 +447,7 @@ export const useGymExerciseDataScreen = () => {
         exitSelectMode,
         handleAddSet,
         handleBack: () => router.back(),
-        handleBackToSession: () => router.replace('/gymSession'),
+        handleBackToSession: () => router.dismissTo('/gymSession'),
         handleCloseError,
         handleConfirmDeleteSets,
         handleCancelDeleteSets: () => setPendingDeleteSets([]),
