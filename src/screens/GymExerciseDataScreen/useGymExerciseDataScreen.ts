@@ -23,7 +23,10 @@ import {
 } from './GymExerciseDataScreen.helpers';
 import type { SetDraft, TrackingFields } from './GymExerciseDataScreen.types';
 import {
+    DEFAULT_DISTANCE_METERS,
+    DEFAULT_DURATION_SEC,
     DEFAULT_REPS,
+    DEFAULT_RPE_TENTHS,
     DEFAULT_WEIGHT_KG,
 } from 'src/helpers/exerciseDefinition.helpers';
 import { getWeightGrams } from 'src/helpers/gymExerciseRecord.helpers';
@@ -291,11 +294,12 @@ export const useGymExerciseDataScreen = () => {
         let nextWeightGrams: number | undefined;
 
         if (trackingFields.hasDistanceMeters) {
-            nextDistanceMeters = previousSet?.distanceMeters;
+            nextDistanceMeters =
+                previousSet?.distanceMeters ?? DEFAULT_DISTANCE_METERS;
         }
 
         if (trackingFields.hasDurationSec) {
-            nextDurationSec = previousSet?.durationSec;
+            nextDurationSec = previousSet?.durationSec ?? DEFAULT_DURATION_SEC;
         }
 
         if (trackingFields.hasReps) {
@@ -303,7 +307,7 @@ export const useGymExerciseDataScreen = () => {
         }
 
         if (trackingFields.hasRpe) {
-            nextRpeTenths = previousSet?.rpeTenths;
+            nextRpeTenths = previousSet?.rpeTenths ?? DEFAULT_RPE_TENTHS;
         }
 
         if (trackingFields.hasWeight) {
