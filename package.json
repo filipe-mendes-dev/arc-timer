@@ -1,6 +1,6 @@
 {
     "name": "arc-timer",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "main": "expo-router/entry",
     "scripts": {
         "start": "expo start",
@@ -17,6 +17,7 @@
         "check": "npm run typecheck && npm run lint",
         "expo:check": "expo install --check",
         "release:check": "npm run check && npm run expo:check && npx expo-doctor",
+        "release:permissions": "node scripts/inspect-native-permissions.js",
         "export:ios": "expo export --clear --platform ios --output-dir /private/tmp/arc-timer-ios-export",
         "export:android": "expo export --clear --platform android --output-dir /private/tmp/arc-timer-android-export",
         "release:ios:check": "npm run release:check && npm run export:ios",
