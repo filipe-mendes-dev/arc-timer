@@ -48,7 +48,6 @@ const GymExerciseDataScreen = () => {
                             color={theme.palette.text.inverted}
                         />
                     }
-                    style={st.completedActionButton}
                 />
             </View>
         );

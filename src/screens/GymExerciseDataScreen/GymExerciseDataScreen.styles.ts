@@ -29,8 +29,5 @@ export const useStyles = createStyles((theme: AppTheme) =>
             paddingHorizontal: theme.layout.screen.paddingHorizontal,
             paddingTop: theme.layout.screen.paddingVertical,
         },
-        completedActionButton: {
-            minWidth: 184,
-        },
     }),
 );
