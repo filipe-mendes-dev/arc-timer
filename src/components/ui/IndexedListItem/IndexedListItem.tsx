@@ -34,7 +34,7 @@ export const IndexedListItem = ({
                     {hasIcon && (
                         <AppIcon
                             id={iconName}
-                            size={20}
+                            size={22}
                             color={theme.palette.accent.primary}
                         />
                     )}
@@ -48,7 +48,12 @@ export const IndexedListItem = ({
             )}
 
             <View style={st.content}>
-                <AppText variant="bodySmall" tone="primary" numberOfLines={1}>
+                <AppText
+                    variant="bodySmall"
+                    tone="primary"
+                    numberOfLines={1}
+                    weight="semibold"
+                >
                     {mainContent}
                 </AppText>
 
@@ -73,9 +78,5 @@ export const IndexedListItem = ({
         );
     }
 
-    return (
-        <View style={st.item}>
-            {content}
-        </View>
-    );
+    return <View style={st.item}>{content}</View>;
 };
