@@ -6,6 +6,7 @@ type MetaCardStyleProps = {
     hasActionStrip: boolean;
     hasSummaryContent: boolean;
     hasCollapsibleContent: boolean;
+    hasStatusBadge: boolean;
     hasTopContent: boolean;
     hasAnyAction: boolean;
     selectionOutlineColor?: string;
@@ -40,6 +41,9 @@ export const useMetaCardStyles = createStyles(
                 borderBottomRightRadius: theme.layout.card.borderRadius,
                 padding: 0,
                 marginRight: props.hasAnyAction ? 50 : 0,
+                flex: 1,
+                maxWidth: '100%',
+                minWidth: 0,
             },
 
             dateTimePill: {
@@ -48,8 +52,8 @@ export const useMetaCardStyles = createStyles(
                 borderBottomRightRadius: 14,
                 paddingHorizontal: 12,
                 paddingVertical: 2,
-                borderRightWidth: 1,
-                borderBottomWidth: 1,
+                borderRightWidth: props.hasStatusBadge ? 0 : 1,
+                borderBottomWidth: props.hasStatusBadge ? 0 : 1,
                 borderColor: theme.palette.metaCard.container.border,
                 marginRight: 4,
                 flexDirection: 'row',
@@ -93,8 +97,10 @@ export const useMetaCardStyles = createStyles(
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: 6,
+                marginLeft: -14,
                 position: 'relative',
                 zIndex: 1,
+                flexShrink: 0,
             },
             statusBadge: {
                 flexDirection: 'row',
@@ -105,7 +111,6 @@ export const useMetaCardStyles = createStyles(
                 paddingBottom: 3,
                 paddingHorizontal: 18,
                 borderBottomRightRadius: 14,
-                marginLeft: -14,
                 overflow: 'hidden',
                 backgroundColor: theme.palette.metaCard.statusBadge.background,
             },

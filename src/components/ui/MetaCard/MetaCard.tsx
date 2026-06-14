@@ -80,6 +80,7 @@ export const MetaCard: FC<MetaCardProps> = ({
         hasAnyAction,
         hasCollapsibleContent: !!collapsibleContent,
         hasSummaryContent: !!summaryContent,
+        hasStatusBadge: !!statusBadge,
         hasTopContent: !noTopContent,
         selectionOutlineColor:
             selectionOutlineColor ?? theme.palette.accent.primary,
