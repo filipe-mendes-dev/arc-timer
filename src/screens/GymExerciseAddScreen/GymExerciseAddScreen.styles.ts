@@ -22,5 +22,8 @@ export const useStyles = createStyles((theme: AppTheme) =>
         actions: {
             gap: 12,
         },
+        errorBanner: {
+            paddingBottom: 12,
+        },
     }),
 );

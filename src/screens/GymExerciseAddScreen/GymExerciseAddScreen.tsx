@@ -195,6 +195,7 @@ const GymExerciseAddScreen = () => {
                                     addGymExerciseRecord.reset();
                                     addGymExerciseRecordSet.reset();
                                 }}
+                                collapseContentStyle={st.errorBanner}
                             />
                             <Button
                                 title={t(
