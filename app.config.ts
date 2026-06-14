@@ -57,7 +57,7 @@ const scheme = getScheme();
 const config: Config = {
     name,
     slug: 'arc-timer',
-    version: '1.1.0',
+    version: '1.1.1',
     orientation: 'portrait',
     icon: './assets/generated/classic/icon-light.png',
     userInterfaceStyle: 'automatic',
@@ -70,7 +70,7 @@ const config: Config = {
             tinted: './assets/generated/classic/icon-tinted.png',
         },
         bundleIdentifier: bundleId,
-        buildNumber: '3',
+        buildNumber: '4',
         supportsTablet: false,
         infoPlist: {
             ITSAppUsesNonExemptEncryption: false,
@@ -79,7 +79,7 @@ const config: Config = {
     android: {
         icon: './assets/generated/classic/icon-light.png',
         package: bundleId,
-        versionCode: 4,
+        versionCode: 5,
         adaptiveIcon: {
             foregroundImage:
                 './assets/generated/classic/adaptive-foreground.png',
@@ -105,7 +105,11 @@ const config: Config = {
         'expo-router',
         [
             'expo-audio',
-            { microphonePermission: false, recordAudioAndroid: false },
+            {
+                microphonePermission: false,
+                recordAudioAndroid: false,
+                enableBackgroundPlayback: false,
+            },
         ],
         'expo-font',
         'expo-localization',

@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Unreleased]
+## [v1.1.1] - 2026-06-14
 
 ### Added
 
@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - Fix gym session navigation and exercise add error handling edge cases
+- Remove persistent background audio mode from generated builds because workout sound effects do not require background playback
 
 ## [v1.1.0] - 2026-06-11
 
@@ -109,3 +110,5 @@ All notable changes to this project will be documented in this file.
 
 [v1.0.0]: https://github.com/filipe-mendes-dev/arc-timer/releases/tag/v1.0.0
 [v1.0.1]: https://github.com/filipe-mendes-dev/arc-timer/releases/tag/v1.0.1
+[v1.1.0]: https://github.com/filipe-mendes-dev/arc-timer/releases/tag/v1.1.0
+[v1.1.1]: https://github.com/filipe-mendes-dev/arc-timer/releases/tag/v1.1.1
