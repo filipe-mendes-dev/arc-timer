@@ -11,6 +11,15 @@ All notable changes to this project will be documented in this file.
 - Add a dedicated screenshot build variant with separate bundle/package identifiers, runtime variant detection and deterministic seeded demo data for store screenshots
 - Add screenshot demo content with populated HIIT workouts, gym plans, completed history, exercise definitions, personal records and recent exercise sessions
 
+### Changed
+
+- Improve gym session UI/UX with clearer exercise completion, live session timing in exercise details and more polished list/card layouts
+- Improve default values when adding gym sets with duration, distance or RPE tracking enabled
+
+### Fixed
+
+- Fix gym session navigation and exercise add error handling edge cases
+
 ## [v1.1.0] - 2026-06-11
 
 ### Added

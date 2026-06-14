@@ -16,6 +16,7 @@ import {
     useExerciseDefinitionSuggestions,
 } from '@src/data/exerciseDefinitions';
 import {
+    isGymError,
     useActiveGymSession,
     useAddGymExerciseRecordSet,
     useAddGymExerciseRecordByName,
@@ -137,6 +138,19 @@ const GymExerciseAddScreen = () => {
         );
     };
 
+    const getErrorMessage = (): string => {
+        const error =
+            addGymExerciseRecord.error ?? addGymExerciseRecordSet.error;
+
+        if (!error) return '';
+
+        if (isGymError(error)) {
+            return t(error.message);
+        }
+
+        return t('gymActiveSession.errors.addExerciseFailed');
+    };
+
     if (!activeSession) {
         return (
             <MainContainer title={t('gymActiveSession.addExerciseModal.title')}>
@@ -183,18 +197,12 @@ const GymExerciseAddScreen = () => {
                     <View style={st.actions}>
                         <View>
                             <ErrorBanner
-                                message={
-                                    addGymExerciseRecord.error ||
-                                    addGymExerciseRecordSet.error
-                                        ? t(
-                                              'gymActiveSession.errors.addExerciseFailed',
-                                          )
-                                        : ''
-                                }
+                                message={getErrorMessage()}
                                 onClose={() => {
                                     addGymExerciseRecord.reset();
                                     addGymExerciseRecordSet.reset();
                                 }}
+                                collapseContentStyle={st.errorBanner}
                             />
                             <Button
                                 title={t(

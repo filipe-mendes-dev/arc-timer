@@ -277,7 +277,7 @@ const HomeScreen = () => {
                     <HomeActionTile
                         title={t('home.actions.startGymSession')}
                         icon="gymSession"
-                        variant="secondary"
+                        variant="primary"
                         onPress={handleStartGymSession}
                     />
                 </View>

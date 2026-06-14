@@ -19,9 +19,15 @@ export const useStyles = createStyles((theme: AppTheme) =>
         },
         listContent: {
             flexGrow: 1,
+            paddingBottom: 96,
         },
         errorBanner: {
             paddingHorizontal: theme.layout.screen.paddingHorizontal,
+        },
+        completedActionContainer: {
+            alignItems: 'center',
+            paddingHorizontal: theme.layout.screen.paddingHorizontal,
+            paddingTop: theme.layout.screen.paddingVertical,
         },
     }),
 );

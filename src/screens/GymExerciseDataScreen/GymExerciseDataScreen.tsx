@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react';
 import { FlatList, View } from 'react-native';
 
 import { ListEmptyState } from '@src/components/layout/ListEmptyState';
@@ -10,6 +11,9 @@ import ConfirmDialog from '@src/components/modals/ConfirmDialog/ConfirmDialog';
 import { DropdownPortalProvider } from '@src/components/ui/Dropdown/DropdownPortal';
 import { ErrorBanner } from '@src/components/ui/ErrorBanner/ErrorBanner';
 import { Separator } from '@src/components/ui/Separator/Separator';
+import { Button } from '@src/components/ui/Button/Button';
+import { AppIcon } from '@src/components/ui/Icon/AppIcon';
+import { useTheme } from '@src/theme/ThemeProvider';
 
 import { GymExerciseDataFooter } from './components/GymExerciseDataFooter';
 import { GymExerciseDataHeader } from './components/GymExerciseDataHeader';
@@ -27,7 +31,27 @@ const trackingFieldsModalCopy: TrackingFieldsModalCopy = {
 
 const GymExerciseDataScreen = () => {
     const st = useStyles();
+    const { theme } = useTheme();
     const screen = useGymExerciseDataScreen();
+    let completedActionFooter: ReactElement | null = null;
+
+    if (screen.isExerciseComplete && !screen.isSelectMode) {
+        completedActionFooter = (
+            <View style={st.completedActionContainer}>
+                <Button
+                    title={screen.t('gymExerciseData.actions.backToSession')}
+                    onPress={screen.handleBackToSession}
+                    icon={
+                        <AppIcon
+                            id="checkmarkCircle"
+                            size={20}
+                            color={theme.palette.text.inverted}
+                        />
+                    }
+                />
+            </View>
+        );
+    }
 
     if (!screen.record) {
         return (
@@ -53,6 +77,7 @@ const GymExerciseDataScreen = () => {
             <View style={st.screen}>
                 <GymExerciseDataHeader
                     completedSetCount={screen.completedSetCount}
+                    elapsedDuration={screen.elapsedDuration}
                     exerciseName={screen.exerciseName}
                     isSelectMode={screen.isSelectMode}
                     selectedCount={screen.selectedCount}
@@ -97,6 +122,7 @@ const GymExerciseDataScreen = () => {
                             )}
                         />
                     }
+                    ListFooterComponent={completedActionFooter}
                     keyboardShouldPersistTaps="handled"
                 />
 

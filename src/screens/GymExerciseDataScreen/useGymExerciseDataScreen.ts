@@ -23,12 +23,16 @@ import {
 } from './GymExerciseDataScreen.helpers';
 import type { SetDraft, TrackingFields } from './GymExerciseDataScreen.types';
 import {
+    DEFAULT_DISTANCE_METERS,
+    DEFAULT_DURATION_SEC,
     DEFAULT_REPS,
+    DEFAULT_RPE_TENTHS,
     DEFAULT_WEIGHT_KG,
 } from 'src/helpers/exerciseDefinition.helpers';
 import { getWeightGrams } from 'src/helpers/gymExerciseRecord.helpers';
 import type { UpdateExerciseRecordSetInput } from 'src/db/services/gyms/gymSessionServiceFactory';
 import type { GymError } from 'src/db/repositories/gyms/gymErrors';
+import { useElapsedDuration } from '@src/hooks/useElapsedDuration';
 
 const getRecordIdParam = (recordId?: string | string[]): string | undefined => {
     if (Array.isArray(recordId)) {
@@ -135,6 +139,7 @@ export const useGymExerciseDataScreen = () => {
     const updateSet = useUpdateGymExerciseRecordSet();
     const deleteSet = useDeleteGymExerciseRecordSet();
     const { data: activeSession } = useActiveGymSession();
+    const elapsedDuration = useElapsedDuration(activeSession?.startedAtMs);
     const record = activeSession?.exerciseRecords.find(
         (item) => item.id === recordId,
     );
@@ -168,6 +173,8 @@ export const useGymExerciseDataScreen = () => {
     const completedSetCount = sets.filter(
         (set) => set.completedAtMs !== undefined,
     ).length;
+    const isExerciseComplete =
+        sets.length > 0 && completedSetCount === sets.length;
     const getDeleteConfirmTitle = (): string => {
         if (pendingDeleteSets.length > 1) {
             return t('gymExerciseData.deleteConfirmBulk.title', {
@@ -291,11 +298,12 @@ export const useGymExerciseDataScreen = () => {
         let nextWeightGrams: number | undefined;
 
         if (trackingFields.hasDistanceMeters) {
-            nextDistanceMeters = previousSet?.distanceMeters;
+            nextDistanceMeters =
+                previousSet?.distanceMeters ?? DEFAULT_DISTANCE_METERS;
         }
 
         if (trackingFields.hasDurationSec) {
-            nextDurationSec = previousSet?.durationSec;
+            nextDurationSec = previousSet?.durationSec ?? DEFAULT_DURATION_SEC;
         }
 
         if (trackingFields.hasReps) {
@@ -303,7 +311,7 @@ export const useGymExerciseDataScreen = () => {
         }
 
         if (trackingFields.hasRpe) {
-            nextRpeTenths = previousSet?.rpeTenths;
+            nextRpeTenths = previousSet?.rpeTenths ?? DEFAULT_RPE_TENTHS;
         }
 
         if (trackingFields.hasWeight) {
@@ -432,13 +440,14 @@ export const useGymExerciseDataScreen = () => {
         deleteConfirmMessage: getDeleteConfirmMessage(),
         deleteConfirmTitle: getDeleteConfirmTitle(),
         editingDraft,
+        elapsedDuration,
         enterSelectMode,
         errorMessage: getErrorMessage(),
         exerciseName,
         exitSelectMode,
         handleAddSet,
         handleBack: () => router.back(),
-        handleBackToSession: () => router.replace('/gymSession'),
+        handleBackToSession: () => router.dismissTo('/gymSession'),
         handleCloseError,
         handleConfirmDeleteSets,
         handleCancelDeleteSets: () => setPendingDeleteSets([]),
@@ -456,6 +465,7 @@ export const useGymExerciseDataScreen = () => {
             deleteSet.isPending && deleteSet.variables === set.id,
         isCompletingSet: (set: GymExerciseRecordSet) =>
             updateSet.isPending && updateSet.variables.id === set.id,
+        isExerciseComplete,
         isSavingSet: updateSet.isPending,
         isSelectMode,
         isSelected,

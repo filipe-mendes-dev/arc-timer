@@ -9,6 +9,9 @@ import {
 
 export const DEFAULT_REPS = 12;
 export const DEFAULT_WEIGHT_KG = 10;
+export const DEFAULT_DURATION_SEC = 60;
+export const DEFAULT_DISTANCE_METERS = 1000;
+export const DEFAULT_RPE_TENTHS = 70;
 
 export const defaultTrackingFields: GymExerciseTrackingFieldsValue = {
     hasDistanceMeters: false,

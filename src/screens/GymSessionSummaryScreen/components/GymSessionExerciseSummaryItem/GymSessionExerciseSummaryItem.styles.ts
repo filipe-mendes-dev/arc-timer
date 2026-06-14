@@ -29,7 +29,6 @@ export const useStyles = createStyles((theme: AppTheme) =>
         },
         setTitle: {
             flexShrink: 0,
-            fontWeight: '600',
             color: theme.palette.text.primary,
         },
         setDetails: {

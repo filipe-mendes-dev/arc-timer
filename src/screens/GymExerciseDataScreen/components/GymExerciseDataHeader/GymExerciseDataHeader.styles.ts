@@ -36,16 +36,16 @@ export const useStyles = createStyles((theme: AppTheme) =>
             fontWeight: '700',
             letterSpacing: 0.2,
         },
-        progressContainer: {
+        durationContainer: {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
         },
-        progressIcon: {
+        durationIcon: {
             marginRight: 4,
         },
-        progressText: {
+        durationText: {
             color: theme.palette.text.primary,
             fontWeight: '700',
             fontVariant: ['tabular-nums'],
