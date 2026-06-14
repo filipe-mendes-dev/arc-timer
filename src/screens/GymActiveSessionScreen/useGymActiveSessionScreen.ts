@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
@@ -10,12 +10,8 @@ import {
     useDiscardGymSession,
     useFinishGymSession,
 } from '@src/data/gymSessions';
-import {
-    formatElapsedDuration,
-    formatShortTime,
-} from '@src/helpers/time.helpers';
-
-const TICK_INTERVAL_MS = 1000;
+import { formatShortTime } from '@src/helpers/time.helpers';
+import { useElapsedDuration } from '@src/hooks/useElapsedDuration';
 
 export const useGymActiveSessionScreen = () => {
     const { i18n, t } = useTranslation();
@@ -25,19 +21,11 @@ export const useGymActiveSessionScreen = () => {
     const finishGymSession = useFinishGymSession();
     const discardGymSession = useDiscardGymSession();
     const deleteExerciseRecord = useDeleteGymExerciseRecord();
-    const [nowMs, setNowMs] = useState(Date.now());
     const [isEndSessionModalVisible, setEndSessionModalVisible] =
         useState(false);
     const [pendingRemoveRecord, setPendingRemoveRecord] =
         useState<GymExerciseRecord | null>(null);
-
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            setNowMs(Date.now());
-        }, TICK_INTERVAL_MS);
-
-        return () => clearInterval(intervalId);
-    }, []);
+    const elapsedDuration = useElapsedDuration(activeSession?.startedAtMs);
 
     const exerciseNameById = useMemo(
         () =>
@@ -71,12 +59,6 @@ export const useGymActiveSessionScreen = () => {
 
         const locale = i18n.resolvedLanguage ?? i18n.language;
         return formatShortTime(activeSession.startedAtMs, locale);
-    };
-
-    const getElapsedDuration = (): string => {
-        if (!activeSession) return formatElapsedDuration(0);
-
-        return formatElapsedDuration(nowMs - activeSession.startedAtMs);
     };
 
     const handleBackToGym = () => {
@@ -142,7 +124,7 @@ export const useGymActiveSessionScreen = () => {
 
     return {
         activeSession,
-        elapsedDuration: getElapsedDuration(),
+        elapsedDuration,
         errorMessage: getErrorMessage(),
         exerciseNameById,
         exerciseRecordCount,

@@ -10,6 +10,7 @@ import { useStyles } from './GymExerciseDataHeader.styles';
 
 interface GymExerciseDataHeaderProps {
     completedSetCount: number;
+    elapsedDuration: string;
     exerciseName: string;
     isSelectMode: boolean;
     selectedCount: number;
@@ -18,6 +19,7 @@ interface GymExerciseDataHeaderProps {
 
 export const GymExerciseDataHeader = ({
     completedSetCount,
+    elapsedDuration,
     exerciseName,
     isSelectMode,
     selectedCount,
@@ -60,19 +62,19 @@ export const GymExerciseDataHeader = ({
                     </AppText>
                 </View>
 
-                <View style={st.progressContainer}>
+                <View style={st.durationContainer}>
                     <AppIcon
-                        id="checkmarkCircle"
+                        id="duration"
                         size={16}
                         color={theme.palette.text.primary}
-                        style={st.progressIcon}
+                        style={st.durationIcon}
                     />
                     <AppText
                         variant="title3"
-                        style={st.progressText}
+                        style={st.durationText}
                         numberOfLines={1}
                     >
-                        {completedSetCount}/{setCount}
+                        {elapsedDuration}
                     </AppText>
                 </View>
             </View>

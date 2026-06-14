@@ -32,6 +32,7 @@ import {
 import { getWeightGrams } from 'src/helpers/gymExerciseRecord.helpers';
 import type { UpdateExerciseRecordSetInput } from 'src/db/services/gyms/gymSessionServiceFactory';
 import type { GymError } from 'src/db/repositories/gyms/gymErrors';
+import { useElapsedDuration } from '@src/hooks/useElapsedDuration';
 
 const getRecordIdParam = (recordId?: string | string[]): string | undefined => {
     if (Array.isArray(recordId)) {
@@ -138,6 +139,7 @@ export const useGymExerciseDataScreen = () => {
     const updateSet = useUpdateGymExerciseRecordSet();
     const deleteSet = useDeleteGymExerciseRecordSet();
     const { data: activeSession } = useActiveGymSession();
+    const elapsedDuration = useElapsedDuration(activeSession?.startedAtMs);
     const record = activeSession?.exerciseRecords.find(
         (item) => item.id === recordId,
     );
@@ -171,6 +173,8 @@ export const useGymExerciseDataScreen = () => {
     const completedSetCount = sets.filter(
         (set) => set.completedAtMs !== undefined,
     ).length;
+    const isExerciseComplete =
+        sets.length > 0 && completedSetCount === sets.length;
     const getDeleteConfirmTitle = (): string => {
         if (pendingDeleteSets.length > 1) {
             return t('gymExerciseData.deleteConfirmBulk.title', {
@@ -436,6 +440,7 @@ export const useGymExerciseDataScreen = () => {
         deleteConfirmMessage: getDeleteConfirmMessage(),
         deleteConfirmTitle: getDeleteConfirmTitle(),
         editingDraft,
+        elapsedDuration,
         enterSelectMode,
         errorMessage: getErrorMessage(),
         exerciseName,
@@ -460,6 +465,7 @@ export const useGymExerciseDataScreen = () => {
             deleteSet.isPending && deleteSet.variables === set.id,
         isCompletingSet: (set: GymExerciseRecordSet) =>
             updateSet.isPending && updateSet.variables.id === set.id,
+        isExerciseComplete,
         isSavingSet: updateSet.isPending,
         isSelectMode,
         isSelected,
