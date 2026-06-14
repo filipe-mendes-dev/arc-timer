@@ -12,9 +12,19 @@ export type TextTone =
     | 'error'
     | 'success';
 
+export type AppTextWeight = 'regular' | 'medium' | 'semibold' | 'bold';
+
+const fontWeightByWeight: Record<AppTextWeight, TextStyle['fontWeight']> = {
+    regular: '400',
+    medium: '500',
+    semibold: '600',
+    bold: '700',
+};
+
 export interface AppTextProps extends TextProps {
     variant?: TextVariant;
     tone?: TextTone;
+    weight?: AppTextWeight;
     align?: 'left' | 'center' | 'right';
     style?: StyleProp<TextStyle>;
     children: React.ReactNode;
@@ -23,6 +33,7 @@ export interface AppTextProps extends TextProps {
 export const AppText: FC<AppTextProps> = ({
     variant = 'body',
     tone = 'primary',
+    weight,
     align,
     style,
     children,
@@ -39,9 +50,12 @@ export const AppText: FC<AppTextProps> = ({
         color,
         textAlign: align,
     };
+    const weightStyle: TextStyle | undefined = weight
+        ? { fontWeight: fontWeightByWeight[weight] }
+        : undefined;
 
     return (
-        <Text {...rest} style={[variantStyle, base, style]}>
+        <Text {...rest} style={[variantStyle, base, weightStyle, style]}>
             {children}
         </Text>
     );
