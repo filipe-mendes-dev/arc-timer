@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- Include system exercises referenced by HIIT or gym sessions in active exercise definition lists
+
 ## [v1.1.1] - 2026-06-14
 
 ### Added
