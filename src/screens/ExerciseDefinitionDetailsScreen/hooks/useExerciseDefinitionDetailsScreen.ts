@@ -12,11 +12,11 @@ import type {
     ExerciseDefinitionReferenceItem,
 } from '@src/core/entities/exerciseDefinition.interfaces';
 
+import type { ExerciseDefinitionStatItem } from '../ExerciseDefinitionDetailsScreen.helpers';
 import {
-    formatMetric,
-    type ExerciseDefinitionStatItem,
-} from '../ExerciseDefinitionDetailsScreen.helpers';
-import { formatWeight } from 'src/helpers/gymExerciseRecord.helpers';
+    formatDistance,
+    formatWeight,
+} from 'src/helpers/gymExerciseRecord.helpers';
 
 interface UseExerciseDefinitionDetailsScreenResult {
     deleteError: string | undefined;
@@ -72,9 +72,11 @@ export const useExerciseDefinitionDetailsScreen =
                 items.push({
                     id: 'distance-pr',
                     labelKey: 'exerciseDefinitions.fields.distancePr',
-                    value:
-                        formatMetric(definition.stats.distancePr.value) ??
-                        t('exerciseDefinitions.emptyValue'),
+                    value: t('gymExerciseData.setDetails.distance', {
+                        value: formatDistance(
+                            definition.stats.distancePr.value,
+                        ),
+                    }),
                 });
             }
 
