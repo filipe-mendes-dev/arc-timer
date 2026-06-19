@@ -274,7 +274,12 @@ export const createExerciseDefinitionRepository = ({
         return Array.from(itemByKey.values())
             .sort((left, right) => right.startedAtMs - left.startedAtMs)
             .slice(0, normalizeRecentSessionLimit(limit))
-            .map(({ id, kind, title }) => ({ id, kind, title }));
+            .map(({ id, kind, startedAtMs, title }) => ({
+                id,
+                kind,
+                startedAtMs,
+                title,
+            }));
     };
 
     const repository: ExerciseDefinitionRepository = {
@@ -440,7 +445,6 @@ export const createExerciseDefinitionRepository = ({
                         id: row.id,
                         kind: 'gym',
                         title,
-                        sourceGymPlanName: row.sourceGymPlanName ?? undefined,
                         startedAtMs: row.startedAtMs,
                     };
                 },

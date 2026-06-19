@@ -64,6 +64,9 @@ export const useExerciseDefinitionDetailsScreenStyles = createStyles(
                 color: theme.palette.text.primary,
                 fontWeight: '700',
             },
+            sessionDate: {
+                color: theme.palette.text.secondary,
+            },
             sessionDurationPill: {
                 flexDirection: 'row',
                 alignItems: 'center',

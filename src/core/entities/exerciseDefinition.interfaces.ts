@@ -42,8 +42,8 @@ export interface ExerciseDefinitionReferences {
 export interface ExerciseDefinitionRecentSessionItem {
     id: UUID;
     kind: TrainingSessionKind;
+    startedAtMs: number;
     title: string;
-    sourceGymPlanName?: string;
 }
 
 export interface ExerciseDefinitionTargetSetData {
