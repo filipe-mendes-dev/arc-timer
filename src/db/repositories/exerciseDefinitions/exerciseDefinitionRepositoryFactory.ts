@@ -555,6 +555,17 @@ export const createExerciseDefinitionRepository = ({
                                       ),
                                   ),
                           ),
+                          exists(
+                              db
+                                  .select({ id: gymExerciseRecordsTable.id })
+                                  .from(gymExerciseRecordsTable)
+                                  .where(
+                                      eq(
+                                          gymExerciseRecordsTable.exerciseDefinitionId,
+                                          exerciseDefinitionsTable.id,
+                                      ),
+                                  ),
+                          ),
                       )
                     : undefined,
                 filters?.source
