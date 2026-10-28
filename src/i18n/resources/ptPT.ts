@@ -13,12 +13,14 @@ export const ptPT: I18nResource = {
             start: 'Iniciar',
             share: 'Partilhar',
             done: 'Concluído',
+            details: 'Detalhes',
         },
         status: {
             noTimeEstimate: 'Sem estimativa de tempo',
             mixedTimeAndReps: 'Misto (tempo + repetições)',
         },
         units: {
+            kg: 'kg',
             block_one: '{{count}} bloco',
             block_other: '{{count}} blocos',
             set_one: '{{count}} série',
@@ -462,6 +464,7 @@ export const ptPT: I18nResource = {
             'Este exercício não está na sessão de ginásio ativa.',
         actions: {
             addSet: 'Adicionar série',
+            openExerciseDetails: 'Abrir detalhes de {{name}}',
             backToSession: 'Voltar à sessão',
             completeSet: 'Concluir',
             deleteSet: 'Eliminar',
@@ -493,6 +496,11 @@ export const ptPT: I18nResource = {
         editSet: {
             description: 'Atualiza os valores registados nesta série.',
             title: 'Editar série',
+        },
+        history: {
+            lastSession: 'Última sessão',
+            weightPr: 'Recorde pessoal',
+            reps: '× {{count}}',
         },
         status: {
             complete: 'Concluído',

@@ -7,6 +7,7 @@ export {
 } from './exerciseDefinitionMutations';
 export {
     useExerciseDefinition,
+    useExerciseDefinitionLastWeightSet,
     useExerciseDefinitionByNormalizedName,
     useExerciseDefinitions,
     useGymExerciseDefinitions,

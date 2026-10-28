@@ -13,12 +13,14 @@ export const en: I18nResource = {
             start: 'Start',
             share: 'Share',
             done: 'Done',
+            details: 'Details',
         },
         status: {
             noTimeEstimate: 'No time estimate',
             mixedTimeAndReps: 'Mixed (time + reps)',
         },
         units: {
+            kg: 'kg',
             block_one: '{{count}} block',
             block_other: '{{count}} blocks',
             set_one: '{{count}} set',
@@ -446,6 +448,7 @@ export const en: I18nResource = {
         notFoundDescription: 'This exercise is not in the active gym session.',
         actions: {
             addSet: 'Add set',
+            openExerciseDetails: 'Open details for {{name}}',
             backToSession: 'Back to session',
             completeSet: 'Done',
             deleteSet: 'Delete',
@@ -477,6 +480,11 @@ export const en: I18nResource = {
         editSet: {
             description: 'Update the values tracked for this set.',
             title: 'Edit set',
+        },
+        history: {
+            lastSession: 'Last session',
+            weightPr: 'Personal best',
+            reps: '× {{count}}',
         },
         status: {
             complete: 'Complete',

@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNotNull } from 'drizzle-orm';
 
 import type {
     ExerciseDefinitionSetMetric,
@@ -29,6 +29,9 @@ export interface RebuildExerciseDefinitionStatsInput {
 }
 
 export interface ExerciseDefinitionStatsRepository {
+    getLastCompletedWeightSet: (
+        exerciseDefinitionId: string,
+    ) => ExerciseDefinitionSetMetric | null;
     getByExerciseDefinitionId: (
         exerciseDefinitionId: string,
     ) => ExerciseDefinitionStats | null;
@@ -421,6 +424,51 @@ export const createExerciseDefinitionStatsRepository = ({
     };
 
     const repository: ExerciseDefinitionStatsRepository = {
+        getLastCompletedWeightSet: (exerciseDefinitionId) => {
+            const row = db
+                .select({
+                    gymExerciseRecordSetId: gymExerciseRecordSetsTable.id,
+                    gymSessionId: gymSessionsTable.id,
+                    value: gymExerciseRecordSetsTable.weightGrams,
+                    reps: gymExerciseRecordSetsTable.reps,
+                    completedAtMs: gymExerciseRecordSetsTable.completedAtMs,
+                })
+                .from(gymExerciseRecordSetsTable)
+                .innerJoin(
+                    gymExerciseRecordsTable,
+                    eq(gymExerciseRecordsTable.id, gymExerciseRecordSetsTable.gymExerciseRecordId),
+                )
+                .innerJoin(
+                    gymSessionsTable,
+                    eq(gymSessionsTable.id, gymExerciseRecordsTable.gymSessionId),
+                )
+                .where(
+                    and(
+                        eq(gymExerciseRecordsTable.exerciseDefinitionId, exerciseDefinitionId),
+                        eq(gymSessionsTable.status, 'completed'),
+                        eq(gymExerciseRecordSetsTable.isWarmup, false),
+                        isNotNull(gymExerciseRecordSetsTable.completedAtMs),
+                        isNotNull(gymExerciseRecordSetsTable.weightGrams),
+                    ),
+                )
+                .orderBy(
+                    desc(gymSessionsTable.startedAtMs),
+                    desc(gymExerciseRecordSetsTable.weightGrams),
+                    desc(gymExerciseRecordSetsTable.reps),
+                )
+                .limit(1)
+                .get();
+            if (!row) return null;
+            if (row.value === null) return null;
+            return {
+                gymExerciseRecordSetId: row.gymExerciseRecordSetId,
+                gymSessionId: row.gymSessionId,
+                value: row.value,
+                reps: row.reps ?? undefined,
+                completedAtMs: row.completedAtMs ?? undefined,
+            };
+        },
+
         getByExerciseDefinitionId: (
             exerciseDefinitionId: string,
         ): ExerciseDefinitionStats | null => {

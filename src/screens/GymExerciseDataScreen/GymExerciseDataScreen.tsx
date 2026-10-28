@@ -79,6 +79,9 @@ const GymExerciseDataScreen = () => {
                     completedSetCount={screen.completedSetCount}
                     elapsedDuration={screen.elapsedDuration}
                     exerciseName={screen.exerciseName}
+                    onPressExercise={screen.openExerciseDetails}
+                    weightPr={screen.weightPr}
+                    lastWeightSet={screen.lastWeightSet}
                     isSelectMode={screen.isSelectMode}
                     selectedCount={screen.selectedCount}
                     setCount={screen.sets.length}

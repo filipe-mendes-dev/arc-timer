@@ -6,6 +6,7 @@ export const useMetricCardStyles = createStyles(() =>
     StyleSheet.create({
         card: {
             flex: 1,
+            minWidth: 0,
             justifyContent: 'center',
             gap: 2,
         },
@@ -15,6 +16,12 @@ export const useMetricCardStyles = createStyles(() =>
         },
         label: {
             marginBottom: 2,
+            flexShrink: 1,
+        },
+        labelRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
         },
         value: {
             fontWeight: '700',

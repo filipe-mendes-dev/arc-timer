@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import type { GymExerciseRecordSet } from '@src/core/entities/gymSession.interfaces';
 import {
     useExerciseDefinition,
+    useExerciseDefinitionLastWeightSet,
 } from '@src/data/exerciseDefinitions';
 import {
     fieldsFromTrackingFieldValue,
@@ -66,6 +67,9 @@ export const useGymExerciseDataScreen = () => {
     );
     const sets = record?.sets ?? [];
     const { data: definition } = useExerciseDefinition(
+        record?.exerciseDefinitionId,
+    );
+    const { data: lastWeightSet } = useExerciseDefinitionLastWeightSet(
         record?.exerciseDefinitionId,
     );
     const [trackingFieldsOverride, setTrackingFields] =
@@ -376,6 +380,15 @@ export const useGymExerciseDataScreen = () => {
         enterSelectMode,
         errorMessage: getErrorMessage(),
         exerciseName,
+        weightPr: trackingFields.hasWeight ? definition?.stats?.weightPr : undefined,
+        lastWeightSet: trackingFields.hasWeight ? lastWeightSet : undefined,
+        openExerciseDetails: () => {
+            if (!definition) return;
+            router.push({
+                pathname: '/exercise-definitions/[id]',
+                params: { id: definition.id },
+            });
+        },
         exitSelectMode,
         handleAddSet,
         handleBack: () => router.back(),

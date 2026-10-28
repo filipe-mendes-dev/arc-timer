@@ -74,6 +74,16 @@ const ICON_MAP = {
         name: 'time-outline',
         defaultSize: 18,
     },
+    trophy: {
+        lib: 'ion',
+        name: 'trophy-outline',
+        defaultSize: 16,
+    },
+    linkArrow: {
+        lib: 'feather',
+        name: 'arrow-up-right',
+        defaultSize: 14,
+    },
     quickSession: {
         lib: 'ion',
         name: 'play',
