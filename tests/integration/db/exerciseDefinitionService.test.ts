@@ -272,6 +272,61 @@ describe('exerciseDefinitionService integration', () => {
         context.testDb.close();
     });
 
+    describe('upsertExerciseDefinitionData', () => {
+        it('persists tracking fields independently from numeric defaults', () => {
+            const definition = seedExerciseDefinition(
+                context.testDb,
+                createExerciseDefinitionFixture({
+                    id: 'definition-fields-without-values',
+                    name: 'Fields Without Values',
+                    availability: 'gym',
+                }),
+            );
+            const { exerciseDefinitionService } = context.testDb.dbServices;
+
+            exerciseDefinitionService.upsertExerciseDefinitionData({
+                defaultTrackingFields: ['distance', 'duration'],
+                exerciseDefinitionId: definition.id,
+            });
+
+            expect(exerciseDefinitionService.getById(definition.id)?.data).toMatchObject(
+                {
+                    defaultTrackingFields: ['duration', 'distance'],
+                    defaultTargetSet: undefined,
+                },
+            );
+        });
+
+        it('preserves a selected field when its numeric default is removed', () => {
+            const definition = seedExerciseDefinition(
+                context.testDb,
+                createExerciseDefinitionFixture({
+                    id: 'definition-cleared-default',
+                    name: 'Cleared Default',
+                    availability: 'gym',
+                }),
+            );
+            const { exerciseDefinitionService } = context.testDb.dbServices;
+
+            exerciseDefinitionService.upsertExerciseDefinitionData({
+                defaultTrackingFields: ['duration'],
+                defaultTargetSet: { durationSec: 300 },
+                exerciseDefinitionId: definition.id,
+            });
+            exerciseDefinitionService.upsertExerciseDefinitionData({
+                defaultTrackingFields: ['duration'],
+                exerciseDefinitionId: definition.id,
+            });
+
+            expect(exerciseDefinitionService.getById(definition.id)?.data).toMatchObject(
+                {
+                    defaultTrackingFields: ['duration'],
+                    defaultTargetSet: undefined,
+                },
+            );
+        });
+    });
+
     describe('createUserExerciseDefinition', () => {
         it('persists normalized user-owned identity fields from the input and current clock', () => {
             const expectedPersistedFields = {

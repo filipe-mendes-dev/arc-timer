@@ -26,8 +26,6 @@ export const trackingFieldsFromDefinition = (
 ): GymExerciseTrackingFieldsValue => {
     const fields = definition.data?.defaultTrackingFields ?? [];
 
-    if (fields.length === 0) return defaultTrackingFields;
-
     return trackingFieldValueFromFields(fields);
 };
 
