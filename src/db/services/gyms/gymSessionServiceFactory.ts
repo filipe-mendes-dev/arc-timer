@@ -1,4 +1,9 @@
 import type {
+    ExerciseDefinitionTargetSetData,
+    ExerciseTrackingField,
+} from '@src/core/entities/exerciseDefinition.interfaces';
+import { createStarterTargetSet } from '@src/core/exercises/exerciseTrackingPresets';
+import type {
     GymExerciseRecord,
     GymExerciseRecordSet,
     GymSession,
@@ -20,7 +25,9 @@ import type {
 } from '../../repositories/gyms/gymSessionRepositoryFactory';
 import { systemClock, type Clock } from '../../repositories/repositoryClock';
 import type { ExerciseDefinitionService } from '../exerciseDefinitions/exerciseDefinitionServiceFactory';
+import { createExerciseDefinitionDataRepository } from '../../repositories/exerciseDefinitions/exerciseDefinitionDataRepositoryFactory';
 import type { ExerciseDefinitionStatsRepository } from '../../repositories/exerciseDefinitions/exerciseDefinitionStatsRepositoryFactory';
+import type { RepositoryDb } from '../../repositories/workouts/workoutRepositoryFactory';
 
 export interface ListGymSessionsInput {
     limit?: number;
@@ -45,6 +52,16 @@ export interface StartGymSessionFromSessionSnapshotInput {
 export interface AddExerciseRecordToSessionInput {
     exerciseDefinitionId?: string;
     name?: string;
+    notes?: string;
+    sessionId: string;
+    startedAtMs?: number;
+}
+
+export interface AddConfiguredExerciseRecordToSessionInput {
+    defaultTargetSet?: ExerciseDefinitionTargetSetData;
+    defaultTrackingFields: ExerciseTrackingField[];
+    exerciseDefinitionId?: string;
+    name: string;
     notes?: string;
     sessionId: string;
     startedAtMs?: number;
@@ -93,6 +110,9 @@ export interface GymSessionService {
     addExerciseRecordToSession: (
         input: AddExerciseRecordToSessionInput,
     ) => GymExerciseRecord;
+    addConfiguredExerciseRecordToSession: (
+        input: AddConfiguredExerciseRecordToSessionInput,
+    ) => GymExerciseRecord;
     addSetToExerciseRecord: (
         input: AddSetToExerciseRecordInput,
     ) => GymExerciseRecordSet;
@@ -108,6 +128,7 @@ export interface GymSessionService {
 
 export interface CreateGymSessionServiceArgs {
     clock?: Clock;
+    db: RepositoryDb;
     exerciseDefinitionService: ExerciseDefinitionService;
     exerciseDefinitionStatsRepository: ExerciseDefinitionStatsRepository;
     gymExerciseRecordRepository: GymExerciseRecordRepository;
@@ -210,6 +231,7 @@ const assertSetIsValid = (set: GymSetValidationInput): void => {
 
 export const createGymSessionService = ({
     clock = systemClock,
+    db,
     exerciseDefinitionService,
     exerciseDefinitionStatsRepository,
     gymExerciseRecordRepository,
@@ -599,6 +621,46 @@ export const createGymSessionService = ({
 
             return gymExerciseRecordFromPersisted(record);
         },
+
+        addConfiguredExerciseRecordToSession: ({
+            defaultTargetSet,
+            defaultTrackingFields,
+            ...recordInput
+        }: AddConfiguredExerciseRecordToSessionInput): GymExerciseRecord =>
+            db.transaction((tx) => {
+                if (defaultTrackingFields.length === 0) {
+                    throw createGymError(gymErrors.invalidGymSet);
+                }
+
+                const record = service.addExerciseRecordToSession(recordInput);
+                const definition = exerciseDefinitionService.getById(
+                    record.exerciseDefinitionId,
+                );
+                if (!definition) {
+                    throw createGymError(gymErrors.exerciseDefinitionNotFound);
+                }
+
+                createExerciseDefinitionDataRepository({ db: tx }).upsert({
+                    defaultTargetSet,
+                    defaultTrackingFields,
+                    exerciseDefinitionId: definition.id,
+                    notes: definition.data?.notes,
+                    updatedAtMs: clock.now(),
+                });
+                service.addSetToExerciseRecord({
+                    ...createStarterTargetSet(
+                        defaultTrackingFields,
+                        defaultTargetSet,
+                    ),
+                    exerciseRecordId: record.id,
+                });
+                const persisted = gymExerciseRecordRepository.getById(record.id);
+                if (!persisted) {
+                    throw createGymError(gymErrors.exerciseRecordNotFound);
+                }
+
+                return gymExerciseRecordFromPersisted(persisted);
+            }),
 
         addSetToExerciseRecord: ({
             completedAtMs,

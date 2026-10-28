@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { dbServices } from '@src/db/dbServices';
 import type {
     AddExerciseRecordToSessionInput,
+    AddConfiguredExerciseRecordToSessionInput,
     AddSetToExerciseRecordInput,
     StartGymSessionFromPlanInput,
     StartGymSessionFromSessionSnapshotInput,
@@ -185,6 +186,25 @@ export const useAddGymExerciseRecordByName = () => {
     return useMutation({
         mutationFn: async (input: AddGymExerciseRecordByNameInput) =>
             dbServices.gymSessionService.addExerciseRecordToSession(input),
+        onSuccess: async () => {
+            await Promise.all([
+                invalidateGymSessionQueries(queryClient),
+                queryClient.invalidateQueries({
+                    queryKey: exerciseDefinitionKeys.all,
+                }),
+            ]);
+        },
+    });
+};
+
+export const useAddConfiguredGymExerciseRecord = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (input: AddConfiguredExerciseRecordToSessionInput) =>
+            dbServices.gymSessionService.addConfiguredExerciseRecordToSession(
+                input,
+            ),
         onSuccess: async () => {
             await Promise.all([
                 invalidateGymSessionQueries(queryClient),

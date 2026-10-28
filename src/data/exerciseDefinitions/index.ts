@@ -7,6 +7,7 @@ export {
 } from './exerciseDefinitionMutations';
 export {
     useExerciseDefinition,
+    useExerciseDefinitionByNormalizedName,
     useExerciseDefinitions,
     useGymExerciseDefinitions,
 } from './exerciseDefinitionQueries';

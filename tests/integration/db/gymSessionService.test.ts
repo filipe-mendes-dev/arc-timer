@@ -1033,6 +1033,96 @@ describe('gymSessionService integration', () => {
         });
     });
 
+    describe('addConfiguredExerciseRecordToSession', () => {
+        it('creates definition defaults, a record, and a populated initial set', () => {
+            const { exerciseDefinitionService, gymSessionService } =
+                context.testDb.dbServices;
+            const session = seedGymSession(
+                context.testDb,
+                createGymSessionFixture({
+                    id: 'configured-exercise-session',
+                    startedAtMs: FIXED_NOW_MS - 1_000,
+                    status: 'active',
+                }),
+            );
+
+            const record =
+                gymSessionService.addConfiguredExerciseRecordToSession({
+                    defaultTrackingFields: ['distance', 'duration'],
+                    defaultTargetSet: {
+                        distanceMeters: 1_000,
+                        durationSec: 300,
+                    },
+                    name: 'Configured Cardio Exercise',
+                    sessionId: session.id,
+                });
+            const definition = exerciseDefinitionService.getById(
+                record.exerciseDefinitionId,
+            );
+
+            expect(definition?.data).toMatchObject({
+                defaultTrackingFields: ['duration', 'distance'],
+                defaultTargetSet: {
+                    distanceMeters: 1_000,
+                    durationSec: 300,
+                },
+            });
+            expect(record.sets).toEqual([
+                expect.objectContaining({
+                    distanceMeters: 1_000,
+                    durationSec: 300,
+                }),
+            ]);
+        });
+
+        it('rolls back changed defaults when the record cannot be added', () => {
+            const definition = seedExerciseDefinition(
+                context.testDb,
+                createExerciseDefinitionFixture({
+                    id: 'atomic-configured-definition',
+                    name: 'Atomic Configured Exercise',
+                    availability: 'gym',
+                }),
+            );
+            const { exerciseDefinitionService, gymSessionService } =
+                context.testDb.dbServices;
+            exerciseDefinitionService.upsertExerciseDefinitionData({
+                defaultTrackingFields: ['reps'],
+                defaultTargetSet: { reps: 12 },
+                exerciseDefinitionId: definition.id,
+            });
+            const session = seedGymSession(
+                context.testDb,
+                createGymSessionFixture({
+                    id: 'atomic-configured-session',
+                    status: 'active',
+                    exerciseRecords: [
+                        createGymExerciseRecordFixture({
+                            id: 'existing-atomic-record',
+                            exerciseDefinitionId: definition.id,
+                        }),
+                    ],
+                }),
+            );
+
+            expectGymErrorCode(() => {
+                gymSessionService.addConfiguredExerciseRecordToSession({
+                    defaultTrackingFields: ['duration'],
+                    defaultTargetSet: { durationSec: 300 },
+                    exerciseDefinitionId: definition.id,
+                    name: definition.name,
+                    sessionId: session.id,
+                });
+            }, 'DUPLICATE_EXERCISE_RECORD');
+            expect(exerciseDefinitionService.getById(definition.id)?.data).toMatchObject(
+                {
+                    defaultTrackingFields: ['reps'],
+                    defaultTargetSet: { reps: 12 },
+                },
+            );
+        });
+    });
+
     describe('addSetToExerciseRecord', () => {
         it('appends meaningful sets with record-scoped set indexes', () => {
             const { gymSessionService } = context.testDb.dbServices;

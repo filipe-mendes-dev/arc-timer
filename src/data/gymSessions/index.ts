@@ -1,6 +1,7 @@
 export { gymSessionKeys } from './gymSessionKeys';
 export {
     useAddGymExerciseRecordByName,
+    useAddConfiguredGymExerciseRecord,
     useAddGymExerciseRecordSet,
     useDeleteGymExerciseRecord,
     useDeleteGymExerciseRecordSet,

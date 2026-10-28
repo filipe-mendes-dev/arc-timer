@@ -17,6 +17,18 @@ export type ExerciseTrackingField =
     | 'distance'
     | 'rpe';
 
+export type ExerciseTrackingPresetId =
+    | 'strength'
+    | 'cardio'
+    | 'timed'
+    | 'bodyweight';
+
+export interface ExerciseTrackingPreset {
+    defaultTargetSet: ExerciseDefinitionTargetSetData;
+    fields: ExerciseTrackingField[];
+    id: ExerciseTrackingPresetId;
+}
+
 export interface ExerciseDefinitionListItem {
     id: UUID;
     name: string;

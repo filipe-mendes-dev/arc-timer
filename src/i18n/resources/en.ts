@@ -816,6 +816,21 @@ export const en: I18nResource = {
             distance: 'Distance',
             rpe: 'RPE',
         },
+        trackingSetup: {
+            confirm: 'Confirm',
+            changeDefaults: 'Change defaults',
+            description:
+                'These defaults are used for future plans and gym sessions.',
+            fields: 'Tracking fields',
+            presets: {
+                bodyweight: 'Bodyweight',
+                cardio: 'Cardio',
+                custom: 'Custom',
+                strength: 'Strength',
+                timed: 'Timed',
+            },
+            title: 'Exercise defaults',
+        },
         source: {
             system: 'System',
             user: 'Custom',

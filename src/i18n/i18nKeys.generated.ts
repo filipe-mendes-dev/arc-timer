@@ -791,6 +791,20 @@ export const i18nKeys = {
             distance: 'exerciseDefinitions.trackingField.distance',
             rpe: 'exerciseDefinitions.trackingField.rpe',
         },
+        trackingSetup: {
+            confirm: 'exerciseDefinitions.trackingSetup.confirm',
+            changeDefaults: 'exerciseDefinitions.trackingSetup.changeDefaults',
+            description: 'exerciseDefinitions.trackingSetup.description',
+            fields: 'exerciseDefinitions.trackingSetup.fields',
+            presets: {
+                bodyweight: 'exerciseDefinitions.trackingSetup.presets.bodyweight',
+                cardio: 'exerciseDefinitions.trackingSetup.presets.cardio',
+                custom: 'exerciseDefinitions.trackingSetup.presets.custom',
+                strength: 'exerciseDefinitions.trackingSetup.presets.strength',
+                timed: 'exerciseDefinitions.trackingSetup.presets.timed',
+            },
+            title: 'exerciseDefinitions.trackingSetup.title',
+        },
         source: {
             system: 'exerciseDefinitions.source.system',
             user: 'exerciseDefinitions.source.user',

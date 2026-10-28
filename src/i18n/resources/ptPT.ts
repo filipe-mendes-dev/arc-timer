@@ -840,6 +840,21 @@ export const ptPT: I18nResource = {
             distance: 'Distância',
             rpe: 'RPE',
         },
+        trackingSetup: {
+            confirm: 'Confirmar',
+            changeDefaults: 'Alterar predefinições',
+            description:
+                'Estas predefinições são usadas em futuros planos e sessões de ginásio.',
+            fields: 'Campos registados',
+            presets: {
+                bodyweight: 'Peso corporal',
+                cardio: 'Cardio',
+                custom: 'Personalizado',
+                strength: 'Força',
+                timed: 'Temporizado',
+            },
+            title: 'Predefinições do exercício',
+        },
         source: {
             system: 'Sistema',
             user: 'Personalizado',

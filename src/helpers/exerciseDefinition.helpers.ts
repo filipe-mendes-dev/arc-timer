@@ -2,16 +2,19 @@ import type {
     ExerciseDefinition,
     ExerciseDefinitionTargetSetData,
 } from 'src/core/entities/exerciseDefinition.interfaces';
+import { DEFAULT_WEIGHT_GRAMS } from 'src/core/exercises/exerciseTrackingPresets';
 import {
     trackingFieldValueFromFields,
     type GymExerciseTrackingFieldsValue,
 } from 'src/core/entities/exerciseTrackingFields';
 
-export const DEFAULT_REPS = 12;
-export const DEFAULT_WEIGHT_KG = 10;
-export const DEFAULT_DURATION_SEC = 60;
-export const DEFAULT_DISTANCE_METERS = 1000;
-export const DEFAULT_RPE_TENTHS = 70;
+export {
+    DEFAULT_DISTANCE_METERS,
+    DEFAULT_DURATION_SEC,
+    DEFAULT_REPS,
+    DEFAULT_RPE_TENTHS,
+} from 'src/core/exercises/exerciseTrackingPresets';
+export const DEFAULT_WEIGHT_KG = DEFAULT_WEIGHT_GRAMS / 1000;
 
 export const defaultTrackingFields: GymExerciseTrackingFieldsValue = {
     hasDistanceMeters: false,
@@ -41,10 +44,6 @@ export const createTargetSetFromDefinition = <
 
     return {
         ...fallbackTargetSet,
-        distanceMeters: defaultTargetSet.distanceMeters,
-        durationSec: defaultTargetSet.durationSec,
-        reps: defaultTargetSet.reps,
-        rpeTenths: defaultTargetSet.rpeTenths,
-        weightGrams: defaultTargetSet.weightGrams,
+        ...defaultTargetSet,
     };
 };

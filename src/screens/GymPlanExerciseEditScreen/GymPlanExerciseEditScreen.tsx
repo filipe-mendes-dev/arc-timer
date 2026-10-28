@@ -2,6 +2,8 @@ import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { TrackingFieldsModal } from '@src/components/gym/TrackingFieldsModal';
+import { ExerciseTrackingPresetPicker } from '@src/components/gym/ExerciseTrackingPresetPicker/ExerciseTrackingPresetPicker';
+import { ErrorBanner } from '@src/components/ui/ErrorBanner/ErrorBanner';
 import { FooterBar } from '@src/components/layout/FooterBar';
 import { ListEmptyState } from '@src/components/layout/ListEmptyState';
 import { MainContainer } from '@src/components/layout/MainContainer/MainContainer';
@@ -55,6 +57,7 @@ const GymPlanExerciseEditScreen = () => {
                     value={screen.nameInput}
                     onChangeText={screen.handleNameChange}
                     onBlur={screen.handleNameBlur}
+                    onSubmitEditing={screen.handleNameBlur}
                     placeholder={t(
                         'gymPlanExerciseEdit.exerciseNamePlaceholder',
                     )}
@@ -64,6 +67,16 @@ const GymPlanExerciseEditScreen = () => {
                     onSuggestionPress={screen.handleNameSuggestionPress}
                     errorText={screen.nameError}
                 />
+
+                {screen.shouldShowPresetPicker && (
+                    <ExerciseTrackingPresetPicker
+                        key={screen.committedName}
+                        fields={screen.presetFields}
+                        onSelect={screen.selectPreset}
+                    />
+                )}
+
+                <ErrorBanner message={screen.errorMessage} />
 
                 <ScreenSection
                     title={t('gymPlanExerciseEdit.targets')}
@@ -120,6 +133,7 @@ const GymPlanExerciseEditScreen = () => {
                     variant="primary"
                     onPress={screen.saveExercise}
                     loading={screen.isSaving}
+                    disabled={!screen.canSave}
                     flex={1}
                 />
             </FooterBar>

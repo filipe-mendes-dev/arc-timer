@@ -781,6 +781,20 @@ export interface I18nResource {
             distance: string;
             rpe: string;
         };
+        trackingSetup: {
+            confirm: string;
+            changeDefaults: string;
+            description: string;
+            fields: string;
+            presets: {
+                bodyweight: string;
+                cardio: string;
+                custom: string;
+                strength: string;
+                timed: string;
+            };
+            title: string;
+        };
         source: {
             system: string;
             user: string;
