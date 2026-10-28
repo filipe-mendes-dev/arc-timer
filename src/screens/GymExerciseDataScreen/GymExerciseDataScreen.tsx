@@ -23,10 +23,10 @@ import { useStyles } from './GymExerciseDataScreen.styles';
 import { useGymExerciseDataScreen } from './useGymExerciseDataScreen';
 
 const trackingFieldsModalCopy: TrackingFieldsModalCopy = {
-    description: 'gymExerciseData.defaults.description',
+    description: 'exerciseDefinitions.trackingSetup.description',
     removeDataAndSave: 'gymExerciseData.defaults.removeDataAndSave',
     removeDataWarning: 'gymExerciseData.defaults.removeDataWarning',
-    title: 'gymExerciseData.defaults.title',
+    title: 'exerciseDefinitions.trackingSetup.title',
 };
 
 const GymExerciseDataScreen = () => {
@@ -143,6 +143,7 @@ const GymExerciseDataScreen = () => {
                     copy={trackingFieldsModalCopy}
                     fieldsWithData={screen.fieldsWithData}
                     isSaving={screen.isSavingSet}
+                    errorMessage={screen.errorMessage}
                     value={screen.trackingFields}
                     visible={screen.isTrackingFieldsModalVisible}
                     onClose={screen.closeTrackingFieldsModal}
@@ -152,7 +153,7 @@ const GymExerciseDataScreen = () => {
                 <GymExerciseSetEditModal
                     draft={screen.editingDraft}
                     isSaving={screen.isSavingSet}
-                    trackingFields={screen.trackingFields}
+                    trackingFields={screen.editingTrackingFields}
                     onCancel={() => screen.setEditingDraft(null)}
                     onChangeDraft={screen.setEditingDraft}
                     onSave={screen.handleSaveDraft}

@@ -8,6 +8,7 @@ import type {
     StartGymSessionFromPlanInput,
     StartGymSessionFromSessionSnapshotInput,
     UpdateExerciseRecordSetInput,
+    UpdateExerciseRecordTrackingDefaultsInput,
 } from '@src/db/services/gyms/gymSessionServiceFactory';
 
 import { exerciseDefinitionKeys } from '../exerciseDefinitions/exerciseDefinitionKeys';
@@ -162,6 +163,25 @@ export const useUpdateGymExerciseRecordSet = () => {
             dbServices.gymSessionService.updateExerciseRecordSet(input),
         onSuccess: async () => {
             await invalidateGymSessionQueries(queryClient);
+        },
+    });
+};
+
+export const useUpdateGymExerciseRecordTrackingDefaults = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (input: UpdateExerciseRecordTrackingDefaultsInput) =>
+            dbServices.gymSessionService.updateExerciseRecordTrackingDefaults(
+                input,
+            ),
+        onSuccess: async () => {
+            await Promise.all([
+                invalidateGymSessionQueries(queryClient),
+                queryClient.invalidateQueries({
+                    queryKey: exerciseDefinitionKeys.all,
+                }),
+            ]);
         },
     });
 };

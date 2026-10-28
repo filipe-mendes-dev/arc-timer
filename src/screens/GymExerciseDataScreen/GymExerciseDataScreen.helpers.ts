@@ -38,7 +38,7 @@ export const draftFromSet = (set: GymExerciseRecordSet): SetDraft => ({
     id: set.id,
     reps: set.reps ?? 0,
     rpeTenths: set.rpeTenths ?? 0,
-    weightKg: set.weightGrams ? set.weightGrams / 1000 : 0,
+    weightKg: set.weightGrams === undefined ? undefined : set.weightGrams / 1000,
 });
 
 // TODO: Revisit exercise notes, RPE, and warmup once the gym flow proves a need.

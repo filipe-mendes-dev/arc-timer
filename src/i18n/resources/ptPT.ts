@@ -484,7 +484,7 @@ export const ptPT: I18nResource = {
         },
         defaults: {
             description:
-                'Escolhe o que este exercício regista. Repetições e peso vêm ativos por defeito.',
+                'Escolhe os campos a registar neste exercício.',
             removeDataAndSave: 'Remover dados e guardar',
             removeDataWarning:
                 'Guardar vai remover valores existentes para: {{fields}}.',

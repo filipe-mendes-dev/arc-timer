@@ -12,6 +12,7 @@ export {
     useStartGymSessionFromPlan,
     useStartGymSessionFromSessionSnapshot,
     useUpdateGymExerciseRecordSet,
+    useUpdateGymExerciseRecordTrackingDefaults,
 } from './gymSessionMutations';
 export {
     useActiveGymSession,

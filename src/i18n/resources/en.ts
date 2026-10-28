@@ -468,7 +468,7 @@ export const en: I18nResource = {
         },
         defaults: {
             description:
-                'Choose what this exercise tracks. Reps and weight are enabled by default.',
+                'Choose which fields to track for this exercise.',
             removeDataAndSave: 'Remove data and save',
             removeDataWarning:
                 'Saving will remove existing values for: {{fields}}.',
