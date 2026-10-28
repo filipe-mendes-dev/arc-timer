@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -30,6 +30,7 @@ const GymExerciseAddScreen = () => {
     const { t } = useTranslation();
     const router = useRouter();
     const st = useStyles();
+    const shouldSkipBlurRef = useRef(false);
     const [name, setName] = useState('');
     const [committedName, setCommittedName] = useState('');
     const [exerciseDefinitionId, setExerciseDefinitionId] = useState<string>();
@@ -47,6 +48,7 @@ const GymExerciseAddScreen = () => {
     const defaults = selectedPreset?.defaultTargetSet ?? definition?.data?.defaultTargetSet;
 
     const handleNameChange = (value: string) => {
+        shouldSkipBlurRef.current = false;
         setName(value);
         setCommittedName('');
         setExerciseDefinitionId(undefined);
@@ -55,10 +57,15 @@ const GymExerciseAddScreen = () => {
         addExercise.reset();
     };
     const handleNameBlur = () => {
+        if (shouldSkipBlurRef.current) {
+            shouldSkipBlurRef.current = false;
+            return;
+        }
         setName(name.trim());
         setCommittedName(name.trim());
     };
     const handleSuggestionPress = (suggestion: TextFieldSuggestionItem) => {
+        shouldSkipBlurRef.current = true;
         setName(suggestion.label);
         setCommittedName(suggestion.label);
         setExerciseDefinitionId(suggestion.id);
@@ -142,6 +149,8 @@ const GymExerciseAddScreen = () => {
                         onSubmitEditing={handleNameBlur}
                         placeholder={t('gymActiveSession.addExerciseModal.namePlaceholder')}
                         autoCapitalize="words"
+                        autoCorrect={false}
+                        spellCheck={false}
                         autoFocus
                         returnKeyType="done"
                         errorText={nameError}

@@ -333,6 +333,7 @@ export const useGymPlanExerciseEditScreen =
         };
 
         const handleNameChange = (value: string): void => {
+            shouldSkipNameBlurCommitRef.current = false;
             setNameInput(value);
             setSelectedExerciseDefinitionId(undefined);
             seededDefaultsKeyRef.current = null;

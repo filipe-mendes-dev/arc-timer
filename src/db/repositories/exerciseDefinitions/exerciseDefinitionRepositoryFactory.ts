@@ -1,4 +1,4 @@
-import { and, asc, eq, exists, like, ne, or } from 'drizzle-orm';
+import { and, asc, eq, exists, like, ne, or, sql } from 'drizzle-orm';
 import type { BaseSQLiteDatabase } from 'drizzle-orm/sqlite-core';
 
 import type {
@@ -81,6 +81,7 @@ export interface ExerciseDefinitionListFilters {
     availability?: ExerciseDefinitionAvailability;
     name?: string;
     namePrefix?: string;
+    shouldRankNameMatches?: boolean;
     source?: ExerciseDefinitionSource;
 }
 
@@ -598,11 +599,18 @@ export const createExerciseDefinitionRepository = ({
                     : undefined,
             ];
             const whereClause = and(...conditions);
+            const ordering = [asc(exerciseDefinitionsTable.name)];
+            if (filters?.shouldRankNameMatches && normalizedNameFilter) {
+                ordering.unshift(sql`case
+                    when ${exerciseDefinitionsTable.normalizedName} = ${normalizedNameFilter} then 0
+                    when ${exerciseDefinitionsTable.normalizedName} like ${`${normalizedNameFilter}%`} then 1
+                    else 2 end`);
+            }
             const query = db
                 .select()
                 .from(exerciseDefinitionsTable)
                 .where(whereClause)
-                .orderBy(asc(exerciseDefinitionsTable.name));
+                .orderBy(...ordering);
             const limit = normalizeLimit(pagination?.limit);
             const rows =
                 limit === undefined ? query.all() : query.limit(limit).all();

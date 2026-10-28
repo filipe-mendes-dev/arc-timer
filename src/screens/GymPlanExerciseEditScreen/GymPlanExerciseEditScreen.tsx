@@ -62,6 +62,8 @@ const GymPlanExerciseEditScreen = () => {
                         'gymPlanExerciseEdit.exerciseNamePlaceholder',
                     )}
                     autoCapitalize="words"
+                    autoCorrect={false}
+                    spellCheck={false}
                     returnKeyType="done"
                     suggestions={screen.exerciseSuggestions}
                     onSuggestionPress={screen.handleNameSuggestionPress}
