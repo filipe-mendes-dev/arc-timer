@@ -2,6 +2,7 @@ import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { ExerciseWeightReference } from '@src/components/gym/ExerciseWeightReference/ExerciseWeightReference';
+import { GymSessionHeaderBackground } from '@src/components/gym/GymSessionHeaderBackground/GymSessionHeaderBackground';
 import { ScreenHeaderBar } from '@src/components/layout/ScreenHeaderBar';
 import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import { AppText } from '@src/components/ui/Typography/AppText';
@@ -50,7 +51,10 @@ export const GymExerciseDataHeader = ({
     const hasWeightHistory = lastWeightSet != null || weightPr !== undefined;
 
     return (
-        <ScreenHeaderBar containerStyle={st.root}>
+        <ScreenHeaderBar
+            containerStyle={st.root}
+            background={<GymSessionHeaderBackground />}
+        >
             <View style={st.headerTopRow}>
                 <View style={st.titleBlock}>
                     <GuardedPressable
@@ -68,7 +72,7 @@ export const GymExerciseDataHeader = ({
                         <AppIcon
                             id={titleIconId}
                             size={24}
-                            color={theme.palette.text.primary}
+                            color={theme.palette.accent.foreground}
                         />
                         <AppText
                             variant="title1"
@@ -108,7 +112,7 @@ export const GymExerciseDataHeader = ({
                         <AppIcon
                             id="linkArrow"
                             size={14}
-                            color={theme.palette.accent.primaryStrong}
+                            color={theme.palette.accent.foreground}
                         />
                     </GuardedPressable>
                 )}
@@ -120,7 +124,7 @@ export const GymExerciseDataHeader = ({
                         <AppIcon
                             id="sets"
                             size={14}
-                            color={theme.palette.text.muted}
+                            color={theme.palette.accent.foreground}
                             style={st.metricIcon}
                         />
                         <AppText
@@ -139,7 +143,7 @@ export const GymExerciseDataHeader = ({
                         <AppIcon
                             id={statusIconId}
                             size={14}
-                            color={theme.palette.text.muted}
+                            color={theme.palette.accent.foreground}
                             style={st.metricIcon}
                         />
                         <AppText
@@ -156,7 +160,7 @@ export const GymExerciseDataHeader = ({
                     <AppIcon
                         id="duration"
                         size={15}
-                        color={theme.palette.text.primary}
+                        color={theme.palette.accent.foreground}
                         style={st.durationIcon}
                     />
                     <AppText

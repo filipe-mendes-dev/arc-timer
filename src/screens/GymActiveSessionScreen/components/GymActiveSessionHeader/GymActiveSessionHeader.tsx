@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { GymSessionHeaderBackground } from '@src/components/gym/GymSessionHeaderBackground/GymSessionHeaderBackground';
 import { ScreenHeaderBar } from '@src/components/layout/ScreenHeaderBar';
 import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import { AppText } from '@src/components/ui/Typography/AppText';
@@ -26,14 +27,17 @@ export const GymActiveSessionHeader = ({
     const st = useStyles();
 
     return (
-        <ScreenHeaderBar containerStyle={st.root}>
+        <ScreenHeaderBar
+            containerStyle={st.root}
+            background={<GymSessionHeaderBackground />}
+        >
             <View style={st.headerTopRow}>
                 <View style={st.titleBlock}>
                     <View style={st.titleRow}>
                         <AppIcon
                             id="gymSession"
                             size={22}
-                            color={theme.palette.text.primary}
+                            color={theme.palette.accent.foreground}
                         />
                         <AppText
                             variant="title1"
@@ -44,7 +48,7 @@ export const GymActiveSessionHeader = ({
                         </AppText>
                     </View>
 
-                    <AppText variant="bodySmall" tone="muted" numberOfLines={1}>
+                    <AppText variant="bodySmall" tone="secondary" numberOfLines={1}>
                         {t('gymActiveSession.startedAt')} {startedAtLabel}
                     </AppText>
                 </View>
@@ -53,7 +57,7 @@ export const GymActiveSessionHeader = ({
                     <AppIcon
                         id="duration"
                         size={16}
-                        color={theme.palette.text.primary}
+                        color={theme.palette.accent.foreground}
                         style={st.durationIcon}
                     />
                     <AppText
@@ -71,7 +75,7 @@ export const GymActiveSessionHeader = ({
                     <AppIcon
                         id="exercise"
                         size={14}
-                        color={theme.palette.text.muted}
+                        color={theme.palette.accent.foreground}
                         style={st.metricIcon}
                     />
                     <AppText
@@ -92,7 +96,7 @@ export const GymActiveSessionHeader = ({
                     <AppIcon
                         id="sets"
                         size={14}
-                        color={theme.palette.text.muted}
+                        color={theme.palette.accent.foreground}
                         style={st.metricIcon}
                     />
                     <AppText

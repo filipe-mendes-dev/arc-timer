@@ -8,6 +8,7 @@ import type { AppTheme } from '@src/theme/theme';
 interface ScreenHeaderBarProps {
     children: ReactNode;
     containerStyle?: StyleProp<ViewStyle>;
+    background?: ReactNode;
 }
 
 const useStyles = createStyles((theme: AppTheme) =>
@@ -26,11 +27,13 @@ const useStyles = createStyles((theme: AppTheme) =>
 export const ScreenHeaderBar = ({
     children,
     containerStyle,
+    background,
 }: ScreenHeaderBarProps) => {
     const st = useStyles();
 
     return (
         <SafeAreaView edges={['top', 'left', 'right']} style={st.safe}>
+            {background}
             <View style={[st.content, containerStyle]}>{children}</View>
         </SafeAreaView>
     );

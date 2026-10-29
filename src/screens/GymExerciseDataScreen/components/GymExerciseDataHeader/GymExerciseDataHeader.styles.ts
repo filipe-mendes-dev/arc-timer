@@ -43,7 +43,7 @@ export const useStyles = createStyles((theme: AppTheme) =>
             flexShrink: 0,
         },
         detailsLabel: {
-            color: theme.palette.accent.primaryStrong,
+            color: theme.palette.accent.foreground,
             fontWeight: '500',
         },
         metadataRow: {
