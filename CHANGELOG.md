@@ -6,9 +6,29 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Add Strength, Cardio, Timed and Bodyweight tracking presets with icons and confirmation when adding new or unconfigured exercises to gym sessions and plans
+- Show previous-session weight and personal best in the exercise screen, with a shortcut to exercise details
+- Show dates alongside recent training sessions in exercise details
+
+### Changed
+
+- Unify gym session and exercise headers with theme-aware accent gradients, logo watermarks and consistent footer actions, including selection mode
+- Match exercise suggestions anywhere in the name, prioritizing exact and prefix matches
+- Allow empty gym plan targets and plan-derived incomplete session sets without inserting unrelated reps and weight values
+- Hide the session discard action once a set has been completed
+
 ### Fixed
 
 - Include system exercises referenced by HIIT or gym sessions in active exercise definition lists
+- Preserve selected tracking fields when numeric defaults are absent or cleared, with migration backfill for existing defaults
+- Create configured session exercises and populated initial sets atomically using saved defaults or starter values
+- Apply tracking-field changes atomically to incomplete sets while preserving completed sets and showing save errors
+- Reject empty manual session sets and require at least one positive tracked value before completing a set
+- Preserve zero-weight values for bodyweight exercises
+- Prevent iOS autocorrect from overwriting a selected exercise suggestion
+- Format distance personal records consistently with exercise set values
 
 ## [v1.1.1] - 2026-06-14
 
