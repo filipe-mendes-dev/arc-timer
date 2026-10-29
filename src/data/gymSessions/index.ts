@@ -1,6 +1,7 @@
 export { gymSessionKeys } from './gymSessionKeys';
 export {
     useAddGymExerciseRecordByName,
+    useAddConfiguredGymExerciseRecord,
     useAddGymExerciseRecordSet,
     useDeleteGymExerciseRecord,
     useDeleteGymExerciseRecordSet,
@@ -11,6 +12,7 @@ export {
     useStartGymSessionFromPlan,
     useStartGymSessionFromSessionSnapshot,
     useUpdateGymExerciseRecordSet,
+    useUpdateGymExerciseRecordTrackingDefaults,
 } from './gymSessionMutations';
 export {
     useActiveGymSession,

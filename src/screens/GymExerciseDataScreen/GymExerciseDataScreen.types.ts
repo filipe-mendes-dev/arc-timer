@@ -8,5 +8,5 @@ export interface SetDraft {
     id: string;
     reps: number;
     rpeTenths: number;
-    weightKg: number;
+    weightKg?: number;
 }

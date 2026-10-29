@@ -369,6 +369,47 @@ describe('gymPlanService integration', () => {
             });
         });
 
+        it('persists an empty target set as a planned set slot', () => {
+            const { gymPlanService } = context.testDb.dbServices;
+            const gymPlan = createDraftPlan({
+                id: 'empty-target-draft',
+                sections: [
+                    createGymPlanSectionFixture({
+                        id: 'empty-target-section',
+                        exercises: [
+                            createGymPlanExerciseFixture({
+                                id: 'empty-target-exercise',
+                                exerciseDefinitionId,
+                                targetSetDrafts: [
+                                    createGymPlanExerciseTargetSetFixture({
+                                        id: 'empty-target-set',
+                                    }),
+                                ],
+                            }),
+                        ],
+                    }),
+                ],
+            });
+
+            gymPlanService.upsertDraftGymPlan(gymPlan);
+
+            expect(
+                readGymPlanExerciseTargetSets(
+                    context.testDb,
+                    'empty-target-exercise',
+                ),
+            ).toEqual([
+                expect.objectContaining({
+                    id: 'empty-target-set',
+                    reps: null,
+                    weightGrams: null,
+                    durationSec: null,
+                    distanceMeters: null,
+                    rpeTenths: null,
+                }),
+            ]);
+        });
+
         it('replaces an existing draft with the same id', () => {
             const { gymPlanService } = context.testDb.dbServices;
 

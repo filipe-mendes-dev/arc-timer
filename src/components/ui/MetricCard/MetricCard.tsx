@@ -2,12 +2,16 @@ import type { ReactNode } from 'react';
 import { View } from 'react-native';
 
 import GuardedPressable from '@src/components/ui/GuardedPressable/GuardedPressable';
+import { AppIcon, type IconId } from '@src/components/ui/Icon/AppIcon';
 import { AppText } from '@src/components/ui/Typography/AppText';
+import { useTheme } from '@src/theme/ThemeProvider';
 
 import { useMetricCardStyles } from './MetricCard.styles';
 
 interface MetricCardProps {
     label: string;
+    labelIcon?: IconId;
+    labelIconColor?: string;
     value: ReactNode;
     disabled?: boolean;
     isWide?: boolean;
@@ -20,6 +24,8 @@ const isTextValue = (value: ReactNode): value is string | number =>
 
 export const MetricCard = ({
     label,
+    labelIcon,
+    labelIconColor,
     value,
     disabled = false,
     isWide = false,
@@ -27,6 +33,7 @@ export const MetricCard = ({
     onPress,
 }: MetricCardProps) => {
     const st = useMetricCardStyles();
+    const { theme } = useTheme();
     const cardStyle = [st.card, isWide && st.cardWide, disabled && st.disabled];
     const valueContent = isTextValue(value) ? (
         <AppText
@@ -47,9 +54,18 @@ export const MetricCard = ({
                 onPress={onPress}
                 style={cardStyle}
             >
-                <AppText variant="caption" tone="muted" style={st.label}>
-                    {label}
-                </AppText>
+                <View style={st.labelRow}>
+                    {labelIcon && (
+                        <AppIcon
+                            id={labelIcon}
+                            size={14}
+                            color={labelIconColor ?? theme.palette.text.muted}
+                        />
+                    )}
+                    <AppText variant="caption" tone="muted" style={st.label}>
+                        {label}
+                    </AppText>
+                </View>
                 {valueContent}
             </GuardedPressable>
         );
@@ -57,9 +73,18 @@ export const MetricCard = ({
 
     return (
         <View style={cardStyle}>
-            <AppText variant="caption" tone="muted" style={st.label}>
-                {label}
-            </AppText>
+            <View style={st.labelRow}>
+                {labelIcon && (
+                    <AppIcon
+                        id={labelIcon}
+                        size={14}
+                        color={labelIconColor ?? theme.palette.text.muted}
+                    />
+                )}
+                <AppText variant="caption" tone="muted" style={st.label}>
+                    {label}
+                </AppText>
+            </View>
             {valueContent}
         </View>
     );

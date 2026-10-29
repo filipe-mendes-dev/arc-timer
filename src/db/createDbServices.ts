@@ -122,6 +122,7 @@ export const createDbServices = ({
     });
     const gymSessionService = createGymSessionService({
         clock,
+        db,
         exerciseDefinitionService,
         exerciseDefinitionStatsRepository,
         gymExerciseRecordRepository,

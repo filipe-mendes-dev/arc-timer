@@ -29,6 +29,14 @@ interface DefaultTrackingFieldValues {
     weightGrams: number | null;
 }
 
+interface DefaultTrackingFieldSelection {
+    hasDistance: boolean;
+    hasDuration: boolean;
+    hasReps: boolean;
+    hasRpe: boolean;
+    hasWeight: boolean;
+}
+
 export interface UpsertExerciseDefinitionDataInput {
     defaultTargetSet?: ExerciseDefinitionTargetSetData;
     defaultTrackingFields: ExerciseTrackingField[];
@@ -91,34 +99,19 @@ const trackingFieldsFromRow = (
     trackingFieldsRow: ExerciseDefinitionDefaultTrackingFieldsRow | null,
 ): ExerciseTrackingField[] => {
     const fields: ExerciseTrackingField[] = [];
-    if (
-        trackingFieldsRow?.reps !== null &&
-        trackingFieldsRow?.reps !== undefined
-    ) {
+    if (trackingFieldsRow?.hasReps) {
         fields.push('reps');
     }
-    if (
-        trackingFieldsRow?.weightGrams !== null &&
-        trackingFieldsRow?.weightGrams !== undefined
-    ) {
+    if (trackingFieldsRow?.hasWeight) {
         fields.push('weight');
     }
-    if (
-        trackingFieldsRow?.durationSec !== null &&
-        trackingFieldsRow?.durationSec !== undefined
-    ) {
+    if (trackingFieldsRow?.hasDuration) {
         fields.push('duration');
     }
-    if (
-        trackingFieldsRow?.distanceMeters !== null &&
-        trackingFieldsRow?.distanceMeters !== undefined
-    ) {
+    if (trackingFieldsRow?.hasDistance) {
         fields.push('distance');
     }
-    if (
-        trackingFieldsRow?.rpeTenths !== null &&
-        trackingFieldsRow?.rpeTenths !== undefined
-    ) {
+    if (trackingFieldsRow?.hasRpe) {
         fields.push('rpe');
     }
 
@@ -207,6 +200,13 @@ export const createExerciseDefinitionDataRepository = ({
                 distanceMeters: null,
                 rpeTenths: null,
             };
+            const trackingFieldSelection: DefaultTrackingFieldSelection = {
+                hasDistance: normalizedTrackingFields.includes('distance'),
+                hasDuration: normalizedTrackingFields.includes('duration'),
+                hasReps: normalizedTrackingFields.includes('reps'),
+                hasRpe: normalizedTrackingFields.includes('rpe'),
+                hasWeight: normalizedTrackingFields.includes('weight'),
+            };
 
             if (normalizedTrackingFields.includes('reps')) {
                 trackingFieldValues.reps = defaultTargetSet?.reps ?? null;
@@ -235,6 +235,7 @@ export const createExerciseDefinitionDataRepository = ({
                 {
                     exerciseDefinitionId,
                     ...trackingFieldValues,
+                    ...trackingFieldSelection,
                     createdAtMs:
                         existingTrackingFieldsRow?.createdAtMs ?? updatedAtMs,
                     updatedAtMs,
@@ -261,6 +262,11 @@ export const createExerciseDefinitionDataRepository = ({
                             durationSec: trackingFieldsRow.durationSec,
                             distanceMeters: trackingFieldsRow.distanceMeters,
                             rpeTenths: trackingFieldsRow.rpeTenths,
+                            hasDistance: trackingFieldsRow.hasDistance,
+                            hasDuration: trackingFieldsRow.hasDuration,
+                            hasReps: trackingFieldsRow.hasReps,
+                            hasRpe: trackingFieldsRow.hasRpe,
+                            hasWeight: trackingFieldsRow.hasWeight,
                             updatedAtMs: trackingFieldsRow.updatedAtMs,
                         },
                     })
@@ -278,12 +284,14 @@ export const createExerciseDefinitionDataRepository = ({
                 defaultTrackingFields: trackingFieldsFromRow({
                     exerciseDefinitionId,
                     ...trackingFieldValues,
+                    ...trackingFieldSelection,
                     createdAtMs: trackingFieldsRow.createdAtMs,
                     updatedAtMs: trackingFieldsRow.updatedAtMs,
                 }),
                 defaultTargetSet: targetSetFromRow({
                     exerciseDefinitionId,
                     ...trackingFieldValues,
+                    ...trackingFieldSelection,
                     createdAtMs: trackingFieldsRow.createdAtMs,
                     updatedAtMs: trackingFieldsRow.updatedAtMs,
                 }),

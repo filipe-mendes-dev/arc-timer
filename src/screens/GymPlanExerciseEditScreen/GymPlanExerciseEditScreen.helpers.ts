@@ -10,7 +10,6 @@ import type {
 } from '@src/core/entities/gymPlan.interfaces';
 import {
     createGymPlanTargetSet,
-    getDefaultGymPlanTargetWeightKg,
     withGymPlanExerciseTargetSets,
 } from '@src/core/gyms/gymPlanTargetSets';
 import { uid } from '@src/core/id';
@@ -24,7 +23,6 @@ import type {
     TrackingFields,
 } from '../GymExerciseDataScreen/GymExerciseDataScreen.types';
 import {
-    DEFAULT_REPS,
     defaultTrackingFields,
 } from 'src/helpers/exerciseDefinition.helpers';
 import {
@@ -249,16 +247,15 @@ export const createNextTargetSet = (
     trackingFields: TrackingFields,
 ): GymPlanExerciseTargetSet => {
     const previousSet = targetSets.at(-1);
-    const previousWeightKg = getPreviousTargetWeightKg(previousSet);
     const nextSet: GymPlanExerciseTargetSet = {
         ...createGymPlanTargetSet(targetSets.length),
     };
 
     if (trackingFields.hasReps) {
-        nextSet.reps = previousSet?.reps ?? DEFAULT_REPS;
+        nextSet.reps = previousSet?.reps;
     }
     if (trackingFields.hasWeight) {
-        nextSet.weightGrams = getWeightGrams(previousWeightKg);
+        nextSet.weightGrams = previousSet?.weightGrams;
     }
     if (trackingFields.hasDurationSec) {
         nextSet.durationSec = previousSet?.durationSec;
@@ -271,16 +268,6 @@ export const createNextTargetSet = (
     }
 
     return nextSet;
-};
-
-const getPreviousTargetWeightKg = (
-    previousSet: GymPlanExerciseTargetSet | undefined,
-): number => {
-    if (previousSet?.weightGrams !== undefined) {
-        return previousSet.weightGrams / 1000;
-    }
-
-    return getDefaultGymPlanTargetWeightKg();
 };
 
 export const removeTrackingFieldData = (

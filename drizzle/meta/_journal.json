@@ -29,6 +29,13 @@
       "when": 1781104822764,
       "tag": "0003_gym_session_source_name",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1781912220056,
+      "tag": "0004_exercise-tracking-field-selection",
+      "breakpoints": true
     }
   ]
 }

@@ -74,6 +74,16 @@ const ICON_MAP = {
         name: 'time-outline',
         defaultSize: 18,
     },
+    trophy: {
+        lib: 'ion',
+        name: 'trophy-outline',
+        defaultSize: 16,
+    },
+    linkArrow: {
+        lib: 'feather',
+        name: 'arrow-up-right',
+        defaultSize: 14,
+    },
     quickSession: {
         lib: 'ion',
         name: 'play',
@@ -228,21 +238,34 @@ const ICON_MAP = {
 
 export type IconId = keyof typeof ICON_MAP;
 
-type AppIconProps = {
+interface AppIconProps {
     id: IconId;
     size?: number;
     color?: string;
+    isFilled?: boolean;
     style?: StyleProp<TextStyle>;
-};
+}
 
-export const AppIcon = ({ id, size, color, style }: AppIconProps) => {
+export const AppIcon = ({
+    id,
+    size,
+    color,
+    isFilled = false,
+    style,
+}: AppIconProps) => {
     const def = ICON_MAP[id];
     const finalSize = size ?? def.defaultSize;
 
     if (def.lib === 'ion') {
+        let iconName = def.name;
+
+        if (isFilled && iconName.endsWith('-outline')) {
+            iconName = iconName.replace('-outline', '');
+        }
+
         return (
             <Ionicons
-                name={def.name as IoniconsName}
+                name={iconName as IoniconsName}
                 size={finalSize}
                 color={color}
                 style={style}

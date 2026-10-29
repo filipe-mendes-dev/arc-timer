@@ -9,12 +9,14 @@ export interface I18nResource {
             start: string;
             share: string;
             done: string;
+            details: string;
         };
         status: {
             noTimeEstimate: string;
             mixedTimeAndReps: string;
         };
         units: {
+            kg: string;
             block_one: string;
             block_other: string;
             set_one: string;
@@ -422,6 +424,7 @@ export interface I18nResource {
         notFoundDescription: string;
         actions: {
             addSet: string;
+            openExerciseDetails: string;
             backToSession: string;
             completeSet: string;
             deleteSet: string;
@@ -451,6 +454,11 @@ export interface I18nResource {
         editSet: {
             description: string;
             title: string;
+        };
+        history: {
+            lastSession: string;
+            weightPr: string;
+            reps: string;
         };
         status: {
             complete: string;
@@ -780,6 +788,20 @@ export interface I18nResource {
             duration: string;
             distance: string;
             rpe: string;
+        };
+        trackingSetup: {
+            confirm: string;
+            changeDefaults: string;
+            description: string;
+            fields: string;
+            presets: {
+                bodyweight: string;
+                cardio: string;
+                custom: string;
+                strength: string;
+                timed: string;
+            };
+            title: string;
         };
         source: {
             system: string;

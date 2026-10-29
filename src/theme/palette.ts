@@ -23,7 +23,7 @@ export interface ThemePalette {
     icon: {
         error: string;
     };
-    accent: AccentTokens;
+    accent: ThemeAccentTokens;
     button: {
         primary: string;
         secondary: string;
@@ -75,7 +75,7 @@ export interface ThemePalette {
 
 export type AccentId = 'classic' | 'violet' | 'cyan' | 'amber' | 'neutral';
 
-export interface AccentTokens {
+export interface AccentPresetTokens {
     primary: string;
     primaryStrong: string;
     soft: string;
@@ -83,13 +83,35 @@ export interface AccentTokens {
     darkInk: string;
 }
 
+interface ThemeAccentTokens extends AccentPresetTokens {
+    foreground: string;
+    tintedSurface: string;
+    tintedBorder: string;
+    headerStart: string;
+}
+
+const mixHexColors = (
+    foreground: string,
+    background: string,
+    foregroundWeight: number,
+): string => {
+    const channels = [1, 3, 5].map((offset) =>
+        Math.round(
+            parseInt(foreground.slice(offset, offset + 2), 16) * foregroundWeight +
+                parseInt(background.slice(offset, offset + 2), 16) * (1 - foregroundWeight),
+        ),
+    );
+
+    return `rgb(${channels.join(', ')})`;
+};
+
 export interface AccentDefinition {
     id: AccentId;
     label: string;
-    tokens: AccentTokens;
+    tokens: AccentPresetTokens;
 }
 
-export const VIOLET_ACCENT: AccentTokens = {
+export const VIOLET_ACCENT: AccentPresetTokens = {
     primary: colors.violet[400],
     primaryStrong: colors.violet[500],
     soft: colors.violet[300],
@@ -97,7 +119,7 @@ export const VIOLET_ACCENT: AccentTokens = {
     darkInk: colors.violet.dark,
 };
 
-export const CYAN_ACCENT: AccentTokens = {
+export const CYAN_ACCENT: AccentPresetTokens = {
     primary: colors.cyan[500],
     primaryStrong: colors.cyan[500],
     soft: colors.cyan[300],
@@ -105,7 +127,7 @@ export const CYAN_ACCENT: AccentTokens = {
     darkInk: colors.cyan.dark,
 };
 
-export const AMBER_ACCENT: AccentTokens = {
+export const AMBER_ACCENT: AccentPresetTokens = {
     primary: colors.amber[500],
     primaryStrong: colors.amber[500],
     soft: colors.amber[300],
@@ -113,7 +135,7 @@ export const AMBER_ACCENT: AccentTokens = {
     darkInk: colors.amber.dark,
 };
 
-export const CLASSIC_ACCENT: AccentTokens = {
+export const CLASSIC_ACCENT: AccentPresetTokens = {
     primary: colors.classic[500],
     primaryStrong: colors.classic[600],
     soft: colors.classic[300],
@@ -121,7 +143,7 @@ export const CLASSIC_ACCENT: AccentTokens = {
     darkInk: colors.classic.dark,
 };
 
-export const NEUTRAL_ACCENT: AccentTokens = {
+export const NEUTRAL_ACCENT: AccentPresetTokens = {
     primary: colors.neutral[500],
     primaryStrong: colors.neutral[600],
     soft: colors.neutral[300],
@@ -157,7 +179,7 @@ export const COLOR_ACCENTS: Record<AccentId, AccentDefinition> = {
     },
 };
 
-export const buildLightPalette = (accent: AccentTokens): ThemePalette => ({
+export const buildLightPalette = (accent: AccentPresetTokens): ThemePalette => ({
     background: {
         primary: colors.white.main,
         card: colors.gray[100],
@@ -186,6 +208,10 @@ export const buildLightPalette = (accent: AccentTokens): ThemePalette => ({
         soft: accent.soft,
         surface: accent.surface,
         darkInk: accent.darkInk,
+        foreground: mixHexColors(accent.primary, colors.black.main, 0.55),
+        tintedSurface: mixHexColors(accent.primary, colors.gray[100], 0.1),
+        tintedBorder: mixHexColors(accent.primary, colors.gray[100], 0.2),
+        headerStart: mixHexColors(accent.primary, colors.white.main, 0.5),
     },
     button: {
         primary: accent.primary,
@@ -236,7 +262,7 @@ export const buildLightPalette = (accent: AccentTokens): ThemePalette => ({
     },
 });
 
-export const buildDarkPalette = (accent: AccentTokens): ThemePalette => ({
+export const buildDarkPalette = (accent: AccentPresetTokens): ThemePalette => ({
     background: {
         primary: colors.black.main,
         card: colors.gray.background,
@@ -265,6 +291,10 @@ export const buildDarkPalette = (accent: AccentTokens): ThemePalette => ({
         soft: accent.darkInk,
         surface: colors.gray[900],
         darkInk: accent.darkInk,
+        foreground: mixHexColors(accent.primary, colors.white.main, 0.85),
+        tintedSurface: mixHexColors(accent.primary, colors.gray.background, 0.1),
+        tintedBorder: mixHexColors(accent.primary, colors.gray.background, 0.2),
+        headerStart: mixHexColors(accent.primary, colors.black.main, 0.26),
     },
     button: {
         primary: accent.primary,

@@ -836,6 +836,53 @@ describe('gymSessionService integration', () => {
                 },
             ]);
         });
+
+        it('creates empty incomplete session sets from empty plan targets', () => {
+            const { gymSessionService } = context.testDb.dbServices;
+            const definition = seedExerciseDefinition(
+                context.testDb,
+                createExerciseDefinitionFixture({
+                    name: 'Gym Test Empty Target Exercise',
+                    availability: 'gym',
+                }),
+            );
+            const gymPlan = seedGymPlan(
+                context.testDb,
+                createGymPlanFixture({
+                    id: 'empty-target-session-plan',
+                    sections: [
+                        createGymPlanSectionFixture({
+                            id: 'empty-target-session-section',
+                            exercises: [
+                                createGymPlanExerciseFixture({
+                                    id: 'empty-target-session-exercise',
+                                    exerciseDefinitionId: definition.id,
+                                    targetSetDrafts: [
+                                        createGymPlanExerciseTargetSetFixture({
+                                            id: 'empty-target-session-set',
+                                        }),
+                                    ],
+                                }),
+                            ],
+                        }),
+                    ],
+                }),
+            );
+
+            const session = gymSessionService.startGymSessionFromPlan({
+                gymPlanId: gymPlan.id,
+            });
+
+            expect(session.exerciseRecords[0].sets).toEqual([
+                expect.objectContaining({
+                    reps: undefined,
+                    weightGrams: undefined,
+                    durationSec: undefined,
+                    distanceMeters: undefined,
+                    completedAtMs: undefined,
+                }),
+            ]);
+        });
     });
 
     describe('addExerciseRecordToSession', () => {
@@ -1030,6 +1077,96 @@ describe('gymSessionService integration', () => {
                     exerciseDefinitionId: definition.id,
                 });
             }, 'DUPLICATE_EXERCISE_RECORD');
+        });
+    });
+
+    describe('addConfiguredExerciseRecordToSession', () => {
+        it('creates definition defaults, a record, and a populated initial set', () => {
+            const { exerciseDefinitionService, gymSessionService } =
+                context.testDb.dbServices;
+            const session = seedGymSession(
+                context.testDb,
+                createGymSessionFixture({
+                    id: 'configured-exercise-session',
+                    startedAtMs: FIXED_NOW_MS - 1_000,
+                    status: 'active',
+                }),
+            );
+
+            const record =
+                gymSessionService.addConfiguredExerciseRecordToSession({
+                    defaultTrackingFields: ['distance', 'duration'],
+                    defaultTargetSet: {
+                        distanceMeters: 1_000,
+                        durationSec: 300,
+                    },
+                    name: 'Configured Cardio Exercise',
+                    sessionId: session.id,
+                });
+            const definition = exerciseDefinitionService.getById(
+                record.exerciseDefinitionId,
+            );
+
+            expect(definition?.data).toMatchObject({
+                defaultTrackingFields: ['duration', 'distance'],
+                defaultTargetSet: {
+                    distanceMeters: 1_000,
+                    durationSec: 300,
+                },
+            });
+            expect(record.sets).toEqual([
+                expect.objectContaining({
+                    distanceMeters: 1_000,
+                    durationSec: 300,
+                }),
+            ]);
+        });
+
+        it('rolls back changed defaults when the record cannot be added', () => {
+            const definition = seedExerciseDefinition(
+                context.testDb,
+                createExerciseDefinitionFixture({
+                    id: 'atomic-configured-definition',
+                    name: 'Atomic Configured Exercise',
+                    availability: 'gym',
+                }),
+            );
+            const { exerciseDefinitionService, gymSessionService } =
+                context.testDb.dbServices;
+            exerciseDefinitionService.upsertExerciseDefinitionData({
+                defaultTrackingFields: ['reps'],
+                defaultTargetSet: { reps: 12 },
+                exerciseDefinitionId: definition.id,
+            });
+            const session = seedGymSession(
+                context.testDb,
+                createGymSessionFixture({
+                    id: 'atomic-configured-session',
+                    status: 'active',
+                    exerciseRecords: [
+                        createGymExerciseRecordFixture({
+                            id: 'existing-atomic-record',
+                            exerciseDefinitionId: definition.id,
+                        }),
+                    ],
+                }),
+            );
+
+            expectGymErrorCode(() => {
+                gymSessionService.addConfiguredExerciseRecordToSession({
+                    defaultTrackingFields: ['duration'],
+                    defaultTargetSet: { durationSec: 300 },
+                    exerciseDefinitionId: definition.id,
+                    name: definition.name,
+                    sessionId: session.id,
+                });
+            }, 'DUPLICATE_EXERCISE_RECORD');
+            expect(exerciseDefinitionService.getById(definition.id)?.data).toMatchObject(
+                {
+                    defaultTrackingFields: ['reps'],
+                    defaultTargetSet: { reps: 12 },
+                },
+            );
         });
     });
 
@@ -1293,6 +1430,75 @@ describe('gymSessionService integration', () => {
         });
     });
 
+    describe('updateExerciseRecordTrackingDefaults', () => {
+        it('updates incomplete sets and preserves completed set history', () => {
+            const definition = seedExerciseDefinition(
+                context.testDb,
+                createExerciseDefinitionFixture({
+                    name: 'Gym Test Tracking Defaults',
+                    availability: 'gym',
+                }),
+            );
+            const session = seedGymSession(
+                context.testDb,
+                createGymSessionFixture({
+                    id: 'tracking-defaults-session',
+                    status: 'active',
+                    exerciseRecords: [
+                        createGymExerciseRecordFixture({
+                            id: 'tracking-defaults-record',
+                            exerciseDefinitionId: definition.id,
+                            sets: [
+                                createGymExerciseRecordSetFixture({
+                                    id: 'completed-tracking-set',
+                                    completedAtMs: FIXED_NOW_MS - 100,
+                                    reps: 10,
+                                }),
+                                createGymExerciseRecordSetFixture({
+                                    id: 'incomplete-tracking-set',
+                                    reps: 12,
+                                    setIndex: 1,
+                                }),
+                            ],
+                        }),
+                    ],
+                }),
+            );
+            const { exerciseDefinitionService, gymSessionService } =
+                context.testDb.dbServices;
+
+            const record =
+                gymSessionService.updateExerciseRecordTrackingDefaults({
+                    defaultTrackingFields: ['distance', 'duration'],
+                    defaultTargetSet: {
+                        distanceMeters: 1_000,
+                        durationSec: 300,
+                    },
+                    exerciseRecordId: session.exerciseRecords[0].id,
+                });
+
+            expect(record.sets[0]).toMatchObject({
+                id: 'completed-tracking-set',
+                reps: 10,
+            });
+            expect(record.sets[1]).toMatchObject({
+                id: 'incomplete-tracking-set',
+                reps: undefined,
+                distanceMeters: 1_000,
+                durationSec: 300,
+            });
+            expect(
+                exerciseDefinitionService.getById(definition.id)?.data,
+            ).toMatchObject({
+                defaultTrackingFields: ['duration', 'distance'],
+                defaultTargetSet: {
+                    distanceMeters: 1_000,
+                    durationSec: 300,
+                },
+            });
+        });
+    });
+
     describe('updateExerciseRecordSet', () => {
         it('updates editable set fields while preserving the logged set identity', () => {
             const { gymSessionService } = context.testDb.dbServices;
@@ -1450,6 +1656,118 @@ describe('gymSessionService integration', () => {
                     id: set.id,
                     reps: undefined,
                     notes: 'empty update',
+                });
+            }, 'INVALID_GYM_SET');
+        });
+
+        it('allows a plan-derived incomplete set to remain empty', () => {
+            const definition = seedExerciseDefinition(
+                context.testDb,
+                createExerciseDefinitionFixture({
+                    name: 'Gym Test Empty Planned Set',
+                    availability: 'gym',
+                }),
+            );
+            seedGymPlan(
+                context.testDb,
+                createGymPlanFixture({
+                    id: 'planned-empty-source-plan',
+                    sections: [
+                        createGymPlanSectionFixture({
+                            id: 'planned-empty-source-section',
+                            exercises: [
+                                createGymPlanExerciseFixture({
+                                    id: 'source-plan-exercise',
+                                    exerciseDefinitionId: definition.id,
+                                }),
+                            ],
+                        }),
+                    ],
+                }),
+            );
+            const session = seedGymSession(
+                context.testDb,
+                createGymSessionFixture({
+                    id: 'planned-empty-session',
+                    startedAtMs: FIXED_NOW_MS - 1_000,
+                    status: 'active',
+                    exerciseRecords: [
+                        createGymExerciseRecordFixture({
+                            id: 'planned-empty-record',
+                            exerciseDefinitionId: definition.id,
+                            sourceGymPlanExerciseId: 'source-plan-exercise',
+                            sets: [
+                                createGymExerciseRecordSetFixture({
+                                    id: 'planned-empty-set',
+                                }),
+                            ],
+                        }),
+                    ],
+                }),
+            );
+            const { gymSessionService } = context.testDb.dbServices;
+
+            const updated = gymSessionService.updateExerciseRecordSet({
+                id: session.exerciseRecords[0].sets[0].id,
+                notes: 'Still intentionally empty',
+            });
+
+            expect(updated).toMatchObject({
+                id: 'planned-empty-set',
+                notes: 'Still intentionally empty',
+            });
+        });
+
+        it('rejects completing an empty plan-derived set', () => {
+            const definition = seedExerciseDefinition(
+                context.testDb,
+                createExerciseDefinitionFixture({
+                    name: 'Gym Test Complete Empty Planned Set',
+                    availability: 'gym',
+                }),
+            );
+            seedGymPlan(
+                context.testDb,
+                createGymPlanFixture({
+                    id: 'complete-empty-source-plan',
+                    sections: [
+                        createGymPlanSectionFixture({
+                            id: 'complete-empty-source-section',
+                            exercises: [
+                                createGymPlanExerciseFixture({
+                                    id: 'source-plan-exercise',
+                                    exerciseDefinitionId: definition.id,
+                                }),
+                            ],
+                        }),
+                    ],
+                }),
+            );
+            const session = seedGymSession(
+                context.testDb,
+                createGymSessionFixture({
+                    id: 'complete-empty-session',
+                    status: 'active',
+                    exerciseRecords: [
+                        createGymExerciseRecordFixture({
+                            id: 'complete-empty-record',
+                            exerciseDefinitionId: definition.id,
+                            sourceGymPlanExerciseId: 'source-plan-exercise',
+                            sets: [
+                                createGymExerciseRecordSetFixture({
+                                    id: 'complete-empty-set',
+                                }),
+                            ],
+                        }),
+                    ],
+                }),
+            );
+            const { gymSessionService } = context.testDb.dbServices;
+
+            expectGymErrorCode(() => {
+                gymSessionService.updateExerciseRecordSet({
+                    id: session.exerciseRecords[0].sets[0].id,
+                    completedAtMs: FIXED_NOW_MS,
                 });
             }, 'INVALID_GYM_SET');
         });

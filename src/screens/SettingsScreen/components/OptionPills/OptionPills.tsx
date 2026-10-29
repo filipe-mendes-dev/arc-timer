@@ -66,6 +66,7 @@ export const OptionPills = <T extends string>(props: OptionPillsProps<T>) => {
                             <AppText
                                 variant="bodySmall"
                                 tone={isActive ? 'primary' : 'muted'}
+                                style={st.label}
                             >
                                 {label}
                             </AppText>

@@ -9,6 +9,7 @@ export const useOptionPillsStyles = createStyles((theme) =>
             gap: 8,
         },
         pill: {
+            maxWidth: '100%',
             paddingHorizontal: 16,
             paddingVertical: 10,
             borderRadius: 999,
@@ -26,5 +27,6 @@ export const useOptionPillsStyles = createStyles((theme) =>
             gap: 6,
         },
         leftSlot: {},
+        label: { flexShrink: 1 },
     }),
 );

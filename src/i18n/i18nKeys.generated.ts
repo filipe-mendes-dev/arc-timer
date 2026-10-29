@@ -20,12 +20,14 @@ export const i18nKeys = {
             start: 'common.actions.start',
             share: 'common.actions.share',
             done: 'common.actions.done',
+            details: 'common.actions.details',
         },
         status: {
             noTimeEstimate: 'common.status.noTimeEstimate',
             mixedTimeAndReps: 'common.status.mixedTimeAndReps',
         },
         units: {
+            kg: 'common.units.kg',
             block_one: 'common.units.block_one',
             block_other: 'common.units.block_other',
             set_one: 'common.units.set_one',
@@ -432,6 +434,7 @@ export const i18nKeys = {
         notFoundDescription: 'gymExerciseData.notFoundDescription',
         actions: {
             addSet: 'gymExerciseData.actions.addSet',
+            openExerciseDetails: 'gymExerciseData.actions.openExerciseDetails',
             backToSession: 'gymExerciseData.actions.backToSession',
             completeSet: 'gymExerciseData.actions.completeSet',
             deleteSet: 'gymExerciseData.actions.deleteSet',
@@ -461,6 +464,11 @@ export const i18nKeys = {
         editSet: {
             description: 'gymExerciseData.editSet.description',
             title: 'gymExerciseData.editSet.title',
+        },
+        history: {
+            lastSession: 'gymExerciseData.history.lastSession',
+            weightPr: 'gymExerciseData.history.weightPr',
+            reps: 'gymExerciseData.history.reps',
         },
         status: {
             complete: 'gymExerciseData.status.complete',
@@ -790,6 +798,20 @@ export const i18nKeys = {
             duration: 'exerciseDefinitions.trackingField.duration',
             distance: 'exerciseDefinitions.trackingField.distance',
             rpe: 'exerciseDefinitions.trackingField.rpe',
+        },
+        trackingSetup: {
+            confirm: 'exerciseDefinitions.trackingSetup.confirm',
+            changeDefaults: 'exerciseDefinitions.trackingSetup.changeDefaults',
+            description: 'exerciseDefinitions.trackingSetup.description',
+            fields: 'exerciseDefinitions.trackingSetup.fields',
+            presets: {
+                bodyweight: 'exerciseDefinitions.trackingSetup.presets.bodyweight',
+                cardio: 'exerciseDefinitions.trackingSetup.presets.cardio',
+                custom: 'exerciseDefinitions.trackingSetup.presets.custom',
+                strength: 'exerciseDefinitions.trackingSetup.presets.strength',
+                timed: 'exerciseDefinitions.trackingSetup.presets.timed',
+            },
+            title: 'exerciseDefinitions.trackingSetup.title',
         },
         source: {
             system: 'exerciseDefinitions.source.system',

@@ -13,12 +13,14 @@ export const en: I18nResource = {
             start: 'Start',
             share: 'Share',
             done: 'Done',
+            details: 'Details',
         },
         status: {
             noTimeEstimate: 'No time estimate',
             mixedTimeAndReps: 'Mixed (time + reps)',
         },
         units: {
+            kg: 'kg',
             block_one: '{{count}} block',
             block_other: '{{count}} blocks',
             set_one: '{{count}} set',
@@ -446,6 +448,7 @@ export const en: I18nResource = {
         notFoundDescription: 'This exercise is not in the active gym session.',
         actions: {
             addSet: 'Add set',
+            openExerciseDetails: 'Open details for {{name}}',
             backToSession: 'Back to session',
             completeSet: 'Done',
             deleteSet: 'Delete',
@@ -468,7 +471,7 @@ export const en: I18nResource = {
         },
         defaults: {
             description:
-                'Choose what this exercise tracks. Reps and weight are enabled by default.',
+                'Choose which fields to track for this exercise.',
             removeDataAndSave: 'Remove data and save',
             removeDataWarning:
                 'Saving will remove existing values for: {{fields}}.',
@@ -477,6 +480,11 @@ export const en: I18nResource = {
         editSet: {
             description: 'Update the values tracked for this set.',
             title: 'Edit set',
+        },
+        history: {
+            lastSession: 'Last session',
+            weightPr: 'Personal best',
+            reps: '× {{count}}',
         },
         status: {
             complete: 'Complete',
@@ -815,6 +823,21 @@ export const en: I18nResource = {
             duration: 'Duration',
             distance: 'Distance',
             rpe: 'RPE',
+        },
+        trackingSetup: {
+            confirm: 'Confirm',
+            changeDefaults: 'Change defaults',
+            description:
+                'These defaults are used for future plans and gym sessions.',
+            fields: 'Tracking fields',
+            presets: {
+                bodyweight: 'Bodyweight',
+                cardio: 'Cardio',
+                custom: 'Custom',
+                strength: 'Strength',
+                timed: 'Timed',
+            },
+            title: 'Exercise defaults',
         },
         source: {
             system: 'System',

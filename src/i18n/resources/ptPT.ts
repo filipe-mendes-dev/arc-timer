@@ -13,12 +13,14 @@ export const ptPT: I18nResource = {
             start: 'Iniciar',
             share: 'Partilhar',
             done: 'Concluído',
+            details: 'Detalhes',
         },
         status: {
             noTimeEstimate: 'Sem estimativa de tempo',
             mixedTimeAndReps: 'Misto (tempo + repetições)',
         },
         units: {
+            kg: 'kg',
             block_one: '{{count}} bloco',
             block_other: '{{count}} blocos',
             set_one: '{{count}} série',
@@ -462,6 +464,7 @@ export const ptPT: I18nResource = {
             'Este exercício não está na sessão de ginásio ativa.',
         actions: {
             addSet: 'Adicionar série',
+            openExerciseDetails: 'Abrir detalhes de {{name}}',
             backToSession: 'Voltar à sessão',
             completeSet: 'Concluir',
             deleteSet: 'Eliminar',
@@ -484,7 +487,7 @@ export const ptPT: I18nResource = {
         },
         defaults: {
             description:
-                'Escolhe o que este exercício regista. Repetições e peso vêm ativos por defeito.',
+                'Escolhe os campos a registar neste exercício.',
             removeDataAndSave: 'Remover dados e guardar',
             removeDataWarning:
                 'Guardar vai remover valores existentes para: {{fields}}.',
@@ -493,6 +496,11 @@ export const ptPT: I18nResource = {
         editSet: {
             description: 'Atualiza os valores registados nesta série.',
             title: 'Editar série',
+        },
+        history: {
+            lastSession: 'Última sessão',
+            weightPr: 'Recorde pessoal',
+            reps: '× {{count}}',
         },
         status: {
             complete: 'Concluído',
@@ -839,6 +847,21 @@ export const ptPT: I18nResource = {
             duration: 'Duração',
             distance: 'Distância',
             rpe: 'RPE',
+        },
+        trackingSetup: {
+            confirm: 'Confirmar',
+            changeDefaults: 'Alterar predefinições',
+            description:
+                'Estas predefinições são usadas em futuros planos e sessões de ginásio.',
+            fields: 'Campos registados',
+            presets: {
+                bodyweight: 'Peso corporal',
+                cardio: 'Cardio',
+                custom: 'Personalizado',
+                strength: 'Força',
+                timed: 'Temporizado',
+            },
+            title: 'Predefinições do exercício',
         },
         source: {
             system: 'Sistema',
