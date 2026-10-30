@@ -49,6 +49,8 @@ import {
 import type { ExerciseDefinitionService } from './services/exerciseDefinitions/exerciseDefinitionServiceFactory';
 import type { WorkoutRepository } from './repositories/workouts/workoutRepositoryFactory';
 import type { WorkoutSessionRepository } from './repositories/workoutSessions/workoutSessionRepositoryFactory';
+import { createBackupRepository } from './repositories/backups/backupRepositoryFactory';
+import { createBackupService, type BackupService } from './services/backups/backupServiceFactory';
 
 export interface CreateDbServicesArgs {
     clock?: Clock;
@@ -56,6 +58,7 @@ export interface CreateDbServicesArgs {
 }
 
 export interface DbServices {
+    backupService: BackupService;
     exerciseDefinitionDataRepository: ExerciseDefinitionDataRepository;
     exerciseDefinitionService: ExerciseDefinitionService;
     exerciseDefinitionStatsRepository: ExerciseDefinitionStatsRepository;
@@ -75,6 +78,10 @@ export const createDbServices = ({
     clock = systemClock,
     db,
 }: CreateDbServicesArgs): DbServices => {
+    const backupService = createBackupService({
+        backupRepository: createBackupRepository({ db }),
+        clock,
+    });
     const exerciseDefinitionDataRepository =
         createExerciseDefinitionDataRepository({
             db,
@@ -140,6 +147,7 @@ export const createDbServices = ({
     });
 
     return {
+        backupService,
         exerciseDefinitionDataRepository,
         exerciseDefinitionService,
         exerciseDefinitionStatsRepository,

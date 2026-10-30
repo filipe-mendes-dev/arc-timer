@@ -3,6 +3,9 @@ import { createStyles } from '@src/theme/createStyles';
 
 export const useSettingsStyles = createStyles((theme) =>
     StyleSheet.create({
+        backupActions: {
+            gap: 10,
+        },
         separator: {
             height: 1,
             backgroundColor: theme.palette.border.subtle,

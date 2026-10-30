@@ -18,6 +18,10 @@ import {
     setLanguage,
     type LanguageCode,
 } from '@src/i18n/language';
+import { Button } from '@src/components/ui/Button/Button';
+import { AppIcon } from '@src/components/ui/Icon/AppIcon';
+import ConfirmDialog from '@src/components/modals/ConfirmDialog/ConfirmDialog';
+import { useSettingsBackup } from './useSettingsBackup';
 
 interface LanguageOption {
     value: LanguageCode;
@@ -51,7 +55,7 @@ const APP_NAME = Application.applicationName ?? 'ARC Timer';
 
 const SettingsScreen = () => {
     const { t } = useTranslation();
-    const { preference, setPreference } = useTheme();
+    const { preference, setPreference, theme } = useTheme();
     const {
         isSoundEnabled,
         accentPreference,
@@ -59,6 +63,7 @@ const SettingsScreen = () => {
         setAccentPreference,
     } = useSettingsStore();
     const st = useSettingsStyles();
+    const backup = useSettingsBackup();
 
     const themeOptions = [
         { value: 'light' as const, label: t('settings.theme.light') },
@@ -162,6 +167,38 @@ const SettingsScreen = () => {
 
             <View style={st.separator} />
 
+            <SettingsSection iconId="backup" title={t('settings.backup.title')}>
+                <View style={st.backupActions}>
+                    <Button
+                        title={t('settings.backup.export')}
+                        variant="secondary"
+                        icon={<AppIcon id="share" color={theme.palette.text.primary} />}
+                        onPress={backup.exportBackup}
+                        loading={backup.isExporting}
+                        disabled={backup.isBusy}
+                    />
+                    <Button
+                        title={t('settings.backup.restore')}
+                        variant="secondary"
+                        icon={<AppIcon id="restore" color={theme.palette.text.primary} />}
+                        onPress={backup.selectBackup}
+                        loading={backup.isPicking || backup.isRestoring}
+                        disabled={backup.isBusy}
+                    />
+                </View>
+                {backup.status && (
+                    <AppText
+                        variant="bodySmall"
+                        tone={backup.hasError ? 'error' : 'success'}
+                        accessibilityLiveRegion="polite"
+                    >
+                        {backup.status}
+                    </AppText>
+                )}
+            </SettingsSection>
+
+            <View style={st.separator} />
+
             <SettingsSection iconId="info" title={t('settings.sections.about')}>
                 <View style={st.aboutContent}>
                     <AppLogo size={64} withBackground />
@@ -184,6 +221,16 @@ const SettingsScreen = () => {
                     </View>
                 </View>
             </SettingsSection>
+            <ConfirmDialog
+                visible={backup.pendingBackup !== null}
+                title={t('settings.backup.confirmTitle')}
+                message={t('settings.backup.confirmMessage')}
+                confirmLabel={t('settings.backup.confirm')}
+                cancelLabel={t('common.actions.cancel')}
+                destructive
+                onConfirm={backup.confirmRestore}
+                onCancel={backup.cancelRestore}
+            />
         </MainContainer>
     );
 };

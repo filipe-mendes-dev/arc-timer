@@ -677,6 +677,26 @@ export const i18nKeys = {
     },
     settings: {
         title: 'settings.title',
+        backup: {
+            title: 'settings.backup.title',
+            export: 'settings.backup.export',
+            restore: 'settings.backup.restore',
+            shareTitle: 'settings.backup.shareTitle',
+            confirmTitle: 'settings.backup.confirmTitle',
+            confirmMessage: 'settings.backup.confirmMessage',
+            confirm: 'settings.backup.confirm',
+            restored: 'settings.backup.restored',
+            errors: {
+                invalidExtension: 'settings.backup.errors.invalidExtension',
+                invalidData: 'settings.backup.errors.invalidData',
+                incompatible: 'settings.backup.errors.incompatible',
+                activeSession: 'settings.backup.errors.activeSession',
+                readFailed: 'settings.backup.errors.readFailed',
+                exportFailed: 'settings.backup.errors.exportFailed',
+                sharingUnavailable: 'settings.backup.errors.sharingUnavailable',
+                restoreFailed: 'settings.backup.errors.restoreFailed',
+            },
+        },
         sections: {
             appearance: 'settings.sections.appearance',
             sound: 'settings.sections.sound',
