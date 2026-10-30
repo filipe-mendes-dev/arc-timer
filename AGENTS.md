@@ -139,6 +139,8 @@ You are working in a React Native / Expo Router project (Arc Timer). Follow thes
 
 ## 8) Git / Commits
 
+- Branch names must use a purpose-based prefix such as `feat/`, `fix/`, `refactor/`, `chore/`, `docs/`, or `test/`, followed by a short, descriptive kebab-case name.
+- Never use `codex/` or `claude/` branch prefixes.
 - Commit messages must use conventional commits:
     - `feat: ...`
     - `fix: ...`
