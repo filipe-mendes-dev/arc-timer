@@ -103,6 +103,11 @@ const config: Config = {
     },
     plugins: [
         'expo-router',
+        // Entitlement mods run in reverse order, so remove APNs after notification setup.
+        './plugins/withGymSessionNotifications',
+        ['expo-notifications', {
+            icon: './assets/generated/classic/notification-logo.png',
+        }],
         [
             'expo-audio',
             {
