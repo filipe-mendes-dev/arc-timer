@@ -38,5 +38,9 @@ export const useConfirmDialogStyles = createStyles((theme: AppTheme) =>
         button: {
             flex: 1,
         },
+        buttonText: {
+            flexShrink: 1,
+            textAlign: 'center',
+        },
     }),
 );

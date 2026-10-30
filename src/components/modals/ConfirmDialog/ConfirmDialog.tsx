@@ -85,6 +85,7 @@ const ConfirmDialog = ({
                         variant="secondary"
                         onPress={onCancel}
                         style={st.button}
+                        textStyle={st.buttonText}
                     />
 
                     <Button
@@ -92,6 +93,7 @@ const ConfirmDialog = ({
                         variant={content.destructive ? 'danger' : 'primary'}
                         onPress={onConfirm}
                         style={st.button}
+                        textStyle={st.buttonText}
                     />
                 </View>
             </View>

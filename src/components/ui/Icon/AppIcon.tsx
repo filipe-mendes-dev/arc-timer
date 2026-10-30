@@ -19,6 +19,16 @@ type IconDefinition =
       };
 
 const ICON_MAP = {
+    backup: {
+        lib: 'ion',
+        name: 'archive-outline',
+        defaultSize: 20,
+    },
+    restore: {
+        lib: 'ion',
+        name: 'download-outline',
+        defaultSize: 20,
+    },
     home: {
         lib: 'ion',
         name: 'home-outline',

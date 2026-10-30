@@ -667,6 +667,26 @@ export interface I18nResource {
     };
     settings: {
         title: string;
+        backup: {
+            title: string;
+            export: string;
+            restore: string;
+            shareTitle: string;
+            confirmTitle: string;
+            confirmMessage: string;
+            confirm: string;
+            restored: string;
+            errors: {
+                invalidExtension: string;
+                invalidData: string;
+                incompatible: string;
+                activeSession: string;
+                readFailed: string;
+                exportFailed: string;
+                sharingUnavailable: string;
+                restoreFailed: string;
+            };
+        };
         sections: {
             appearance: string;
             sound: string;
