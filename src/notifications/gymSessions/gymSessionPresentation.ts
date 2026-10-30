@@ -1,5 +1,5 @@
 import Constants from 'expo-constants';
-import { createURL } from 'expo-linking';
+import { applicationId } from 'expo-application';
 import i18n from '@src/i18n';
 import type { GymSession } from '@src/core/entities/gymSession.interfaces';
 import { formatShortTime } from '@src/helpers/time.helpers';
@@ -7,6 +7,13 @@ import { useSettingsStore } from '@src/state/useSettingsStore';
 import { COLOR_ACCENTS, buildDarkPalette, buildLightPalette } from '@src/theme/palette';
 import { Appearance } from 'react-native';
 import { colors } from '@src/theme/colors';
+
+const APP_SCHEMES: Record<string, string | undefined> = {
+    'dev.filipemendes.arctimer': 'arctimer',
+    'dev.filipemendes.arctimer.dev': 'arctimer-dev',
+    'dev.filipemendes.arctimer.preview': 'arctimer-preview',
+    'dev.filipemendes.arctimer.screenshots': 'arctimer-screenshots',
+};
 
 export interface GymSessionPresentation {
     sessionId: string;
@@ -36,12 +43,13 @@ export const createGymSessionPresentation = (session: GymSession): GymSessionPre
     const locale = i18n.resolvedLanguage ?? i18n.language;
     const path = 'gymSession';
     const configuredScheme = Constants.expoConfig?.scheme;
-    const scheme = typeof configuredScheme === 'string' ? configuredScheme : configuredScheme?.[0];
-    const openUrl = createURL(path, { scheme, queryParams: { sessionId: session.id } });
-    const endUrl = createURL(path, {
-        scheme,
-        queryParams: { sessionId: session.id, notificationAction: 'end' },
-    });
+    const fallbackScheme = typeof configuredScheme === 'string' ? configuredScheme : configuredScheme?.[0];
+    // Metro can serve production config to a development app.
+    const scheme = APP_SCHEMES[applicationId ?? ''] ?? fallbackScheme ?? 'arctimer';
+    const queryParams = new URLSearchParams({ sessionId: session.id });
+    const openUrl = `${scheme}://${path}?${queryParams.toString()}`;
+    queryParams.set('notificationAction', 'end');
+    const endUrl = `${scheme}://${path}?${queryParams.toString()}`;
     let buttonTextColor = palette.text.inverted;
     if (accentPreference !== 'neutral') buttonTextColor = accent.darkInk;
     if (accentPreference === 'neutral') buttonTextColor = colors.white.main;
