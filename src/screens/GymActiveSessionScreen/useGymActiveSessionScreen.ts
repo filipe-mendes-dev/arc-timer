@@ -76,7 +76,12 @@ export const useGymActiveSessionScreen = () => {
     };
 
     const handleBack = () => {
-        router.back();
+        if (router.canGoBack()) {
+            router.back();
+            return;
+        }
+
+        handleBackToGym();
     };
 
     const handleAddExercise = () => {
