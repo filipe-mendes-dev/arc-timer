@@ -8,6 +8,10 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Show active gym sessions on the iOS Lock Screen and Dynamic Island and in compact and expanded Android notifications, with live elapsed time and session details
+- Match gym session banners to the selected accent and light/dark theme, with app logo watermarks and English/Portuguese text
+- Open the active session or its end-session confirmation directly from session banners
+- Send one local reminder after 90 minutes and remove session banners and reminders when the session is finished or discarded
 - Add Strength, Cardio, Timed and Bodyweight tracking presets with icons and confirmation when adding new or unconfigured exercises to gym sessions and plans
 - Show previous-session weight and personal best in the exercise screen, with a shortcut to exercise details
 - Show dates alongside recent training sessions in exercise details
