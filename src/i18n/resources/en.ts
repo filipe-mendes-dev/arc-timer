@@ -3,6 +3,14 @@ import type { I18nResource } from './interfaces';
 const exerciseNameRequired = 'Exercise name required.';
 
 export const en: I18nResource = {
+    gymNotifications: {
+        activeTitle: 'Gym session active',
+        elapsed: 'elapsed',
+        channelName: 'Active gym session',
+        reminderChannelName: 'Gym session reminders',
+        reminderTitle: 'Still training?',
+        reminderBody: 'Your gym session started 90 minutes ago.',
+    },
     common: {
         actions: {
             back: 'Back',

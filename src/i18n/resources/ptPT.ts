@@ -3,6 +3,14 @@ import type { I18nResource } from './interfaces';
 const exerciseNameRequired = 'Nome do exercício obrigatório.';
 
 export const ptPT: I18nResource = {
+    gymNotifications: {
+        activeTitle: 'Sessão de ginásio ativa',
+        elapsed: 'decorridos',
+        channelName: 'Sessão de ginásio ativa',
+        reminderChannelName: 'Lembretes de sessões de ginásio',
+        reminderTitle: 'Ainda estás a treinar?',
+        reminderBody: 'A tua sessão de ginásio começou há 90 minutos.',
+    },
     common: {
         actions: {
             back: 'Voltar',
