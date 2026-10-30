@@ -11,6 +11,7 @@ import { initializeDatabase } from '@src/db';
 import { AppQueryProvider } from '@src/data/QueryProvider';
 import { sqliteDb } from '@src/db/client';
 import { DatabaseBootstrapErrorScreen } from '@src/components/bootstrap/DatabaseBootstrapErrorScreen/DatabaseBootstrapErrorScreen';
+import { GymSessionNotificationsCoordinator } from '@src/notifications/gymSessions/GymSessionNotificationsCoordinator';
 
 const SPLASH_MIN_DURATION_MS = 1000;
 const splashStartedAtMs = Date.now();
@@ -112,6 +113,7 @@ const RootLayout = () => {
         <AppQueryProvider>
             <ThemeProvider>
                 <SafeAreaProvider>
+                    <GymSessionNotificationsCoordinator />
                     <Stack
                         initialRouteName="(drawer)" // <— ensure we start at the drawer
                         screenOptions={{

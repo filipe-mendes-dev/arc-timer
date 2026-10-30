@@ -15,6 +15,10 @@ import { exerciseDefinitionKeys } from '../exerciseDefinitions/exerciseDefinitio
 import { gymPlanKeys } from '../gymPlans/gymPlanKeys';
 import { trainingSessionKeys } from '../trainingSessions/trainingSessionKeys';
 import { gymSessionKeys } from './gymSessionKeys';
+import {
+    requestGymSessionNotificationPermission,
+    synchronizeGymSessionNotifications,
+} from '@src/notifications/gymSessions/gymSessionNotifications';
 
 export interface AddGymExerciseRecordByNameInput extends AddExerciseRecordToSessionInput {
     name: string;
@@ -38,6 +42,8 @@ export const useStartGymSession = () => {
         mutationFn: async () =>
             dbServices.gymSessionService.startEmptyGymSession(),
         onSuccess: async () => {
+            await requestGymSessionNotificationPermission();
+            await synchronizeGymSessionNotifications();
             await invalidateGymSessionQueries(queryClient);
         },
     });
@@ -50,6 +56,8 @@ export const useStartGymSessionFromPlan = () => {
         mutationFn: async (input: StartGymSessionFromPlanInput) =>
             dbServices.gymSessionService.startGymSessionFromPlan(input),
         onSuccess: async () => {
+            await requestGymSessionNotificationPermission();
+            await synchronizeGymSessionNotifications();
             await Promise.all([
                 invalidateGymSessionQueries(queryClient),
                 queryClient.invalidateQueries({
@@ -69,6 +77,8 @@ export const useStartGymSessionFromSessionSnapshot = () => {
                 input,
             ),
         onSuccess: async () => {
+            await requestGymSessionNotificationPermission();
+            await synchronizeGymSessionNotifications();
             await invalidateGymSessionQueries(queryClient);
         },
     });
@@ -80,6 +90,7 @@ export const useFinishGymSession = () => {
     return useMutation({
         mutationFn: async () => dbServices.gymSessionService.finishGymSession(),
         onSuccess: async () => {
+            await synchronizeGymSessionNotifications();
             await Promise.all([
                 invalidateGymSessionQueries(queryClient),
                 queryClient.invalidateQueries({
@@ -97,6 +108,7 @@ export const useDiscardGymSession = () => {
         mutationFn: async (id: string) =>
             dbServices.gymSessionService.discardGymSession(id),
         onSuccess: async () => {
+            await synchronizeGymSessionNotifications();
             await Promise.all([
                 invalidateGymSessionQueries(queryClient),
                 queryClient.invalidateQueries({

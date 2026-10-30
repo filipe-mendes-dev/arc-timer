@@ -10,6 +10,14 @@ type I18nKeyTree<T, Prefix extends string = ''> = {
 };
 
 export const i18nKeys = {
+    gymNotifications: {
+        activeTitle: 'gymNotifications.activeTitle',
+        elapsed: 'gymNotifications.elapsed',
+        channelName: 'gymNotifications.channelName',
+        reminderChannelName: 'gymNotifications.reminderChannelName',
+        reminderTitle: 'gymNotifications.reminderTitle',
+        reminderBody: 'gymNotifications.reminderBody',
+    },
     common: {
         actions: {
             back: 'common.actions.back',

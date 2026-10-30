@@ -1,4 +1,12 @@
 export interface I18nResource {
+    gymNotifications: {
+        activeTitle: string;
+        elapsed: string;
+        channelName: string;
+        reminderChannelName: string;
+        reminderTitle: string;
+        reminderBody: string;
+    };
     common: {
         actions: {
             back: string;
