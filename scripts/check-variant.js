@@ -27,7 +27,10 @@ if (fs.existsSync(iosDir)) {
     const content = fs.readFileSync(pbx, 'utf8');
     const ids = [...content.matchAll(/PRODUCT_BUNDLE_IDENTIFIER = ([^;]+);/g)]
       .map((m) => m[1].trim().replace(/^"|"$/g, ''));
-    const bad = ids.filter((id) => id && id !== EXPECTED_ID);
+    // The Live Activity extension has its own bundle ID within the same variant.
+    const bad = ids.filter((id) =>
+      id && id !== EXPECTED_ID && id !== `${EXPECTED_ID}.GymSessionActivity`
+    );
     if (bad.length) {
       errors.push(
         `iOS bundle id is "${bad[0]}" (expected "${EXPECTED_ID}"). Run: ${regenCmd}`
