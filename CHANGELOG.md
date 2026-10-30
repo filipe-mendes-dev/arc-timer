@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Export all workout, gym, exercise and history data from Settings to versioned `.arcbak` files without including app settings or language
+- Restore compatible `.arcbak` backups after destructive confirmation, replacing existing data atomically and blocking restore during active sessions
 - Show active gym sessions on the iOS Lock Screen and Dynamic Island and in compact and expanded Android notifications, with live elapsed time and session details
 - Match gym session banners to the selected accent and light/dark theme, with app logo watermarks and English/Portuguese text
 - Open the active session or its end-session confirmation directly from session banners
