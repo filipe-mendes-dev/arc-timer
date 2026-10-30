@@ -13,14 +13,16 @@ module.exports = {
         '<rootDir>/tests/**/*.test.tsx',
     ],
     moduleNameMapper: {
+        // Immer's React Native export is ESM; Jest executes its equivalent CJS build.
+        '^immer$': '<rootDir>/node_modules/immer/dist/cjs/index.js',
         '^src/(.*)$': '<rootDir>/src/$1',
         '^tests/(.*)$': '<rootDir>/tests/$1',
         '^@src/(.*)$': '<rootDir>/src/$1',
         '^@tests/(.*)$': '<rootDir>/tests/$1',
         '^expo-modules-core/(.*)$':
-            '<rootDir>/node_modules/expo/node_modules/expo-modules-core/$1',
+            '<rootDir>/node_modules/expo-modules-core/$1',
         '^expo-modules-core$':
-            '<rootDir>/node_modules/expo/node_modules/expo-modules-core',
+            '<rootDir>/node_modules/expo-modules-core',
     },
     setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
     watchman: false,
