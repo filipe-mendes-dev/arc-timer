@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { TextInput, View, type ViewStyle } from 'react-native';
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { ScrollView, TextInput, View, type ViewStyle } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 import { ActionModal } from '@src/components/modals/ActionModal';
 import {
@@ -11,6 +11,7 @@ import { useTheme } from '@src/theme/ThemeProvider';
 import { useSearchFieldStyles } from './SearchField.styles';
 import GuardedPressable from '../GuardedPressable/GuardedPressable';
 import { AppText } from '../Typography/AppText';
+import { AppIcon } from '../Icon/AppIcon';
 
 interface SearchFieldFilterSection<
     TKey extends string,
@@ -136,10 +137,12 @@ export const SearchField = <
                     <GuardedPressable
                         onPress={handleOpenFilters}
                         style={st.filterButton}
+                        accessibilityRole="button"
+                        accessibilityLabel={filters.title}
+                        accessibilityState={{ expanded: isFilterModalVisible }}
                     >
-                        <Feather
-                            name="sliders"
-                            size={18}
+                        <AppIcon
+                            id="filter"
                             color={theme.palette.text.inverted}
                         />
 
@@ -160,6 +163,7 @@ export const SearchField = <
             {!!filters && (
                 <ActionModal
                     visible={isFilterModalVisible}
+                    style={st.filterModal}
                     title={filters.title}
                     primaryAction={{
                         title: filters.applyLabel,
@@ -171,7 +175,7 @@ export const SearchField = <
                     }}
                     onClose={handleCloseFilters}
                 >
-                    <View style={st.filterSections}>
+                    <ScrollView style={st.filterScroll} contentContainerStyle={st.filterSections}>
                         {filters.sections.map((section) => (
                             <View key={section.key} style={st.filterSection}>
                                 <AppText variant="bodySmall" tone="secondary">
@@ -193,7 +197,7 @@ export const SearchField = <
                                 />
                             </View>
                         ))}
-                    </View>
+                    </ScrollView>
                 </ActionModal>
             )}
         </>

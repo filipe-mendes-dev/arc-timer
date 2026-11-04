@@ -1,4 +1,103 @@
 export interface I18nResource {
+    statistics: {
+        heading: string;
+        subtitle: string;
+        showExercises: string;
+        sessionCountInPeriod_one: string;
+        sessionCountInPeriod_other: string;
+        noSessionsInPeriod: string;
+
+        exerciseProgressDescription: string;
+        trainedExercises: string;
+        allExercises: string;
+        choosePeriod: string;
+        chooseMetric: string;
+        chooseMonth: string;
+        previousYear: string;
+        nextYear: string;
+        sessionPeriod: string;
+
+        title: string;
+        overview: string;
+        exerciseProgress: string;
+        progress: string;
+        attendance: string;
+        attendanceDescription: string;
+        attendanceHint: string;
+        trainingDays: string;
+        sessions: string;
+        workingSets: string;
+        totalReps: string;
+        lastTrained: string;
+        sessionCount_one: string;
+        sessionCount_other: string;
+        workingSetCount_one: string;
+        workingSetCount_other: string;
+        noExerciseSessionsTitle: string;
+        noExerciseSessionsDescription: string;
+        emptyPeriodTitle: string;
+        emptyPeriodDescription: string;
+        viewAllTime: string;
+        noMetricInPeriod: string;
+        noMetricPeriodDescription: string;
+        noMeasurementInPeriod: string;
+        noMeasurementPeriodDescription: string;
+        emptyTitle: string;
+        emptyDescription: string;
+        noMeasurement: string;
+        noMeasurementDescription: string;
+        noSessions: string;
+        noSessionsDescription: string;
+        warmupsExcluded: string;
+        viewProgress: string;
+        viewSession: string;
+        previous: string;
+        next: string;
+        previousMonth: string;
+        nextMonth: string;
+        retry: string;
+        weightWithReps_one: string;
+        weightWithReps_other: string;
+        chartDescription_one: string;
+        chartDescription_other: string;
+        calendarDay_one: string;
+        calendarDay_other: string;
+        period: {
+            month: string;
+            threeMonths: string;
+            year: string;
+            all: string;
+        };
+        metrics: {
+            weight: string;
+            reps: string;
+            volume: string;
+            duration: string;
+            distance: string;
+        };
+        units: {
+            weight: string;
+            reps: string;
+            volume: string;
+            duration: string;
+            distance: string;
+        };
+        metricDescriptions: {
+            weight: string;
+            reps: string;
+            volume: string;
+            duration: string;
+            distance: string;
+        };
+        values: {
+            volume: string;
+            weight: string;
+            duration: string;
+            distance: string;
+            reps_one: string;
+            reps_other: string;
+        };
+    };
     gymNotifications: {
         activeTitle: string;
         elapsed: string;

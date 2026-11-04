@@ -17,6 +17,7 @@ export const useOptionPillsStyles = createStyles((theme) =>
             borderColor: theme.palette.border.subtle,
             backgroundColor: 'transparent',
         },
+        pillDisabled: { opacity: 0.4 },
         pillActive: {
             borderColor: theme.palette.accent.primary,
             backgroundColor: theme.palette.accent.soft,

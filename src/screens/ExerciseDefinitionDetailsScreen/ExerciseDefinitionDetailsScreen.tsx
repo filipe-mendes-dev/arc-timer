@@ -16,7 +16,7 @@ import { ExerciseDefinitionNameModal } from './components/ExerciseDefinitionName
 import { ExerciseDefinitionOverviewSection } from './components/ExerciseDefinitionOverviewSection';
 import { ExerciseDefinitionReferencesSection } from './components/ExerciseDefinitionReferencesSection';
 import { ExerciseDefinitionStatsSection } from './components/ExerciseDefinitionStatsSection';
-import { RecentSessionsSection } from './components/RecentSessionsSection';
+import { RecentSessionsSection } from '@src/components/sessions/RecentSessionsSection/RecentSessionsSection';
 import { trackingFieldsModalCopy } from './ExerciseDefinitionDetailsScreen.helpers';
 import { useExerciseDefinitionDefaultFields } from './hooks/useExerciseDefinitionDefaultFields';
 import { useExerciseDefinitionDetailsScreen } from './hooks/useExerciseDefinitionDetailsScreen';
@@ -82,10 +82,7 @@ const ExerciseDefinitionDetailsScreen = () => {
 
     return (
         <>
-            <MainContainer
-                title={screen.screenTitle}
-                topBarOptions={topBarOptions}
-            >
+            <MainContainer title={screen.screenTitle} topBarOptions={topBarOptions}>
                 <ExerciseDefinitionOverviewSection
                     definition={screen.definition}
                     onPressAvailability={screen.openAvailabilityModal}
@@ -103,12 +100,12 @@ const ExerciseDefinitionDetailsScreen = () => {
                 />
 
                 <ExerciseDefinitionStatsSection
+                    exerciseDefinitionId={screen.definition.id}
                     items={screen.exerciseStatItems}
                 />
 
                 <RecentSessionsSection
-                    sessions={screen.definition.recentSessions ?? []}
-                    onPressSession={screen.goToRecentSession}
+                    filters={{ exerciseDefinitionId: screen.definition.id }}
                 />
             </MainContainer>
 

@@ -50,7 +50,16 @@ import type { ExerciseDefinitionService } from './services/exerciseDefinitions/e
 import type { WorkoutRepository } from './repositories/workouts/workoutRepositoryFactory';
 import type { WorkoutSessionRepository } from './repositories/workoutSessions/workoutSessionRepositoryFactory';
 import { createBackupRepository } from './repositories/backups/backupRepositoryFactory';
-import { createBackupService, type BackupService } from './services/backups/backupServiceFactory';
+import {
+    createBackupService,
+    type BackupService,
+} from './services/backups/backupServiceFactory';
+import { createTrainingSessionRepository } from './repositories/trainingSessions/trainingSessionRepositoryFactory';
+import { createGymStatisticsRepository } from './repositories/statistics/gymStatisticsRepositoryFactory';
+import {
+    createGymStatisticsService,
+    type GymStatisticsService,
+} from './services/statistics/gymStatisticsServiceFactory';
 
 export interface CreateDbServicesArgs {
     clock?: Clock;
@@ -67,6 +76,7 @@ export interface DbServices {
     gymPlanService: GymPlanService;
     gymSessionRepository: GymSessionRepository;
     gymSessionService: GymSessionService;
+    gymStatisticsService: GymStatisticsService;
     trainingSessionService: TrainingSessionService;
     workoutRepository: WorkoutRepository;
     workoutService: WorkoutService;
@@ -82,10 +92,9 @@ export const createDbServices = ({
         backupRepository: createBackupRepository({ db }),
         clock,
     });
-    const exerciseDefinitionDataRepository =
-        createExerciseDefinitionDataRepository({
-            db,
-        });
+    const exerciseDefinitionDataRepository = createExerciseDefinitionDataRepository({
+        db,
+    });
     const exerciseDefinitionStatsRepository =
         createExerciseDefinitionStatsRepository({
             db,
@@ -142,12 +151,14 @@ export const createDbServices = ({
         gymPlanRepository,
     });
     const trainingSessionService = createTrainingSessionService({
-        gymSessionService,
-        workoutSessionService,
+        repository: createTrainingSessionRepository({ db }),
     });
 
     return {
         backupService,
+        gymStatisticsService: createGymStatisticsService({
+            repository: createGymStatisticsRepository({ db }),
+        }),
         exerciseDefinitionDataRepository,
         exerciseDefinitionService,
         exerciseDefinitionStatsRepository,

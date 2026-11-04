@@ -18,39 +18,40 @@ interface UseExerciseDefinitionsListResult {
     setSearch: (value: string) => void;
 }
 
-export const useExerciseDefinitionsList =
-    (): UseExerciseDefinitionsListResult => {
-        const router = useRouter();
-        const [search, setSearch] = useState('');
-        const debouncedSearch = useDebouncedValue(
-            search.trim(),
-            SEARCH_DEBOUNCE_DELAY_MS,
-        );
-        const listParams = useMemo<ExerciseDefinitionListParams>(
-            () => ({
-                filters: {
-                    name: debouncedSearch,
-                },
-                scope: 'active',
-            }),
-            [debouncedSearch],
-        );
-        const { data: exerciseDefinitions = [] } =
-            useExerciseDefinitions(listParams);
-        const hasSearch = debouncedSearch.length > 0;
-
-        const goToExerciseDefinition = useCallback(
-            (id: string) => {
-                router.push(`/exercise-definitions/${id}`);
+export const useExerciseDefinitionsList = (
+    isProgressMode = false,
+): UseExerciseDefinitionsListResult => {
+    const router = useRouter();
+    const [search, setSearch] = useState('');
+    const debouncedSearch = useDebouncedValue(
+        search.trim(),
+        SEARCH_DEBOUNCE_DELAY_MS,
+    );
+    const listParams = useMemo<ExerciseDefinitionListParams>(
+        () => ({
+            filters: {
+                name: debouncedSearch,
+                availability: isProgressMode ? 'gym' : undefined,
             },
-            [router],
-        );
+            scope: isProgressMode ? 'all' : 'active',
+        }),
+        [debouncedSearch, isProgressMode],
+    );
+    const { data: exerciseDefinitions = [] } = useExerciseDefinitions(listParams);
+    const hasSearch = debouncedSearch.length > 0;
 
-        return {
-            exerciseDefinitions,
-            goToExerciseDefinition,
-            hasSearch,
-            search,
-            setSearch,
-        };
+    const goToExerciseDefinition = useCallback(
+        (id: string) => {
+            router.push(`/exercise-definitions/${id}`);
+        },
+        [router],
+    );
+
+    return {
+        exerciseDefinitions,
+        goToExerciseDefinition,
+        hasSearch,
+        search,
+        setSearch,
     };
+};

@@ -3,6 +3,112 @@ import type { I18nResource } from './interfaces';
 const exerciseNameRequired = 'Exercise name required.';
 
 export const en: I18nResource = {
+    statistics: {
+        heading: 'Your progress',
+        subtitle: 'Review your training over time.',
+        showExercises: 'Show exercises',
+        sessionCountInPeriod_one: '{{count}} session · {{period}}',
+        sessionCountInPeriod_other: '{{count}} sessions · {{period}}',
+        noSessionsInPeriod: 'No sessions · {{period}}',
+
+        exerciseProgressDescription: 'Follow each exercise over time.',
+        trainedExercises: 'With history',
+        allExercises: 'All exercises',
+        choosePeriod: 'Time period',
+        chooseMetric: 'Show on graph',
+        chooseMonth: 'Choose month',
+        previousYear: 'Previous year',
+        nextYear: 'Next year',
+        sessionPeriod: '{{start}} to {{end}}',
+
+        title: 'Progress',
+        overview: 'Gym overview',
+        exerciseProgress: 'Exercise progress',
+        progress: 'Progress',
+        attendance: 'Gym attendance',
+        attendanceDescription: 'See the days you trained.',
+        attendanceHint:
+            'Highlighted days have logged gym sessions. Each day counts once.',
+        trainingDays: 'Training days',
+        sessions: 'Sessions',
+        workingSets: 'Working sets',
+        totalReps: 'Total reps',
+        lastTrained: 'Last session {{date}}',
+        sessionCount_one: '{{count}} session',
+        sessionCount_other: '{{count}} sessions',
+        workingSetCount_one: '{{count}} working set',
+        workingSetCount_other: '{{count}} working sets',
+        noExerciseSessionsTitle: 'No sessions yet',
+        noExerciseSessionsDescription: 'Log this exercise in a gym session to see your progress.',
+        emptyPeriodTitle: 'No sessions in this period',
+        emptyPeriodDescription: 'No sessions recorded for this exercise during {{period}}.',
+        viewAllTime: 'View all time',
+        noMetricInPeriod: 'No {{metric}} recorded in this period',
+        noMetricPeriodDescription: 'No {{metric}} measurements were recorded for this exercise during {{period}}.',
+        noMeasurementInPeriod: 'No measurements in this period',
+        noMeasurementPeriodDescription: 'Sessions were recorded during {{period}}, but their working sets have no measurements to show.',
+        emptyTitle: 'No exercises found',
+        emptyDescription:
+            'Try another search or filter, or log an exercise in a gym session.',
+        noMeasurement: 'No measurements yet',
+        noMeasurementDescription:
+            'Log measurements in your working sets to see progress.',
+        noSessions: 'No sessions on this day',
+        noSessionsDescription:
+            'Choose a highlighted day to see its completed gym sessions.',
+        warmupsExcluded:
+            'Warmups are excluded. Missing measurements stay blank.',
+        viewProgress: 'View progress',
+        viewSession: 'View session',
+        previous: 'Previous',
+        next: 'Next',
+        previousMonth: 'Previous month',
+        nextMonth: 'Next month',
+        retry: 'Could not load progress. Tap to retry.',
+        weightWithReps_one: '{{weight}} × {{count}} rep',
+        weightWithReps_other: '{{weight}} × {{count}} reps',
+        chartDescription_one:
+            '{{exercise}}, {{metric}} across {{count}} session. Use the previous and next buttons for exact values.',
+        chartDescription_other:
+            '{{exercise}}, {{metric}} across {{count}} sessions. Use the previous and next buttons for exact values.',
+        calendarDay_one: '{{date}}, {{count}} completed session',
+        calendarDay_other: '{{date}}, {{count}} completed sessions',
+        period: {
+            month: 'This month',
+            threeMonths: 'Last 3 months',
+            year: 'This year',
+            all: 'All time',
+        },
+        metrics: {
+            weight: 'Weight',
+            reps: 'Reps',
+            volume: 'Volume',
+            duration: 'Duration',
+            distance: 'Distance',
+        },
+        units: {
+            weight: 'kg',
+            reps: 'reps',
+            volume: 'kg·reps',
+            duration: 'min:sec',
+            distance: 'm',
+        },
+        metricDescriptions: {
+            weight: 'Heaviest working set per session',
+            reps: 'Total reps per session',
+            volume: 'Total weight × reps per session',
+            duration: 'Total duration per session',
+            distance: 'Total distance per session',
+        },
+        values: {
+            volume: '{{value}} kg·reps',
+            weight: '{{value}} kg',
+            duration: '{{value}} s',
+            distance: '{{value}} m',
+            reps_one: '{{count}} rep',
+            reps_other: '{{count}} reps',
+        },
+    },
     gymNotifications: {
         activeTitle: 'Gym session active',
         elapsed: 'elapsed',
@@ -483,8 +589,7 @@ export const en: I18nResource = {
             hasWeight: 'Weight',
         },
         defaults: {
-            description:
-                'Choose which fields to track for this exercise.',
+            description: 'Choose which fields to track for this exercise.',
             removeDataAndSave: 'Remove data and save',
             removeDataWarning:
                 'Saving will remove existing values for: {{fields}}.',

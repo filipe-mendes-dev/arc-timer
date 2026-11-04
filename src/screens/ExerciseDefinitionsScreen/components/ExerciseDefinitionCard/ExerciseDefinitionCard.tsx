@@ -10,6 +10,7 @@ import { useTheme } from '@src/theme/ThemeProvider';
 import { useExerciseDefinitionCardStyles } from './ExerciseDefinitionCard.styles';
 
 interface ExerciseDefinitionCardProps {
+    metadata?: string;
     isSelected?: boolean;
     isSelectionLocked?: boolean;
     isSelectMode?: boolean;
@@ -63,6 +64,7 @@ const getActionStrip = ({
 };
 
 export const ExerciseDefinitionCard = ({
+    metadata,
     isSelected = false,
     isSelectionLocked = false,
     isSelectMode = false,
@@ -109,26 +111,33 @@ export const ExerciseDefinitionCard = ({
                         </AppText>
                     </View>
 
-                    <View style={st.metaRow}>
-                        <View style={st.metaItem}>
-                            <AppIcon
-                                id="info"
-                                size={14}
-                                color={theme.palette.text.secondary}
-                            />
-                            <AppText
-                                variant="caption"
-                                tone="secondary"
-                                numberOfLines={1}
-                            >
-                                {t(
-                                    availabilityLabelKeyByAvailability[
-                                        item.availability
-                                    ],
-                                )}
-                            </AppText>
+                    {metadata !== undefined && (
+                        <AppText variant="caption" tone="secondary">
+                            {metadata}
+                        </AppText>
+                    )}
+                    {metadata === undefined && (
+                        <View style={st.metaRow}>
+                            <View style={st.metaItem}>
+                                <AppIcon
+                                    id="info"
+                                    size={14}
+                                    color={theme.palette.text.secondary}
+                                />
+                                <AppText
+                                    variant="caption"
+                                    tone="secondary"
+                                    numberOfLines={1}
+                                >
+                                    {t(
+                                        availabilityLabelKeyByAvailability[
+                                            item.availability
+                                        ],
+                                    )}
+                                </AppText>
+                            </View>
                         </View>
-                    </View>
+                    )}
                 </View>
             }
         />
