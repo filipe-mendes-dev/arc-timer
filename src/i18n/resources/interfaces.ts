@@ -8,6 +8,7 @@ export interface I18nResource {
         reminderBody: string;
     };
     common: {
+        duration: { seconds: string; minutes: string; minutesSeconds: string };
         actions: {
             back: string;
             cancel: string;

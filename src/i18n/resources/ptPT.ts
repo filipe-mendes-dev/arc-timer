@@ -12,6 +12,11 @@ export const ptPT: I18nResource = {
         reminderBody: 'A tua sessão de ginásio começou há 90 minutos.',
     },
     common: {
+        duration: {
+            seconds: '{{seconds}} s',
+            minutes: '{{minutes}} min',
+            minutesSeconds: '{{minutes}} min {{seconds}} s',
+        },
         actions: {
             back: 'Voltar',
             cancel: 'Cancelar',
@@ -616,14 +621,14 @@ export const ptPT: I18nResource = {
     },
     workoutBlockItem: {
         summary: {
-            timeEach: '{{value}}s cada',
+            timeEach: '{{value}} cada',
             repsEach: '{{value}} repetições cada',
         },
         exerciseMeta: {
-            time: '{{value}}s',
+            time: '{{value}}',
             reps_one: '{{count}} repetição',
             reps_other: '{{count}} repetições',
-            rest: 'Descanso {{value}}s',
+            rest: 'Descanso {{value}}',
         },
         labels: {
             exerciseWithIndex: 'Exercício {{index}}',
@@ -687,7 +692,7 @@ export const ptPT: I18nResource = {
         },
         fields: {
             blockTitle: 'Nome do bloco',
-            durationSec: 'Duração',
+            durationSec: 'Duração (segundos)',
             exerciseDurationSec: 'Duração padrão',
             restBetweenExercisesSec: 'Entre exercícios',
             setsInBlock: 'Séries',

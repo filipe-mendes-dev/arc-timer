@@ -12,6 +12,11 @@ export const en: I18nResource = {
         reminderBody: 'Your gym session started 90 minutes ago.',
     },
     common: {
+        duration: {
+            seconds: '{{seconds}} s',
+            minutes: '{{minutes}} min',
+            minutesSeconds: '{{minutes}} min {{seconds}} s',
+        },
         actions: {
             back: 'Back',
             cancel: 'Cancel',
@@ -594,14 +599,14 @@ export const en: I18nResource = {
     },
     workoutBlockItem: {
         summary: {
-            timeEach: '{{value}}s each',
+            timeEach: '{{value}} each',
             repsEach: '{{value}} reps each',
         },
         exerciseMeta: {
-            time: '{{value}}s',
+            time: '{{value}}',
             reps_one: '{{count}} rep',
             reps_other: '{{count}} reps',
-            rest: 'Rest {{value}}s',
+            rest: 'Rest {{value}}',
         },
         labels: {
             exerciseWithIndex: 'Exercise {{index}}',
@@ -666,7 +671,7 @@ export const en: I18nResource = {
         },
         fields: {
             blockTitle: 'Block name',
-            durationSec: 'Duration',
+            durationSec: 'Duration (seconds)',
             exerciseDurationSec: 'Default duration',
             restBetweenExercisesSec: 'Between exercises',
             setsInBlock: 'Sets',

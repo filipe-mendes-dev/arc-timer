@@ -19,6 +19,11 @@ export const i18nKeys = {
         reminderBody: 'gymNotifications.reminderBody',
     },
     common: {
+        duration: {
+            seconds: 'common.duration.seconds',
+            minutes: 'common.duration.minutes',
+            minutesSeconds: 'common.duration.minutesSeconds',
+        },
         actions: {
             back: 'common.actions.back',
             cancel: 'common.actions.cancel',
