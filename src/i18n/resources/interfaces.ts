@@ -781,6 +781,7 @@ export interface I18nResource {
         };
         title: string;
         backup: {
+            description: string;
             title: string;
             export: string;
             restore: string;

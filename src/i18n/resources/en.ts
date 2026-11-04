@@ -822,23 +822,28 @@ export const en: I18nResource = {
         },
         title: 'Settings',
         backup: {
+            description: 'Save or restore your training data.',
             title: 'Backup',
-            export: 'Export backup',
-            restore: 'Restore backup',
+            export: 'Export',
+            restore: 'Restore',
             shareTitle: 'Export Arc Timer backup',
             confirmTitle: 'Replace all data?',
-            confirmMessage: 'Restoring this backup will replace all workout, gym, exercise, and history data on this device. This cannot be undone.',
+            confirmMessage:
+                'Restoring this backup will replace all workout, gym, exercise, and history data on this device. This cannot be undone.',
             confirm: 'Replace all data',
             restored: 'Backup restored.',
             errors: {
                 invalidExtension: 'Choose an .arcbak backup file.',
                 invalidData: 'This is not a valid Arc Timer backup.',
-                incompatible: 'This backup is not compatible with this version of Arc Timer.',
-                activeSession: 'Finish or discard the active session before restoring a backup.',
+                incompatible:
+                    'This backup is not compatible with this version of Arc Timer.',
+                activeSession:
+                    'Finish or discard the active session before restoring a backup.',
                 readFailed: 'Could not open the backup file.',
                 exportFailed: 'Could not export the backup.',
                 sharingUnavailable: 'Sharing is not available on this device.',
-                restoreFailed: 'Could not restore the backup. Your current data has not changed.',
+                restoreFailed:
+                    'Could not restore the backup. Your current data has not changed.',
             },
         },
         sections: {

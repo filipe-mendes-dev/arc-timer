@@ -793,6 +793,7 @@ export const i18nKeys = {
         },
         title: 'settings.title',
         backup: {
+            description: 'settings.backup.description',
             title: 'settings.backup.title',
             export: 'settings.backup.export',
             restore: 'settings.backup.restore',

@@ -843,23 +843,30 @@ export const ptPT: I18nResource = {
         },
         title: 'Definições',
         backup: {
+            description: 'Guarde ou restaure os seus dados de treino.',
             title: 'Cópia de segurança',
-            export: 'Exportar cópia',
-            restore: 'Restaurar cópia',
+            export: 'Exportar',
+            restore: 'Restaurar',
             shareTitle: 'Exportar cópia do Arc Timer',
             confirmTitle: 'Substituir todos os dados?',
-            confirmMessage: 'Restaurar esta cópia vai substituir todos os dados de treinos, ginásio, exercícios e histórico neste dispositivo. Esta ação não pode ser anulada.',
+            confirmMessage:
+                'Restaurar esta cópia vai substituir todos os dados de treinos, ginásio, exercícios e histórico neste dispositivo. Esta ação não pode ser anulada.',
             confirm: 'Substituir dados',
             restored: 'Cópia restaurada.',
             errors: {
                 invalidExtension: 'Escolhe um ficheiro de cópia .arcbak.',
-                invalidData: 'Este ficheiro não é uma cópia válida do Arc Timer.',
-                incompatible: 'Esta cópia não é compatível com esta versão do Arc Timer.',
-                activeSession: 'Termina ou descarta a sessão ativa antes de restaurar uma cópia.',
+                invalidData:
+                    'Este ficheiro não é uma cópia válida do Arc Timer.',
+                incompatible:
+                    'Esta cópia não é compatível com esta versão do Arc Timer.',
+                activeSession:
+                    'Termina ou descarta a sessão ativa antes de restaurar uma cópia.',
                 readFailed: 'Não foi possível abrir o ficheiro de cópia.',
                 exportFailed: 'Não foi possível exportar a cópia.',
-                sharingUnavailable: 'A partilha não está disponível neste dispositivo.',
-                restoreFailed: 'Não foi possível restaurar a cópia. Os teus dados atuais não foram alterados.',
+                sharingUnavailable:
+                    'A partilha não está disponível neste dispositivo.',
+                restoreFailed:
+                    'Não foi possível restaurar a cópia. Os teus dados atuais não foram alterados.',
             },
         },
         sections: {
