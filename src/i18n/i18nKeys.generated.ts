@@ -778,6 +778,19 @@ export const i18nKeys = {
         },
     },
     settings: {
+        development: {
+            title: 'settings.development.title',
+            description: 'settings.development.description',
+            load: 'settings.development.load',
+            remove: 'settings.development.remove',
+            loaded: 'settings.development.loaded',
+            removed: 'settings.development.removed',
+            failed: 'settings.development.failed',
+            sampleBench: 'settings.development.sampleBench',
+            samplePullUp: 'settings.development.samplePullUp',
+            samplePlank: 'settings.development.samplePlank',
+            sampleRun: 'settings.development.sampleRun',
+        },
         title: 'settings.title',
         backup: {
             title: 'settings.backup.title',

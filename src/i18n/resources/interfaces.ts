@@ -766,6 +766,19 @@ export interface I18nResource {
         };
     };
     settings: {
+        development: {
+            title: string;
+            description: string;
+            load: string;
+            remove: string;
+            loaded: string;
+            removed: string;
+            failed: string;
+            sampleBench: string;
+            samplePullUp: string;
+            samplePlank: string;
+            sampleRun: string;
+        };
         title: string;
         backup: {
             title: string;

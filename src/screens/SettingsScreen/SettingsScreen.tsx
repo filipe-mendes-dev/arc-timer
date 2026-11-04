@@ -21,6 +21,8 @@ import {
 import { Button } from '@src/components/ui/Button/Button';
 import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import ConfirmDialog from '@src/components/modals/ConfirmDialog/ConfirmDialog';
+import { DevelopmentSettingsSection } from './components/DevelopmentSettingsSection/DevelopmentSettingsSection';
+import { appVariant } from '@src/config/appVariant';
 import { useSettingsBackup } from './useSettingsBackup';
 
 interface LanguageOption {
@@ -198,6 +200,13 @@ const SettingsScreen = () => {
             </SettingsSection>
 
             <View style={st.separator} />
+
+            {appVariant === 'development' && (
+                <>
+                    <DevelopmentSettingsSection />
+                    <View style={st.separator} />
+                </>
+            )}
 
             <SettingsSection iconId="info" title={t('settings.sections.about')}>
                 <View style={st.aboutContent}>

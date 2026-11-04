@@ -827,6 +827,20 @@ export const ptPT: I18nResource = {
         },
     },
     settings: {
+        development: {
+            title: 'Desenvolvimento',
+            description:
+                'Carregue sessões de exemplo dos últimos meses para explorar a evolução e a assiduidade. Os seus registos são preservados.',
+            load: 'Carregar dados de treino de exemplo',
+            remove: 'Remover dados de treino de exemplo',
+            loaded: 'Dados de treino de exemplo carregados.',
+            removed: 'Dados de treino de exemplo removidos.',
+            failed: 'Não foi possível atualizar os dados de exemplo. Tente novamente.',
+            sampleBench: 'Exemplo · Supino',
+            samplePullUp: 'Exemplo · Elevações',
+            samplePlank: 'Exemplo · Prancha',
+            sampleRun: 'Exemplo · Corrida',
+        },
         title: 'Definições',
         backup: {
             title: 'Cópia de segurança',

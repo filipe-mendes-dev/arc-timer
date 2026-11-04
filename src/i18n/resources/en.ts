@@ -806,6 +806,20 @@ export const en: I18nResource = {
         },
     },
     settings: {
+        development: {
+            title: 'Development',
+            description:
+                'Load sample sessions across recent months to explore progress and attendance. Your own records are preserved.',
+            load: 'Load sample training data',
+            remove: 'Remove sample training data',
+            loaded: 'Sample training data loaded.',
+            removed: 'Sample training data removed.',
+            failed: 'Could not update sample data. Try again.',
+            sampleBench: 'Sample · Bench Press',
+            samplePullUp: 'Sample · Pull Up',
+            samplePlank: 'Sample · Plank',
+            sampleRun: 'Sample · Run',
+        },
         title: 'Settings',
         backup: {
             title: 'Backup',

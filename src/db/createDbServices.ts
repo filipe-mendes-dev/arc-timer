@@ -61,13 +61,20 @@ import {
     type GymStatisticsService,
 } from './services/statistics/gymStatisticsServiceFactory';
 
+import {
+    createSampleDataService,
+    type SampleDataService,
+} from './services/development/sampleDataServiceFactory';
+
 export interface CreateDbServicesArgs {
+    isDevelopment?: boolean;
     clock?: Clock;
     db: RepositoryDb;
 }
 
 export interface DbServices {
     backupService: BackupService;
+    sampleDataService: SampleDataService;
     exerciseDefinitionDataRepository: ExerciseDefinitionDataRepository;
     exerciseDefinitionService: ExerciseDefinitionService;
     exerciseDefinitionStatsRepository: ExerciseDefinitionStatsRepository;
@@ -86,6 +93,7 @@ export interface DbServices {
 
 export const createDbServices = ({
     clock = systemClock,
+    isDevelopment = false,
     db,
 }: CreateDbServicesArgs): DbServices => {
     const backupService = createBackupService({
@@ -156,6 +164,7 @@ export const createDbServices = ({
 
     return {
         backupService,
+        sampleDataService: createSampleDataService({ db, clock, isDevelopment }),
         gymStatisticsService: createGymStatisticsService({
             repository: createGymStatisticsRepository({ db }),
         }),
