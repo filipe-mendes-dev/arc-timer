@@ -8,6 +8,11 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Add a Progress section with a searchable exercise list and time-period filters defaulting to All time
+- Show Gym exercise progress graphs for weight, reps, volume, duration and distance, with metric selection, units and links to individual sessions; exclude warmup sets from performance measurements
+- Add a training attendance calendar combining Gym and HIIT sessions, counting each training day once, with monthly navigation, loading skeletons and previous-month preloading
+- Track per-exercise session inclusion across Gym sessions and saved HIIT workout snapshots, with recent-session previews and searchable, paginated session history
+- Add development-only sample training data with two reusable HIIT workouts, 144 Gym sessions and 72 HIIT sessions across recent months; support refresh and removal while preserving personal records
 - Export all workout, gym, exercise and history data from Settings to versioned `.arcbak` files without including app settings or language
 - Restore compatible `.arcbak` backups after destructive confirmation, replacing existing data atomically and blocking restore during active sessions
 - Show active gym sessions on the iOS Lock Screen and Dynamic Island and in compact and expanded Android notifications, with live elapsed time and session details
@@ -20,6 +25,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Display longer HIIT exercise and rest durations in minutes and seconds, and resize the countdown text to fit the available screen space
+- Set app variants explicitly in Metro, build and export commands, and validate resolved Expo configuration alongside native bundle/package identifiers
 - Unify gym session and exercise headers with theme-aware accent gradients, logo watermarks and consistent footer actions, including selection mode
 - Match exercise suggestions anywhere in the name, prioritizing exact and prefix matches
 - Allow empty gym plan targets and plan-derived incomplete session sets without inserting unrelated reps and weight values
