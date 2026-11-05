@@ -21,12 +21,18 @@ export const DevelopmentSettingsSection = () => {
                         loading={sample.isPending && sample.variables !== undefined}
                         disabled={sample.isPending}
                         onPress={() =>
-                            sample.mutate([
-                                t('settings.development.sampleBench'),
-                                t('settings.development.samplePullUp'),
-                                t('settings.development.samplePlank'),
-                                t('settings.development.sampleRun'),
-                            ])
+                            sample.mutate({
+                                exerciseNames: [
+                                    t('settings.development.sampleBench'),
+                                    t('settings.development.samplePullUp'),
+                                    t('settings.development.samplePlank'),
+                                    t('settings.development.sampleRun'),
+                                ],
+                                hiitWorkoutNames: [
+                                    t('settings.development.sampleHiit'),
+                                    t('settings.development.sampleIntervals'),
+                                ],
+                            })
                         }
                     />
                     <Button

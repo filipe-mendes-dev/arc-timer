@@ -8,6 +8,9 @@ import {
     gymExerciseRecordSetsTable as sets,
     gymPlanExercisesTable as planExercises,
     workoutExercisesTable as workoutExercises,
+    workoutsTable as workouts,
+    workoutVersionsTable as versions,
+    workoutSessionsTable as hiitSessions,
 } from '../../schema';
 
 export interface SampleSessionInput {
@@ -57,6 +60,37 @@ export const createSampleDataRepository = ({ db }: { db: RepositoryDb }) => ({
     deleteSampleSessions: () => {
         db.delete(sessions)
             .where(sql`${sessions.id} glob ${'dev-sample-*'}`)
+            .run();
+        db.delete(hiitSessions)
+            .where(sql`${hiitSessions.id} glob ${'dev-sample-*'}`)
+            .run();
+    },
+    deleteSampleWorkouts: () => {
+        db.delete(workouts)
+            .where(sql`${workouts.id} glob ${'dev-sample-hiit-workout-*'}`)
+            .run();
+    },
+    deleteUnusedSampleWorkoutVersions: () => {
+        db.delete(versions)
+            .where(
+                and(
+                    sql`${versions.id} glob ${'dev-sample-hiit-version-*'}`,
+                    not(
+                        exists(
+                            db.select({ id: workouts.id })
+                                .from(workouts)
+                                .where(eq(workouts.currentVersionId, versions.id)),
+                        ),
+                    ),
+                    not(
+                        exists(
+                            db.select({ id: hiitSessions.id })
+                                .from(hiitSessions)
+                                .where(eq(hiitSessions.workoutVersionId, versions.id)),
+                        ),
+                    ),
+                ),
+            )
             .run();
     },
     deleteUnusedSampleDefinitions: () => {

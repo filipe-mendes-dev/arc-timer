@@ -815,7 +815,7 @@ export const en: I18nResource = {
         development: {
             title: 'Development',
             description:
-                'Load sample sessions across recent months to explore progress and attendance. Your own records are preserved.',
+                'Load sample gym and HIIT workouts and sessions across recent months. Your own records are preserved.',
             load: 'Load sample training data',
             remove: 'Remove sample training data',
             loaded: 'Sample training data loaded.',
@@ -825,6 +825,8 @@ export const en: I18nResource = {
             samplePullUp: 'Sample · Pull Up',
             samplePlank: 'Sample · Plank',
             sampleRun: 'Sample · Run',
+            sampleHiit: 'Sample · HIIT circuit',
+            sampleIntervals: 'Sample · Short intervals',
         },
         title: 'Settings',
         backup: {

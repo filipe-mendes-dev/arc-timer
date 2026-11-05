@@ -784,6 +784,8 @@ export interface I18nResource {
             samplePullUp: string;
             samplePlank: string;
             sampleRun: string;
+            sampleHiit: string;
+            sampleIntervals: string;
         };
         title: string;
         backup: {

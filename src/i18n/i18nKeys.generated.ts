@@ -796,6 +796,8 @@ export const i18nKeys = {
             samplePullUp: 'settings.development.samplePullUp',
             samplePlank: 'settings.development.samplePlank',
             sampleRun: 'settings.development.sampleRun',
+            sampleHiit: 'settings.development.sampleHiit',
+            sampleIntervals: 'settings.development.sampleIntervals',
         },
         title: 'settings.title',
         backup: {

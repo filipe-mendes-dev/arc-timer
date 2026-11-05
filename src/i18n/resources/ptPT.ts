@@ -836,7 +836,7 @@ export const ptPT: I18nResource = {
         development: {
             title: 'Desenvolvimento',
             description:
-                'Carregue sessões de exemplo dos últimos meses para explorar a evolução e a assiduidade. Os seus registos são preservados.',
+                'Carregue treinos e sessões de exemplo de ginásio e HIIT dos últimos meses. Os seus registos são preservados.',
             load: 'Carregar dados de treino de exemplo',
             remove: 'Remover dados de treino de exemplo',
             loaded: 'Dados de treino de exemplo carregados.',
@@ -846,6 +846,8 @@ export const ptPT: I18nResource = {
             samplePullUp: 'Exemplo · Elevações',
             samplePlank: 'Exemplo · Prancha',
             sampleRun: 'Exemplo · Corrida',
+            sampleHiit: 'Exemplo · Circuito HIIT',
+            sampleIntervals: 'Exemplo · Intervalos curtos',
         },
         title: 'Definições',
         backup: {
