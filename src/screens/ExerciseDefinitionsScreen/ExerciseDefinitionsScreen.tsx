@@ -2,7 +2,7 @@ import { ActivityIndicator, FlatList, View } from 'react-native';
 import { useMemo, useState, type ComponentProps } from 'react';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@src/theme/ThemeProvider';
-import { useGymStatistics } from '@src/data/statistics/statisticsQueries';
+import { useExerciseUsage } from '@src/data/statistics/statisticsQueries';
 import { useStatisticsPeriod } from '@src/screens/StatisticsScreen/useStatisticsPeriod';
 import type { StatisticsPeriod } from '@src/core/statistics/gymStatistics';
 import type { TFunction } from 'i18next';
@@ -73,7 +73,7 @@ const ExerciseDefinitionsScreen = ({
         isPending: isStatsPending,
         isError: hasStatsError,
         refetch: refetchStats,
-    } = useGymStatistics(period.range, undefined, isProgressMode);
+    } = useExerciseUsage(period.range, undefined, isProgressMode);
     const allTimeRange = useMemo(
         () => ({ endedBeforeMs: period.now + 1 }),
         [period.now],
@@ -83,12 +83,12 @@ const ExerciseDefinitionsScreen = ({
         isPending: isHistoryPending,
         isError: hasHistoryError,
         refetch: refetchHistory,
-    } = useGymStatistics(allTimeRange, undefined, isProgressMode);
+    } = useExerciseUsage(allTimeRange, undefined, isProgressMode);
     const statsById = new Map(
-        stats?.exercises.map((exercise) => [exercise.id, exercise]),
+        stats?.map((exercise) => [exercise.id, exercise]),
     );
     const historyById = new Map(
-        allTimeStats?.exercises.map((exercise) => [exercise.id, exercise]),
+        allTimeStats?.map((exercise) => [exercise.id, exercise]),
     );
     const exercises = list.exerciseDefinitions.filter(
         (exercise) =>
@@ -195,7 +195,7 @@ const ExerciseDefinitionsScreen = ({
                     const currentStats = statsById.get(item.id);
                     const lastTrained = historyById.get(
                         item.id,
-                    )?.lastTrainedAtMs;
+                    )?.lastUsedAtMs;
                     let metadata: string | undefined;
                     if (isProgressMode) {
                         const count = currentStats?.sessionCount ?? 0;

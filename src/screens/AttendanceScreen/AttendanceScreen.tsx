@@ -13,7 +13,7 @@ import { AppText } from '@src/components/ui/Typography/AppText';
 import { Button } from '@src/components/ui/Button/Button';
 import { AttendanceCalendar } from '@src/components/statistics/AttendanceCalendar/AttendanceCalendar';
 import { getLocalDayStart } from '@src/core/statistics/gymStatistics';
-import { useGymAttendanceStatistics } from '@src/data/statistics/statisticsQueries';
+import { useTrainingAttendance } from '@src/data/statistics/statisticsQueries';
 import { SessionCardSkeleton } from '@src/components/sessions/SessionCardSkeleton/SessionCardSkeleton';
 import { TrainingSessionListItem } from '@src/screens/HistoryScreen/components/TrainingSessionListItem';
 import { useAttendanceScreenStyles } from './AttendanceScreen.styles';
@@ -38,7 +38,7 @@ const AttendanceScreen = () => {
     });
     const [isMonthPickerVisible, setMonthPickerVisible] = useState(false);
     const [requestedDay, setRequestedDay] = useState<number>();
-    const { data, isPending, isError, refetch } = useGymAttendanceStatistics(month);
+    const { data, isPending, isError, refetch } = useTrainingAttendance(month);
     const sessions = data?.sessions ?? [];
     const sessionsPerDay = new Map<number, number>();
     sessions.forEach((session) => {
@@ -68,6 +68,7 @@ const AttendanceScreen = () => {
                 />
             )}
             <StatisticsOverview
+                title={t('statistics.trainingOverview')}
                 isLoading={isPending}
                 metrics={[
                     {
@@ -120,10 +121,10 @@ const AttendanceScreen = () => {
                 {isPending && [0, 1].map((index) => <SessionCardSkeleton key={index} />)}
                 {selectedSessions.map((session) => (
                     <TrainingSessionListItem
-                        key={session.id}
+                        key={`${session.kind}:${session.id}`}
                         session={session}
                         onPress={() =>
-                            router.push(`/gymHistory/${session.id}`)
+                            router.push(session.kind === 'gym' ? `/gymHistory/${session.id}` : `/history/${session.id}`)
                         }
                     />
                 ))}

@@ -31,7 +31,6 @@ export const useExerciseDefinitionsList = (
         () => ({
             filters: {
                 name: debouncedSearch,
-                availability: isProgressMode ? 'gym' : undefined,
             },
             scope: isProgressMode ? 'all' : 'active',
         }),

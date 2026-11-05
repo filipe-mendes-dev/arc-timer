@@ -23,12 +23,18 @@ export const en: I18nResource = {
 
         title: 'Progress',
         overview: 'Gym overview',
+        trainingOverview: 'Training overview',
+        exerciseUsage: 'Exercise usage',
+        sessionsIncludingExercise: 'Sessions including this exercise',
+        usageHint: 'HIIT counts exercises included in the saved workout.',
+        noGymMeasurements: 'No gym measurements in this period',
+        gymMeasurementsDescription: 'Performance graphs use gym measurements. HIIT sessions count towards exercise usage.',
         exerciseProgress: 'Exercise progress',
         progress: 'Progress',
-        attendance: 'Gym attendance',
-        attendanceDescription: 'See the days you trained.',
+        attendance: 'Training attendance',
+        attendanceDescription: 'Gym and HIIT sessions by day.',
         attendanceHint:
-            'Highlighted days have logged gym sessions. Each day counts once.',
+            'Highlighted days have recorded training sessions. Each day counts once.',
         trainingDays: 'Training days',
         sessions: 'Sessions',
         workingSets: 'Working sets',
@@ -39,7 +45,7 @@ export const en: I18nResource = {
         workingSetCount_one: '{{count}} working set',
         workingSetCount_other: '{{count}} working sets',
         noExerciseSessionsTitle: 'No sessions yet',
-        noExerciseSessionsDescription: 'Log this exercise in a gym session to see your progress.',
+        noExerciseSessionsDescription: 'Save a gym or HIIT session including this exercise to see its usage.',
         emptyPeriodTitle: 'No sessions in this period',
         emptyPeriodDescription: 'No sessions recorded for this exercise during {{period}}.',
         viewAllTime: 'View all time',
@@ -49,13 +55,13 @@ export const en: I18nResource = {
         noMeasurementPeriodDescription: 'Sessions were recorded during {{period}}, but their working sets have no measurements to show.',
         emptyTitle: 'No exercises found',
         emptyDescription:
-            'Try another search or filter, or log an exercise in a gym session.',
+            'Try another search or filter, or save a gym or HIIT session.',
         noMeasurement: 'No measurements yet',
         noMeasurementDescription:
             'Log measurements in your working sets to see progress.',
         noSessions: 'No sessions on this day',
         noSessionsDescription:
-            'Choose a highlighted day to see its completed gym sessions.',
+            'Choose a highlighted day to see its recorded training sessions.',
         warmupsExcluded:
             'Warmups are excluded. Missing measurements stay blank.',
         viewProgress: 'View progress',
@@ -71,8 +77,8 @@ export const en: I18nResource = {
             '{{exercise}}, {{metric}} across {{count}} session. Use the previous and next buttons for exact values.',
         chartDescription_other:
             '{{exercise}}, {{metric}} across {{count}} sessions. Use the previous and next buttons for exact values.',
-        calendarDay_one: '{{date}}, {{count}} completed session',
-        calendarDay_other: '{{date}}, {{count}} completed sessions',
+        calendarDay_one: '{{date}}, {{count}} recorded session',
+        calendarDay_other: '{{date}}, {{count}} recorded sessions',
         period: {
             month: 'This month',
             threeMonths: 'Last 3 months',

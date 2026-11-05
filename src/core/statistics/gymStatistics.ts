@@ -38,9 +38,18 @@ export interface GymExerciseStatistics {
     points: ExerciseProgressPoint[];
 }
 
-export interface GymStatistics {
+export interface TrainingAttendance {
     trainingDayCount: number;
     sessions: TrainingSessionListItem[];
+}
+
+export interface ExerciseUsage {
+    id: string;
+    sessionCount: number;
+    lastUsedAtMs: number;
+}
+
+export interface GymStatistics extends TrainingAttendance {
     exercises: GymExerciseStatistics[];
 }
 

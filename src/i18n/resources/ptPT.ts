@@ -23,12 +23,18 @@ export const ptPT: I18nResource = {
 
         title: 'Progresso',
         overview: 'Resumo de ginásio',
+        trainingOverview: 'Resumo de treino',
+        exerciseUsage: 'Utilização do exercício',
+        sessionsIncludingExercise: 'Sessões que incluem este exercício',
+        usageHint: 'No HIIT, contam os exercícios incluídos no treino guardado.',
+        noGymMeasurements: 'Sem medições de ginásio neste período',
+        gymMeasurementsDescription: 'Os gráficos usam medições de ginásio. As sessões de HIIT contam para a utilização do exercício.',
         exerciseProgress: 'Progresso do exercício',
         progress: 'Progresso',
-        attendance: 'Frequência de ginásio',
-        attendanceDescription: 'Veja os dias em que treinou.',
+        attendance: 'Frequência de treino',
+        attendanceDescription: 'Sessões de ginásio e HIIT por dia.',
         attendanceHint:
-            'Os dias destacados têm sessões de ginásio registadas. Cada dia conta uma vez.',
+            'Os dias destacados têm sessões de treino registadas. Cada dia conta uma vez.',
         trainingDays: 'Dias de treino',
         sessions: 'Sessões',
         workingSets: 'Séries de trabalho',
@@ -39,7 +45,7 @@ export const ptPT: I18nResource = {
         workingSetCount_one: '{{count}} série de trabalho',
         workingSetCount_other: '{{count}} séries de trabalho',
         noExerciseSessionsTitle: 'Ainda sem sessões',
-        noExerciseSessionsDescription: 'Registe este exercício numa sessão de ginásio para ver o progresso.',
+        noExerciseSessionsDescription: 'Guarde uma sessão de ginásio ou HIIT que inclua este exercício para ver a sua utilização.',
         emptyPeriodTitle: 'Sem sessões neste período',
         emptyPeriodDescription: 'Não há sessões registadas para este exercício no período {{period}}.',
         viewAllTime: 'Ver todo o período',
@@ -49,13 +55,13 @@ export const ptPT: I18nResource = {
         noMeasurementPeriodDescription: 'Há sessões registadas no período {{period}}, mas as séries de trabalho não têm medições para mostrar.',
         emptyTitle: 'Nenhum exercício encontrado',
         emptyDescription:
-            'Experimente outra pesquisa ou filtro, ou registe um exercício numa sessão de ginásio.',
+            'Experimente outra pesquisa ou filtro, ou guarde uma sessão de ginásio ou HIIT.',
         noMeasurement: 'Ainda sem medições',
         noMeasurementDescription:
             'Registe medições nas séries de trabalho para ver a evolução.',
         noSessions: 'Sem sessões neste dia',
         noSessionsDescription:
-            'Escolhe um dia destacado para veres as sessões de ginásio concluídas.',
+            'Escolhe um dia destacado para veres as sessões de treino registadas.',
         warmupsExcluded:
             'Os aquecimentos são excluídos. As medições em falta ficam em branco.',
         viewProgress: 'Ver progresso',
@@ -71,8 +77,8 @@ export const ptPT: I18nResource = {
             '{{exercise}}, {{metric}} em {{count}} sessão. Usa os botões anterior e seguinte para consultar os valores exatos.',
         chartDescription_other:
             '{{exercise}}, {{metric}} em {{count}} sessões. Usa os botões anterior e seguinte para consultar os valores exatos.',
-        calendarDay_one: '{{date}}, {{count}} sessão concluída',
-        calendarDay_other: '{{date}}, {{count}} sessões concluídas',
+        calendarDay_one: '{{date}}, {{count}} sessão registada',
+        calendarDay_other: '{{date}}, {{count}} sessões registadas',
         period: {
             month: 'Este mês',
             threeMonths: 'Últimos 3 meses',

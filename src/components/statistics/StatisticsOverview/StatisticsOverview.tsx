@@ -9,11 +9,13 @@ import { useTheme } from '@src/theme/ThemeProvider';
 import { useStatisticsOverviewStyles } from './StatisticsOverview.styles';
 import { Skeleton } from '@src/components/ui/Skeleton/Skeleton';
 interface StatisticsOverviewProps {
+    title?: string;
     rightAccessory?: ReactNode;
     isLoading?: boolean;
     metrics: readonly { label: string; value: number | string }[];
 }
 export const StatisticsOverview = ({
+    title,
     metrics,
     rightAccessory,
     isLoading = false,
@@ -21,8 +23,9 @@ export const StatisticsOverview = ({
     const { t } = useTranslation();
     const { theme } = useTheme();
     const st = useStatisticsOverviewStyles();
+    const overviewTitle = title ?? t('statistics.overview');
     const topLeftContent = {
-        text: t('statistics.overview'),
+        text: overviewTitle,
         icon: (
             <AppIcon
                 id="stats"
@@ -32,7 +35,7 @@ export const StatisticsOverview = ({
     };
     return (
         <ScreenSection
-            title={rightAccessory ? t('statistics.overview') : undefined}
+            title={rightAccessory ? overviewTitle : undefined}
             rightAccessory={rightAccessory}
         >
             <MetaCard

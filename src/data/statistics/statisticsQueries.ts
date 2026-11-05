@@ -5,6 +5,7 @@ import { queryOptions, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { StatisticsRange } from '@src/core/statistics/gymStatistics';
 import { dbServices } from '@src/db/dbServices';
 import { gymSessionKeys } from '../gymSessions/gymSessionKeys';
+import { trainingSessionKeys } from '../trainingSessions/trainingSessionKeys';
 
 const getGymStatisticsQueryOptions = (
     range: StatisticsRange,
@@ -34,7 +35,27 @@ export const useGymStatistics = (
         enabled: isEnabled,
     });
 
-export const useGymAttendanceStatistics = (month: number) => {
+const getTrainingAttendanceQueryOptions = (range: StatisticsRange) =>
+    queryOptions({
+        queryKey: [...trainingSessionKeys.all, 'attendance', range],
+        queryFn: () => dbServices.trainingSessionService.getAttendance(range),
+    });
+
+export const useTrainingAttendanceStatistics = (range: StatisticsRange) =>
+    useQuery(getTrainingAttendanceQueryOptions(range));
+
+export const useExerciseUsage = (
+    range: StatisticsRange,
+    exerciseDefinitionId?: string,
+    isEnabled = true,
+) =>
+    useQuery({
+        queryKey: [...trainingSessionKeys.all, 'exerciseUsage', range, exerciseDefinitionId],
+        queryFn: () => dbServices.trainingSessionService.getExerciseUsage(range, exerciseDefinitionId),
+        enabled: isEnabled,
+    });
+
+export const useTrainingAttendance = (month: number) => {
     const queryClient = useQueryClient();
     const range = useMemo(() => {
         const date = new Date(month);
@@ -47,7 +68,7 @@ export const useGymAttendanceStatistics = (month: number) => {
             ).getTime(),
         };
     }, [month]);
-    const query = useGymStatistics(range);
+    const query = useTrainingAttendanceStatistics(range);
 
     useFocusEffect(
         useCallback(() => {
@@ -60,7 +81,7 @@ export const useGymAttendanceStatistics = (month: number) => {
                     1,
                 ).getTime();
                 await queryClient.prefetchQuery(
-                    getGymStatisticsQueryOptions({
+                    getTrainingAttendanceQueryOptions({
                         startedAtMs: previousMonth,
                         endedBeforeMs: month,
                     }),

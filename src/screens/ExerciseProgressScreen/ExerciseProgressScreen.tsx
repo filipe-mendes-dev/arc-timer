@@ -17,7 +17,7 @@ import { StatisticsOverview } from '@src/components/statistics/StatisticsOvervie
 import { StatisticsPeriodModal } from '@src/components/statistics/StatisticsPeriodModal/StatisticsPeriodModal';
 import { RecentSessionsSection } from '@src/components/sessions/RecentSessionsSection/RecentSessionsSection';
 import type { ExerciseProgressMetric } from '@src/core/statistics/gymStatistics';
-import { useGymStatistics } from '@src/data/statistics/statisticsQueries';
+import { useExerciseUsage, useGymStatistics } from '@src/data/statistics/statisticsQueries';
 import { useExerciseDefinition } from '@src/data/exerciseDefinitions';
 import { useTheme } from '@src/theme/ThemeProvider';
 import { OptionPills } from '@src/screens/SettingsScreen/components/OptionPills';
@@ -44,6 +44,15 @@ const ExerciseProgressScreen = () => {
         period.range,
         id,
     );
+    const {
+        data: usageData,
+        isPending: isUsagePending,
+        isError: hasUsageError,
+        refetch: refetchUsage,
+    } = useExerciseUsage(period.range, id);
+    const usage = usageData?.[0];
+    const isLoading = isPending || isUsagePending;
+    const hasError = isError || hasUsageError;
     const exercise = data?.exercises[0];
     const name =
         definition?.name ?? exercise?.name ?? t('statistics.exerciseProgress');
@@ -98,6 +107,18 @@ const ExerciseProgressScreen = () => {
             weight: valueLabel,
             count: selectedPoint.weightReps,
         });
+    const hasUsage = (usage?.sessionCount ?? 0) > 0;
+    const canShowAllTime = !hasUsage && period.selection.period !== 'all';
+    let emptyTitle = t('statistics.noExerciseSessionsTitle');
+    let emptyDescription = t('statistics.noExerciseSessionsDescription');
+    if (canShowAllTime) {
+        emptyTitle = t('statistics.emptyPeriodTitle');
+        emptyDescription = t('statistics.emptyPeriodDescription', { period: period.rangeLabel });
+    }
+    if (hasUsage) {
+        emptyTitle = t('statistics.noGymMeasurements');
+        emptyDescription = t('statistics.gymMeasurementsDescription');
+    }
     return (
         <MainContainer title={name} topBarLeftMode="back">
             {name.length > 28 && (
@@ -114,42 +135,25 @@ const ExerciseProgressScreen = () => {
                     />
                 }
             >
-                {isPending && (
+                {isLoading && (
                     <ActivityIndicator color={theme.palette.accent.primary} />
                 )}
-                {isError && (
+                {hasError && (
                     <Button
                         accessibilityRole="button"
                         title={t('statistics.retry')}
                         variant="secondary"
                         onPress={async () => {
-                            await refetch();
+                            await Promise.all([refetch(), refetchUsage()]);
                         }}
                     />
                 )}
-                {!isPending && !isError && !exercise && (
+                {!isLoading && !hasError && !exercise && (
                     <ListEmptyState
-                        title={t(
-                            period.selection.period === 'all'
-                                ? 'statistics.noExerciseSessionsTitle'
-                                : 'statistics.emptyPeriodTitle',
-                        )}
-                        description={t(
-                            period.selection.period === 'all'
-                                ? 'statistics.noExerciseSessionsDescription'
-                                : 'statistics.emptyPeriodDescription',
-                            { period: period.rangeLabel },
-                        )}
-                        actionLabel={
-                            period.selection.period === 'all'
-                                ? undefined
-                                : t('statistics.viewAllTime')
-                        }
-                        onPressAction={
-                            period.selection.period === 'all'
-                                ? undefined
-                                : () => period.setSelection({ period: 'all' })
-                        }
+                        title={emptyTitle}
+                        description={emptyDescription}
+                        actionLabel={canShowAllTime ? t('statistics.viewAllTime') : undefined}
+                        onPressAction={canShowAllTime ? () => period.setSelection({ period: 'all' }) : undefined}
                     />
                 )}
                 {exercise && (
@@ -430,34 +434,49 @@ const ExerciseProgressScreen = () => {
                     </>
                 )}
             </ScreenSection>
-            {exercise && (
+            {hasUsage && (
                 <>
                     <StatisticsOverview
+                        title={t('statistics.exerciseUsage')}
                         metrics={[
                             {
-                                label: t('statistics.sessions'),
-                                value: exercise.sessionCount,
-                            },
-                            {
-                                label: t('statistics.workingSets'),
-                                value: exercise.workingSetCount,
-                            },
-                            {
-                                label: t('statistics.totalReps'),
-                                value:
-                                    exercise.totalReps ??
-                                    t('exerciseDefinitions.emptyValue'),
+                                label: t('statistics.sessionsIncludingExercise'),
+                                value: usage?.sessionCount ?? 0,
                             },
                         ]}
                     />
-                    <RecentSessionsSection
-                        filters={{
-                            exerciseDefinitionId: id,
-                            kind: 'gym',
-                            ...period.range,
-                        }}
-                    />
+                    <AppText variant="caption" tone="muted">
+                        {t('statistics.usageHint')}
+                    </AppText>
                 </>
+            )}
+            {exercise && (
+                <StatisticsOverview
+                    metrics={[
+                        {
+                            label: t('statistics.sessions'),
+                            value: exercise.sessionCount,
+                        },
+                        {
+                            label: t('statistics.workingSets'),
+                            value: exercise.workingSetCount,
+                        },
+                        {
+                            label: t('statistics.totalReps'),
+                            value:
+                                exercise.totalReps ??
+                                t('exerciseDefinitions.emptyValue'),
+                        },
+                    ]}
+                />
+            )}
+            {hasUsage && (
+                <RecentSessionsSection
+                    filters={{
+                        exerciseDefinitionId: id,
+                        ...period.range,
+                    }}
+                />
             )}
             <ActionModal
                 visible={isMetricModalVisible}

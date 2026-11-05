@@ -9,7 +9,7 @@ import { StatisticsOverview } from '@src/components/statistics/StatisticsOvervie
 import { StatisticsPeriodModal } from '@src/components/statistics/StatisticsPeriodModal/StatisticsPeriodModal';
 import { StatisticsPeriodControl } from '@src/components/statistics/StatisticsPeriodControl/StatisticsPeriodControl';
 import { HomeActionTile } from '@src/screens/HomeScreen/components/HomeActionTile/HomeActionTile';
-import { useGymStatistics } from '@src/data/statistics/statisticsQueries';
+import { useTrainingAttendanceStatistics } from '@src/data/statistics/statisticsQueries';
 import { useTheme } from '@src/theme/ThemeProvider';
 import { useStatisticsPeriod } from './useStatisticsPeriod';
 import { useStatisticsScreenStyles } from './StatisticsScreen.styles';
@@ -20,7 +20,7 @@ const StatisticsScreen = () => {
     const st = useStatisticsScreenStyles();
     const router = useRouter();
     const period = useStatisticsPeriod();
-    const { data, isPending, isError, refetch } = useGymStatistics(
+    const { data, isPending, isError, refetch } = useTrainingAttendanceStatistics(
         period.range,
     );
     return (
@@ -85,6 +85,7 @@ const StatisticsScreen = () => {
             )}
             {data && (
                 <StatisticsOverview
+                    title={t('statistics.trainingOverview')}
                     rightAccessory={<StatisticsPeriodControl label={period.label} onPress={period.openPicker} />}
                     metrics={[
                         {

@@ -19,6 +19,12 @@ export interface I18nResource {
 
         title: string;
         overview: string;
+        trainingOverview: string;
+        exerciseUsage: string;
+        sessionsIncludingExercise: string;
+        usageHint: string;
+        noGymMeasurements: string;
+        gymMeasurementsDescription: string;
         exerciseProgress: string;
         progress: string;
         attendance: string;

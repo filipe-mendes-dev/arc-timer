@@ -13,6 +13,7 @@ import type {
     TrainingSessionListParams,
     TrainingSessionKind,
 } from '@src/core/entities/trainingSession.interfaces';
+import type { StatisticsRange } from '@src/core/statistics/gymStatistics';
 import type { RepositoryDb } from '../workouts/workoutRepositoryFactory';
 import {
     gymSessionsTable as sessions,
@@ -38,6 +39,17 @@ export interface TrainingSessionRow {
 
 export interface TrainingSessionRepository {
     listItems: (input: TrainingSessionListParams) => TrainingSessionRow[];
+    listExerciseSessions: (
+        range: StatisticsRange,
+        exerciseDefinitionId?: string,
+    ) => ExerciseSessionRow[];
+}
+
+export interface ExerciseSessionRow {
+    exerciseDefinitionId: string | null;
+    sessionId: string;
+    kind: TrainingSessionKind;
+    startedAtMs: number;
 }
 
 export const createTrainingSessionRepository = ({
@@ -163,5 +175,45 @@ export const createTrainingSessionRepository = ({
                     a.kind.localeCompare(b.kind),
             )
             .slice(input.offset ?? 0, readLimit);
+    },
+    listExerciseSessions: (range, exerciseDefinitionId) => {
+        const gymConditions = [
+            eq(sessions.status, 'completed'),
+            lt(sessions.startedAtMs, range.endedBeforeMs),
+        ];
+        const hiitConditions = [lt(hiit.startedAtMs, range.endedBeforeMs)];
+        if (range.startedAtMs !== undefined) {
+            gymConditions.push(gte(sessions.startedAtMs, range.startedAtMs));
+            hiitConditions.push(gte(hiit.startedAtMs, range.startedAtMs));
+        }
+        if (exerciseDefinitionId !== undefined) {
+            gymConditions.push(eq(records.exerciseDefinitionId, exerciseDefinitionId));
+            hiitConditions.push(eq(exercises.exerciseDefinitionId, exerciseDefinitionId));
+        }
+        const gymRows = db
+            .selectDistinct({
+                exerciseDefinitionId: records.exerciseDefinitionId,
+                sessionId: sessions.id,
+                startedAtMs: sessions.startedAtMs,
+            })
+            .from(sessions)
+            .innerJoin(records, eq(records.gymSessionId, sessions.id))
+            .where(and(...gymConditions))
+            .all();
+        const hiitRows = db
+            .selectDistinct({
+                exerciseDefinitionId: exercises.exerciseDefinitionId,
+                sessionId: hiit.id,
+                startedAtMs: hiit.startedAtMs,
+            })
+            .from(hiit)
+            .innerJoin(blocks, eq(blocks.workoutVersionId, hiit.workoutVersionId))
+            .innerJoin(exercises, eq(exercises.blockId, blocks.id))
+            .where(and(...hiitConditions))
+            .all();
+        return [
+            ...gymRows.map((row): ExerciseSessionRow => ({ ...row, kind: 'gym' })),
+            ...hiitRows.map((row): ExerciseSessionRow => ({ ...row, kind: 'hiit' })),
+        ];
     },
 });
