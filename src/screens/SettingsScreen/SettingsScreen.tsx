@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 import * as Application from 'expo-application';
 
 import { MainContainer } from '@src/components/layout/MainContainer/MainContainer';
@@ -21,6 +21,8 @@ import {
 import { Button } from '@src/components/ui/Button/Button';
 import { AppIcon } from '@src/components/ui/Icon/AppIcon';
 import ConfirmDialog from '@src/components/modals/ConfirmDialog/ConfirmDialog';
+import { DevelopmentSettingsSection } from './components/DevelopmentSettingsSection/DevelopmentSettingsSection';
+import { appVariant } from '@src/config/appVariant';
 import { useSettingsBackup } from './useSettingsBackup';
 
 interface LanguageOption {
@@ -62,7 +64,8 @@ const SettingsScreen = () => {
         setIsSoundEnabled,
         setAccentPreference,
     } = useSettingsStore();
-    const st = useSettingsStyles();
+    const { fontScale } = useWindowDimensions();
+    const st = useSettingsStyles({ fontScale });
     const backup = useSettingsBackup();
 
     const themeOptions = [
@@ -85,7 +88,7 @@ const SettingsScreen = () => {
                     {flag}
                 </AppText>
             ),
-        })
+        }),
     );
 
     const colorAccentOptions = (Object.keys(COLOR_ACCENTS) as AccentId[]).map(
@@ -94,7 +97,7 @@ const SettingsScreen = () => {
                 value: id,
                 label: t(ACCENT_LABEL_KEYS[id]),
             };
-        }
+        },
     );
 
     const currentLanguage = getCurrentLanguage();
@@ -168,24 +171,42 @@ const SettingsScreen = () => {
             <View style={st.separator} />
 
             <SettingsSection iconId="backup" title={t('settings.backup.title')}>
-                <View style={st.backupActions}>
-                    <Button
-                        title={t('settings.backup.export')}
-                        variant="secondary"
-                        icon={<AppIcon id="share" color={theme.palette.text.primary} />}
-                        onPress={backup.exportBackup}
-                        loading={backup.isExporting}
-                        disabled={backup.isBusy}
-                    />
-                    <Button
-                        title={t('settings.backup.restore')}
-                        variant="secondary"
-                        icon={<AppIcon id="restore" color={theme.palette.text.primary} />}
-                        onPress={backup.selectBackup}
-                        loading={backup.isPicking || backup.isRestoring}
-                        disabled={backup.isBusy}
-                    />
-                </View>
+                <SettingsSubSection
+                    description={t('settings.backup.description')}
+                >
+                    <View style={st.backupActions}>
+                        <Button
+                            title={t('settings.backup.export')}
+                            style={st.backupAction}
+                            textStyle={st.backupActionText}
+                            variant="primary"
+                            icon={
+                                <AppIcon
+                                    id="share"
+                                    color={theme.palette.text.inverted}
+                                />
+                            }
+                            onPress={backup.exportBackup}
+                            loading={backup.isExporting}
+                            disabled={backup.isBusy}
+                        />
+                        <Button
+                            title={t('settings.backup.restore')}
+                            style={st.backupAction}
+                            textStyle={st.backupActionText}
+                            variant="secondary"
+                            icon={
+                                <AppIcon
+                                    id="restore"
+                                    color={theme.palette.text.primary}
+                                />
+                            }
+                            onPress={backup.selectBackup}
+                            loading={backup.isPicking || backup.isRestoring}
+                            disabled={backup.isBusy}
+                        />
+                    </View>
+                </SettingsSubSection>
                 {backup.status && (
                     <AppText
                         variant="bodySmall"
@@ -198,6 +219,13 @@ const SettingsScreen = () => {
             </SettingsSection>
 
             <View style={st.separator} />
+
+            {appVariant === 'development' && (
+                <>
+                    <DevelopmentSettingsSection />
+                    <View style={st.separator} />
+                </>
+            )}
 
             <SettingsSection iconId="info" title={t('settings.sections.about')}>
                 <View style={st.aboutContent}>

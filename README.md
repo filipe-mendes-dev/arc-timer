@@ -137,7 +137,7 @@ npm run i18n:keys
 npm run db:generate -- <migration-name>
 ```
 
-Native build variants are selected with `APP_VARIANT`. The default is `production`; development and screenshot scripts set or guard the variant where needed.
+Native build variants are selected with `APP_VARIANT`. `npm start` and the development run/build commands set it to `development`; release and export commands set it to `production`. Use `npm run start:production` to start Metro for the production variant. The config fallback remains `production`. Native guards verify both the resolved Expo config and generated native identifiers. When running a guard directly, provide the matching environment, for example `APP_VARIANT=development npm run guard:dev-variant`.
 
 ## Project Structure
 

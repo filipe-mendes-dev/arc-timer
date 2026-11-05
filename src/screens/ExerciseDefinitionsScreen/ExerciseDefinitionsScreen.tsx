@@ -1,5 +1,10 @@
-import { FlatList, View } from 'react-native';
-import { useState } from 'react';
+import { ActivityIndicator, FlatList, View } from 'react-native';
+import { useMemo, useState, type ComponentProps } from 'react';
+import { useRouter } from 'expo-router';
+import { useTheme } from '@src/theme/ThemeProvider';
+import { useExerciseUsage } from '@src/data/statistics/statisticsQueries';
+import { useStatisticsPeriod } from '@src/screens/StatisticsScreen/useStatisticsPeriod';
+import type { StatisticsPeriod } from '@src/core/statistics/gymStatistics';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
@@ -45,11 +50,87 @@ const ExerciseDefinitionsEmptyState = ({
     );
 };
 
-const ExerciseDefinitionsScreen = () => {
-    const { t } = useTranslation();
+interface ExerciseDefinitionsScreenProps {
+    isProgressMode?: boolean;
+}
+
+const progressPeriods: readonly StatisticsPeriod[] = ['all', 'month', 'threeMonths', 'year'];
+
+const ExerciseDefinitionsScreen = ({
+    isProgressMode = false,
+}: ExerciseDefinitionsScreenProps) => {
+    const { t, i18n } = useTranslation();
     const st = useExerciseDefinitionsScreenStyles();
-    const list = useExerciseDefinitionsList();
+    const router = useRouter();
+    const { theme } = useTheme();
+    const list = useExerciseDefinitionsList(isProgressMode);
     const selection = useExerciseDefinitionsSelection();
+    const period = useStatisticsPeriod();
+    const [exerciseFilter, setExerciseFilter] = useState('history');
+    const shouldIncludeUntrained = exerciseFilter === 'all';
+    const {
+        data: stats,
+        isPending: isStatsPending,
+        isError: hasStatsError,
+        refetch: refetchStats,
+    } = useExerciseUsage(period.range, undefined, isProgressMode);
+    const allTimeRange = useMemo(
+        () => ({ endedBeforeMs: period.now + 1 }),
+        [period.now],
+    );
+    const {
+        data: allTimeStats,
+        isPending: isHistoryPending,
+        isError: hasHistoryError,
+        refetch: refetchHistory,
+    } = useExerciseUsage(allTimeRange, undefined, isProgressMode);
+    const statsById = new Map(
+        stats?.map((exercise) => [exercise.id, exercise]),
+    );
+    const historyById = new Map(
+        allTimeStats?.map((exercise) => [exercise.id, exercise]),
+    );
+    const exercises = list.exerciseDefinitions.filter(
+        (exercise) =>
+            !isProgressMode ||
+            shouldIncludeUntrained ||
+            historyById.has(exercise.id),
+    );
+    const locale = i18n.resolvedLanguage ?? i18n.language;
+
+    const progressFilters: ComponentProps<typeof SearchField>['filters'] = {
+        title: t('history.filters.title'),
+        applyLabel: t('history.filters.apply'),
+        clearLabel: t('history.filters.clear'),
+        defaultValues: { activity: 'all', period: 'all' },
+        values: { activity: exerciseFilter, period: period.selection.period },
+        sections: [
+            {
+                key: 'activity',
+                title: t('statistics.showExercises'),
+                options: [
+                    {
+                        value: 'history',
+                        label: t('statistics.trainedExercises'),
+                    },
+                    { value: 'all', label: t('statistics.allExercises') },
+                ],
+            },
+            {
+                key: 'period',
+                title: t('statistics.choosePeriod'),
+                options: progressPeriods.map((value) => ({
+                    value,
+                    label: t(`statistics.period.${value}`),
+                })),
+            },
+        ],
+        onApply: (values) => {
+            setExerciseFilter(values.activity ?? 'all');
+            const selectedPeriod = progressPeriods.find((value) => value === values.period) ?? 'all';
+            period.setSelection({ period: selectedPeriod });
+        },
+    };
 
     const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -63,15 +144,16 @@ const ExerciseDefinitionsScreen = () => {
 
     return (
         <MainContainer
-            title={selection.screenTitle}
+            title={isProgressMode ? t('statistics.exerciseProgress') : selection.screenTitle}
             scroll={false}
             noPadding
-            topBarOptions={selection.topBarOptions}
-            topBarLeftAction={selection.topBarLeftAction}
-            topBarRightAction={selection.topBarRightAction}
+            topBarOptions={isProgressMode ? undefined : selection.topBarOptions}
+            topBarLeftMode={isProgressMode ? 'back' : undefined}
+            topBarLeftAction={isProgressMode ? undefined : selection.topBarLeftAction}
+            topBarRightAction={isProgressMode ? undefined : selection.topBarRightAction}
         >
             <FlatList
-                data={list.exerciseDefinitions}
+                data={exercises}
                 keyExtractor={(item) => item.id}
                 style={st.list}
                 contentContainerStyle={st.listContent}
@@ -82,12 +164,13 @@ const ExerciseDefinitionsScreen = () => {
                                 value={list.search}
                                 onChangeText={list.setSearch}
                                 fullWidth
+                                filters={isProgressMode ? progressFilters : undefined}
                                 placeholder={t(
                                     'exerciseDefinitions.searchPlaceholder',
                                 )}
                             />
 
-                            {!selection.isSelectMode && (
+                            {!isProgressMode && !selection.isSelectMode && (
                                 <Button
                                     title={t('exerciseDefinitions.newButton')}
                                     variant="primary"
@@ -109,12 +192,41 @@ const ExerciseDefinitionsScreen = () => {
                         onRemove = () => selection.requestRemoval(item.id);
                     }
 
+                    const currentStats = statsById.get(item.id);
+                    const lastTrained = historyById.get(
+                        item.id,
+                    )?.lastUsedAtMs;
+                    let metadata: string | undefined;
+                    if (isProgressMode) {
+                        const count = currentStats?.sessionCount ?? 0;
+                        metadata = t('statistics.sessionCountInPeriod', {
+                            count,
+                            period: period.label,
+                        });
+                        if (count === 0)
+                            metadata = t('statistics.noSessionsInPeriod', {
+                                period: period.label,
+                            });
+                        if (lastTrained !== undefined)
+                            metadata += ` · ${t('statistics.lastTrained', { date: new Date(lastTrained).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' }) })}`;
+                    }
+                    const openExercise = () => {
+                        if (isProgressMode)
+                            router.push({
+                                pathname: '/statistics/exercise/[id]',
+                                params: { id: item.id, ...period.routeParams },
+                            });
+                        else list.goToExerciseDefinition(item.id);
+                    };
                     return (
                         <ExerciseDefinitionCard
                             item={item}
-                            onPress={() => list.goToExerciseDefinition(item.id)}
-                            onRemove={onRemove}
-                            isSelectMode={selection.isSelectMode}
+                            metadata={metadata}
+                            onPress={openExercise}
+                            onRemove={isProgressMode ? undefined : onRemove}
+                            isSelectMode={
+                                !isProgressMode && selection.isSelectMode
+                            }
                             isSelectionLocked={isSelectionLocked}
                             isSelected={selection.isSelected(item.id)}
                             onSelect={() => selection.toggleItem(item.id)}
@@ -123,11 +235,46 @@ const ExerciseDefinitionsScreen = () => {
                     );
                 }}
                 ListEmptyComponent={
-                    <ExerciseDefinitionsEmptyState
-                        hasSearch={list.hasSearch}
-                        onNewExercise={openModal}
-                        t={t}
-                    />
+                    <>
+                        {!isProgressMode && (
+                            <ExerciseDefinitionsEmptyState
+                                hasSearch={list.hasSearch}
+                                onNewExercise={openModal}
+                                t={t}
+                            />
+                        )}
+                        {isProgressMode &&
+                            (isStatsPending || isHistoryPending) && (
+                                <ActivityIndicator
+                                    color={theme.palette.accent.primary}
+                                />
+                            )}
+                        {isProgressMode &&
+                            (hasStatsError || hasHistoryError) && (
+                                <Button
+                                    title={t('statistics.retry')}
+                                    variant="secondary"
+                                    onPress={async () => {
+                                        await Promise.all([
+                                            refetchStats(),
+                                            refetchHistory(),
+                                        ]);
+                                    }}
+                                />
+                            )}
+                        {isProgressMode &&
+                            !isStatsPending &&
+                            !isHistoryPending &&
+                            !hasStatsError &&
+                            !hasHistoryError && (
+                                <ListEmptyState
+                                    title={t('statistics.emptyTitle')}
+                                    description={t(
+                                        'statistics.emptyDescription',
+                                    )}
+                                />
+                            )}
+                    </>
                 }
                 keyboardShouldPersistTaps="handled"
             />

@@ -45,6 +45,10 @@ const DrawerLayout = () => {
                 options={{ title: t('drawer.history') }}
             />
             <Drawer.Screen
+                name="statistics/index"
+                options={{ title: t('statistics.title') }}
+            />
+            <Drawer.Screen
                 name="settings/index"
                 options={{ title: t('drawer.settings') }}
             />

@@ -270,7 +270,7 @@ export const MetaCard: FC<MetaCardProps> = ({
             <View>
                 {/* Summary Content */}
                 {summaryContent ? (
-                    collapseTarget === 'summary' ? (
+                    expandable && collapseTarget === 'summary' ? (
                         <MinHeightCollapse
                             expanded={collapseExpanded}
                             minHeight={collapseMinHeight}

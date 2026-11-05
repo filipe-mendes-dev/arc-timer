@@ -7,6 +7,7 @@ import { useOptionPillsStyles } from './OptionPills.styles';
 
 export interface OptionPillsOption<T extends string> {
     value: T;
+    disabled?: boolean;
     label: string;
     leftSlot?: React.ReactNode;
 }
@@ -15,14 +16,16 @@ interface OptionPillsBaseProps<T extends string> {
     options: OptionPillsOption<T>[];
 }
 
-export interface OptionPillsSingleSelectProps<T extends string>
-    extends OptionPillsBaseProps<T> {
+export interface OptionPillsSingleSelectProps<
+    T extends string,
+> extends OptionPillsBaseProps<T> {
     selectedValue: T;
     onSelect: (value: T) => void;
 }
 
-export interface OptionPillsMultiSelectProps<T extends string>
-    extends OptionPillsBaseProps<T> {
+export interface OptionPillsMultiSelectProps<
+    T extends string,
+> extends OptionPillsBaseProps<T> {
     selectedValues: readonly T[];
     onToggle: (value: T) => void;
 }
@@ -35,9 +38,7 @@ export const OptionPills = <T extends string>(props: OptionPillsProps<T>) => {
     const st = useOptionPillsStyles();
     const { options } = props;
     const isMultiSelect = 'selectedValues' in props;
-    const selectedValues = isMultiSelect
-        ? props.selectedValues
-        : [props.selectedValue];
+    const selectedValues = isMultiSelect ? props.selectedValues : [props.selectedValue];
 
     const handlePress = (value: T): void => {
         if (isMultiSelect) {
@@ -50,14 +51,21 @@ export const OptionPills = <T extends string>(props: OptionPillsProps<T>) => {
 
     return (
         <View style={st.container}>
-            {options.map(({ value, label, leftSlot }) => {
+            {options.map(({ value, label, leftSlot, disabled }) => {
                 const isActive = selectedValues.includes(value);
 
                 return (
                     <GuardedPressable
                         key={value}
+                        accessibilityRole={isMultiSelect ? 'checkbox' : 'radio'}
+                        accessibilityState={{ checked: isActive, disabled }}
+                        disabled={disabled}
                         onPress={() => handlePress(value)}
-                        style={[st.pill, isActive && st.pillActive]}
+                        style={[
+                            st.pill,
+                            isActive && st.pillActive,
+                            disabled && st.pillDisabled,
+                        ]}
                     >
                         <View style={st.pillContent}>
                             {leftSlot && (

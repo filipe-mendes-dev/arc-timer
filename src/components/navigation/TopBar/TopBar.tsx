@@ -159,6 +159,9 @@ export const TopBar = ({
             return (
                 <GuardedPressable
                     disabled={rightAction.disabled}
+                    accessibilityRole="button"
+                    accessibilityLabel={rightAction.accessibilityLabel}
+                    accessibilityState={{ disabled: rightAction.disabled }}
                     onPress={rightAction.onPress}
                     style={[st.action, st.rightAction]}
                 >

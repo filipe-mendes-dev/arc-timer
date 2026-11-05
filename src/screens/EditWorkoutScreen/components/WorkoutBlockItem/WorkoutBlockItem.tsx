@@ -1,3 +1,4 @@
+import { formatDurationLabel } from '@src/helpers/time.helpers';
 import React, { useMemo } from 'react';
 import { View } from 'react-native';
 
@@ -43,13 +44,11 @@ export const WorkoutBlockItem = ({
 
         const first = exercises[0];
         const allSame = exercises.every(
-            (ex) => ex.mode === first.mode && ex.value === first.value
+            (ex) => ex.mode === first.mode && ex.value === first.value,
         );
 
         if (!allSame) return '';
-        return first.mode === 'time'
-            ? t('workoutBlockItem.summary.timeEach', { value: first.value })
-            : t('workoutBlockItem.summary.repsEach', { value: first.value });
+        return first.mode === 'time' ? t('workoutBlockItem.summary.timeEach', { value: formatDurationLabel(first.value, t), }) : t('workoutBlockItem.summary.repsEach', { value: first.value });
     }, [exercises, t]);
 
     const metaParts = useMemo(() => {
@@ -63,27 +62,16 @@ export const WorkoutBlockItem = ({
 
     const trimmedTitle = block.title?.trim();
     const blockLabel =
-        trimmedTitle && trimmedTitle.length > 0
-            ? trimmedTitle
-            : t('common.labels.blockWithIndex', { index: index + 1 });
+        trimmedTitle && trimmedTitle.length > 0 ? trimmedTitle : t('common.labels.blockWithIndex', { index: index + 1 });
 
     const formatExerciseMeta = (
         mode: WorkoutBlock['exercises'][number]['mode'],
         value: number,
-        restSec?: number
+        restSec?: number,
     ): string => {
         const main =
-            mode === 'time'
-                ? t('workoutBlockItem.exerciseMeta.time', { value })
-                : t(
-                      value === 1
-                          ? 'workoutBlockItem.exerciseMeta.reps_one'
-                          : 'workoutBlockItem.exerciseMeta.reps_other',
-                      { count: value }
-                  );
-        return restSec && restSec > 0
-            ? `${main} • ${t('workoutBlockItem.exerciseMeta.rest', { value: restSec })}`
-            : main;
+            mode === 'time' ? formatDurationLabel(value, t) : t( value === 1 ? 'workoutBlockItem.exerciseMeta.reps_one' : 'workoutBlockItem.exerciseMeta.reps_other', { count: value }, );
+        return restSec && restSec > 0 ? `${main} • ${t('workoutBlockItem.exerciseMeta.rest', { value: formatDurationLabel(restSec, t) })}` : main;
     };
 
     const handlePress = onPress ? () => onPress(block.id) : undefined;
@@ -95,19 +83,7 @@ export const WorkoutBlockItem = ({
         return () => onExercisePress(exerciseDefinitionId);
     };
 
-    const actionStrip = onRemove
-        ? {
-              icon: (
-                  <AppIcon
-                      id="trash"
-                      size={18}
-                      color={theme.palette.metaCard.actionStrip.icon}
-                  />
-              ),
-              backgroundColor: theme.palette.metaCard.actionStrip.background,
-              onPress: () => onRemove(block.id),
-          }
-        : undefined;
+    const actionStrip = onRemove ? { icon: ( <AppIcon id="trash" size={18} color={theme.palette.metaCard.actionStrip.icon} /> ), backgroundColor: theme.palette.metaCard.actionStrip.background, onPress: () => onRemove(block.id), } : undefined;
 
     const measureKey = [
         block.id,
@@ -161,20 +137,16 @@ export const WorkoutBlockItem = ({
                             {exercises.map((ex, i) => {
                                 const mainContent =
                                     ex.name ??
-                                    t(
-                                        'workoutBlockItem.labels.exerciseWithIndex',
-                                        {
-                                            index: i + 1,
-                                        },
-                                    );
+                                    t('workoutBlockItem.labels.exerciseWithIndex', {
+                                        index: i + 1,
+                                    });
                                 const secondaryContent = formatExerciseMeta(
                                     ex.mode,
                                     ex.value,
                                 );
-                                const handleExercisePress =
-                                    getExercisePressHandler(
-                                        ex.exerciseDefinitionId,
-                                    );
+                                const handleExercisePress = getExercisePressHandler(
+                                    ex.exerciseDefinitionId,
+                                );
 
                                 return (
                                     <IndexedListItem

@@ -1,8 +1,10 @@
+import type { TFunction } from 'i18next';
+
 export type RoundingMode = 'ceil' | 'floor';
 
 export const msToSeconds = (
     ms: number,
-    mode: 'floor' | 'ceil' | 'round' = 'round'
+    mode: 'floor' | 'ceil' | 'round' = 'round',
 ): number => {
     if (ms <= 0) return 0;
 
@@ -34,4 +36,13 @@ export const formatElapsedDuration = (durationMs: number): string => {
         minutes.toString().padStart(2, '0'),
         seconds.toString().padStart(2, '0'),
     ].join(':');
+};
+
+export const formatDurationLabel = (seconds: number, t: TFunction): string => {
+    const total = Math.max(0, Math.floor(seconds));
+    const minutes = Math.floor(total / 60);
+    const remainder = total % 60;
+    if (minutes === 0) return t('common.duration.seconds', { seconds: remainder });
+    if (remainder === 0) return t('common.duration.minutes', { minutes });
+    return t('common.duration.minutesSeconds', { minutes, seconds: remainder });
 };

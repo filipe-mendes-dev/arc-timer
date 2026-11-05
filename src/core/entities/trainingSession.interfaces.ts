@@ -2,6 +2,16 @@ import type { UUID } from './common.interfaces';
 
 export type TrainingSessionKind = 'hiit' | 'gym';
 
+export interface TrainingSessionListParams {
+    kind?: TrainingSessionKind;
+    exerciseDefinitionId?: string;
+    startedAtMs?: number;
+    endedBeforeMs?: number;
+    search?: string;
+    limit?: number;
+    offset?: number;
+}
+
 export interface TrainingSessionListItem {
     id: UUID;
     kind: TrainingSessionKind;

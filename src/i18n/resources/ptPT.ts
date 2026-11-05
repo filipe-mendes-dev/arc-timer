@@ -3,6 +3,118 @@ import type { I18nResource } from './interfaces';
 const exerciseNameRequired = 'Nome do exercício obrigatório.';
 
 export const ptPT: I18nResource = {
+    statistics: {
+        heading: 'A sua evolução',
+        subtitle: 'Veja o seu histórico de treino.',
+        showExercises: 'Mostrar exercícios',
+        sessionCountInPeriod_one: '{{count}} sessão · {{period}}',
+        sessionCountInPeriod_other: '{{count}} sessões · {{period}}',
+        noSessionsInPeriod: 'Sem sessões · {{period}}',
+
+        exerciseProgressDescription: 'Acompanhe a evolução de cada exercício.',
+        trainedExercises: 'Com histórico',
+        allExercises: 'Todos os exercícios',
+        choosePeriod: 'Período',
+        chooseMetric: 'Mostrar no gráfico',
+        chooseMonth: 'Escolher mês',
+        previousYear: 'Ano anterior',
+        nextYear: 'Ano seguinte',
+        sessionPeriod: '{{start}} a {{end}}',
+
+        title: 'Progresso',
+        overview: 'Resumo de ginásio',
+        trainingOverview: 'Resumo de treino',
+        exerciseUsage: 'Utilização do exercício',
+        sessionsIncludingExercise: 'Sessões que incluem este exercício',
+        usageHint: 'No HIIT, contam os exercícios incluídos no treino guardado.',
+        noGymMeasurements: 'Sem medições de ginásio neste período',
+        gymMeasurementsDescription: 'Os gráficos usam medições de ginásio. As sessões de HIIT contam para a utilização do exercício.',
+        exerciseProgress: 'Progresso do exercício',
+        progress: 'Progresso',
+        attendance: 'Frequência de treino',
+        attendanceDescription: 'Sessões de ginásio e HIIT por dia.',
+        attendanceHint:
+            'Os dias destacados têm sessões de treino registadas. Cada dia conta uma vez.',
+        trainingDays: 'Dias de treino',
+        sessions: 'Sessões',
+        workingSets: 'Séries de trabalho',
+        totalReps: 'Total de repetições',
+        lastTrained: 'Última sessão {{date}}',
+        sessionCount_one: '{{count}} sessão',
+        sessionCount_other: '{{count}} sessões',
+        workingSetCount_one: '{{count}} série de trabalho',
+        workingSetCount_other: '{{count}} séries de trabalho',
+        noExerciseSessionsTitle: 'Ainda sem sessões',
+        noExerciseSessionsDescription: 'Guarde uma sessão de ginásio ou HIIT que inclua este exercício para ver a sua utilização.',
+        emptyPeriodTitle: 'Sem sessões neste período',
+        emptyPeriodDescription: 'Não há sessões registadas para este exercício no período {{period}}.',
+        viewAllTime: 'Ver todo o período',
+        noMetricInPeriod: 'Sem registos de {{metric}} neste período',
+        noMetricPeriodDescription: 'Não há medições de {{metric}} registadas para este exercício no período {{period}}.',
+        noMeasurementInPeriod: 'Sem medições neste período',
+        noMeasurementPeriodDescription: 'Há sessões registadas no período {{period}}, mas as séries de trabalho não têm medições para mostrar.',
+        emptyTitle: 'Nenhum exercício encontrado',
+        emptyDescription:
+            'Experimente outra pesquisa ou filtro, ou guarde uma sessão de ginásio ou HIIT.',
+        noMeasurement: 'Ainda sem medições',
+        noMeasurementDescription:
+            'Registe medições nas séries de trabalho para ver a evolução.',
+        noSessions: 'Sem sessões neste dia',
+        noSessionsDescription:
+            'Escolhe um dia destacado para veres as sessões de treino registadas.',
+        warmupsExcluded:
+            'Os aquecimentos são excluídos. As medições em falta ficam em branco.',
+        viewProgress: 'Ver progresso',
+        viewSession: 'Ver sessão',
+        previous: 'Anterior',
+        next: 'Seguinte',
+        previousMonth: 'Mês anterior',
+        nextMonth: 'Mês seguinte',
+        retry: 'Não foi possível carregar o progresso. Toque para tentar novamente.',
+        weightWithReps_one: '{{weight}} × {{count}} repetição',
+        weightWithReps_other: '{{weight}} × {{count}} repetições',
+        chartDescription_one:
+            '{{exercise}}, {{metric}} em {{count}} sessão. Usa os botões anterior e seguinte para consultar os valores exatos.',
+        chartDescription_other:
+            '{{exercise}}, {{metric}} em {{count}} sessões. Usa os botões anterior e seguinte para consultar os valores exatos.',
+        calendarDay_one: '{{date}}, {{count}} sessão registada',
+        calendarDay_other: '{{date}}, {{count}} sessões registadas',
+        period: {
+            month: 'Este mês',
+            threeMonths: 'Últimos 3 meses',
+            year: 'Este ano',
+            all: 'Todo o período',
+        },
+        metrics: {
+            weight: 'Peso',
+            reps: 'Repetições',
+            volume: 'Volume',
+            duration: 'Duração',
+            distance: 'Distância',
+        },
+        units: {
+            weight: 'kg',
+            reps: 'rep',
+            volume: 'kg·rep',
+            duration: 'min:seg',
+            distance: 'm',
+        },
+        metricDescriptions: {
+            weight: 'Série de trabalho mais pesada por sessão',
+            reps: 'Total de repetições por sessão',
+            volume: 'Total de peso × repetições por sessão',
+            duration: 'Duração total por sessão',
+            distance: 'Distância total por sessão',
+        },
+        values: {
+            volume: '{{value}} kg·rep',
+            weight: '{{value}} kg',
+            duration: '{{value}} s',
+            distance: '{{value}} m',
+            reps_one: '{{count}} repetição',
+            reps_other: '{{count}} repetições',
+        },
+    },
     gymNotifications: {
         activeTitle: 'Sessão de ginásio ativa',
         elapsed: 'decorridos',
@@ -12,6 +124,11 @@ export const ptPT: I18nResource = {
         reminderBody: 'A tua sessão de ginásio começou há 90 minutos.',
     },
     common: {
+        duration: {
+            seconds: '{{seconds}} s',
+            minutes: '{{minutes}} min',
+            minutesSeconds: '{{minutes}} min {{seconds}} s',
+        },
         actions: {
             back: 'Voltar',
             cancel: 'Cancelar',
@@ -494,8 +611,7 @@ export const ptPT: I18nResource = {
             hasWeight: 'Peso',
         },
         defaults: {
-            description:
-                'Escolhe os campos a registar neste exercício.',
+            description: 'Escolhe os campos a registar neste exercício.',
             removeDataAndSave: 'Remover dados e guardar',
             removeDataWarning:
                 'Guardar vai remover valores existentes para: {{fields}}.',
@@ -616,14 +732,14 @@ export const ptPT: I18nResource = {
     },
     workoutBlockItem: {
         summary: {
-            timeEach: '{{value}}s cada',
+            timeEach: '{{value}} cada',
             repsEach: '{{value}} repetições cada',
         },
         exerciseMeta: {
-            time: '{{value}}s',
+            time: '{{value}}',
             reps_one: '{{count}} repetição',
             reps_other: '{{count}} repetições',
-            rest: 'Descanso {{value}}s',
+            rest: 'Descanso {{value}}',
         },
         labels: {
             exerciseWithIndex: 'Exercício {{index}}',
@@ -687,7 +803,7 @@ export const ptPT: I18nResource = {
         },
         fields: {
             blockTitle: 'Nome do bloco',
-            durationSec: 'Duração',
+            durationSec: 'Duração (segundos)',
             exerciseDurationSec: 'Duração padrão',
             restBetweenExercisesSec: 'Entre exercícios',
             setsInBlock: 'Séries',
@@ -717,25 +833,48 @@ export const ptPT: I18nResource = {
         },
     },
     settings: {
+        development: {
+            title: 'Desenvolvimento',
+            description:
+                'Carregue treinos e sessões de exemplo de ginásio e HIIT dos últimos meses. Os seus registos são preservados.',
+            load: 'Carregar dados de treino de exemplo',
+            remove: 'Remover dados de treino de exemplo',
+            loaded: 'Dados de treino de exemplo carregados.',
+            removed: 'Dados de treino de exemplo removidos.',
+            failed: 'Não foi possível atualizar os dados de exemplo. Tente novamente.',
+            sampleBench: 'Exemplo · Supino',
+            samplePullUp: 'Exemplo · Elevações',
+            samplePlank: 'Exemplo · Prancha',
+            sampleRun: 'Exemplo · Corrida',
+            sampleHiit: 'Exemplo · Circuito HIIT',
+            sampleIntervals: 'Exemplo · Intervalos curtos',
+        },
         title: 'Definições',
         backup: {
+            description: 'Guarde ou restaure os seus dados de treino.',
             title: 'Cópia de segurança',
-            export: 'Exportar cópia',
-            restore: 'Restaurar cópia',
+            export: 'Exportar',
+            restore: 'Restaurar',
             shareTitle: 'Exportar cópia do Arc Timer',
             confirmTitle: 'Substituir todos os dados?',
-            confirmMessage: 'Restaurar esta cópia vai substituir todos os dados de treinos, ginásio, exercícios e histórico neste dispositivo. Esta ação não pode ser anulada.',
+            confirmMessage:
+                'Restaurar esta cópia vai substituir todos os dados de treinos, ginásio, exercícios e histórico neste dispositivo. Esta ação não pode ser anulada.',
             confirm: 'Substituir dados',
             restored: 'Cópia restaurada.',
             errors: {
                 invalidExtension: 'Escolhe um ficheiro de cópia .arcbak.',
-                invalidData: 'Este ficheiro não é uma cópia válida do Arc Timer.',
-                incompatible: 'Esta cópia não é compatível com esta versão do Arc Timer.',
-                activeSession: 'Termina ou descarta a sessão ativa antes de restaurar uma cópia.',
+                invalidData:
+                    'Este ficheiro não é uma cópia válida do Arc Timer.',
+                incompatible:
+                    'Esta cópia não é compatível com esta versão do Arc Timer.',
+                activeSession:
+                    'Termina ou descarta a sessão ativa antes de restaurar uma cópia.',
                 readFailed: 'Não foi possível abrir o ficheiro de cópia.',
                 exportFailed: 'Não foi possível exportar a cópia.',
-                sharingUnavailable: 'A partilha não está disponível neste dispositivo.',
-                restoreFailed: 'Não foi possível restaurar a cópia. Os teus dados atuais não foram alterados.',
+                sharingUnavailable:
+                    'A partilha não está disponível neste dispositivo.',
+                restoreFailed:
+                    'Não foi possível restaurar a cópia. Os teus dados atuais não foram alterados.',
             },
         },
         sections: {

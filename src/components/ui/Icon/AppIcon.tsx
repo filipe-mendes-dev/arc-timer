@@ -19,6 +19,11 @@ type IconDefinition =
       };
 
 const ICON_MAP = {
+    filter: {
+        lib: 'feather',
+        name: 'sliders',
+        defaultSize: 18,
+    },
     backup: {
         lib: 'ion',
         name: 'archive-outline',

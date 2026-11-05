@@ -25,6 +25,7 @@ const ICONS_BY_ROUTE: Record<string, IconId> = {
     'gym/index': 'gym',
     'exercise-definitions/index': 'exercise',
     'history/index': 'history',
+    'statistics/index': 'stats',
     'settings/index': 'settings',
 };
 
