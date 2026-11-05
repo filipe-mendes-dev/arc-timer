@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const fs = require('fs');
 const path = require('path');
+const { getConfig } = require('expo/config');
 
 const BASE_ID = 'dev.filipemendes.arctimer';
 const VARIANTS = {
@@ -17,8 +18,23 @@ if (!VARIANTS[target]) {
 }
 const { id: EXPECTED_ID, regenCmd } = VARIANTS[target];
 const errors = [];
+const projectRoot = path.join(__dirname, '..');
 
-const iosDir = path.join(__dirname, '..', 'ios');
+try {
+  const { exp } = getConfig(projectRoot);
+  if (exp.extra?.appVariant !== target) {
+    errors.push(
+      `Expo app variant is "${exp.extra?.appVariant}" (expected "${target}"). Set APP_VARIANT=${target} for this command.`
+    );
+  }
+  if (exp.ios?.bundleIdentifier !== EXPECTED_ID || exp.android?.package !== EXPECTED_ID) {
+    errors.push(`Expo bundle/package identifiers must both be "${EXPECTED_ID}". Check app.config.ts.`);
+  }
+} catch (error) {
+  errors.push(`Could not resolve Expo config: ${error instanceof Error ? error.message : String(error)}`);
+}
+
+const iosDir = path.join(projectRoot, 'ios');
 if (fs.existsSync(iosDir)) {
   const pbxFiles = fs.readdirSync(iosDir)
     .filter((f) => f.endsWith('.xcodeproj'))
@@ -39,7 +55,7 @@ if (fs.existsSync(iosDir)) {
   }
 }
 
-const gradle = path.join(__dirname, '..', 'android', 'app', 'build.gradle');
+const gradle = path.join(projectRoot, 'android', 'app', 'build.gradle');
 if (fs.existsSync(gradle)) {
   const content = fs.readFileSync(gradle, 'utf8');
   const m = content.match(/applicationId\s+['"]([^'"]+)['"]/);
@@ -58,4 +74,4 @@ if (errors.length) {
   );
   process.exit(1);
 }
-console.log(`[guard:${target}-variant] OK — native projects are on the ${target} variant.`);
+console.log(`[guard:${target}-variant] OK — Expo config and native projects match the ${target} variant.`);
