@@ -7,7 +7,7 @@ import {
     useState,
     type ReactNode,
 } from 'react';
-import { View, type MeasureInWindowOnSuccessCallback } from 'react-native';
+import { View, type ViewInstance, type MeasureInWindowOnSuccessCallback } from 'react-native';
 
 import { useDropdownStyles } from './Dropdown.styles';
 
@@ -33,7 +33,7 @@ export const DropdownPortalProvider = ({
     children,
 }: DropdownPortalProviderProps) => {
     const st = useDropdownStyles();
-    const portalLayerRef = useRef<View | null>(null);
+    const portalLayerRef = useRef<ViewInstance | null>(null);
     const [activeDropdown, setActiveDropdown] =
         useState<ActiveDropdown | null>(null);
 

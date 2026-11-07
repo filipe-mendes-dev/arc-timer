@@ -49,13 +49,32 @@ import {
 import type { ExerciseDefinitionService } from './services/exerciseDefinitions/exerciseDefinitionServiceFactory';
 import type { WorkoutRepository } from './repositories/workouts/workoutRepositoryFactory';
 import type { WorkoutSessionRepository } from './repositories/workoutSessions/workoutSessionRepositoryFactory';
+import { createBackupRepository } from './repositories/backups/backupRepositoryFactory';
+import {
+    createBackupService,
+    type BackupService,
+} from './services/backups/backupServiceFactory';
+import { createTrainingSessionRepository } from './repositories/trainingSessions/trainingSessionRepositoryFactory';
+import { createGymStatisticsRepository } from './repositories/statistics/gymStatisticsRepositoryFactory';
+import {
+    createGymStatisticsService,
+    type GymStatisticsService,
+} from './services/statistics/gymStatisticsServiceFactory';
+
+import {
+    createSampleDataService,
+    type SampleDataService,
+} from './services/development/sampleDataServiceFactory';
 
 export interface CreateDbServicesArgs {
+    isDevelopment?: boolean;
     clock?: Clock;
     db: RepositoryDb;
 }
 
 export interface DbServices {
+    backupService: BackupService;
+    sampleDataService: SampleDataService;
     exerciseDefinitionDataRepository: ExerciseDefinitionDataRepository;
     exerciseDefinitionService: ExerciseDefinitionService;
     exerciseDefinitionStatsRepository: ExerciseDefinitionStatsRepository;
@@ -64,6 +83,7 @@ export interface DbServices {
     gymPlanService: GymPlanService;
     gymSessionRepository: GymSessionRepository;
     gymSessionService: GymSessionService;
+    gymStatisticsService: GymStatisticsService;
     trainingSessionService: TrainingSessionService;
     workoutRepository: WorkoutRepository;
     workoutService: WorkoutService;
@@ -73,12 +93,16 @@ export interface DbServices {
 
 export const createDbServices = ({
     clock = systemClock,
+    isDevelopment = false,
     db,
 }: CreateDbServicesArgs): DbServices => {
-    const exerciseDefinitionDataRepository =
-        createExerciseDefinitionDataRepository({
-            db,
-        });
+    const backupService = createBackupService({
+        backupRepository: createBackupRepository({ db }),
+        clock,
+    });
+    const exerciseDefinitionDataRepository = createExerciseDefinitionDataRepository({
+        db,
+    });
     const exerciseDefinitionStatsRepository =
         createExerciseDefinitionStatsRepository({
             db,
@@ -122,6 +146,7 @@ export const createDbServices = ({
     });
     const gymSessionService = createGymSessionService({
         clock,
+        db,
         exerciseDefinitionService,
         exerciseDefinitionStatsRepository,
         gymExerciseRecordRepository,
@@ -134,11 +159,15 @@ export const createDbServices = ({
         gymPlanRepository,
     });
     const trainingSessionService = createTrainingSessionService({
-        gymSessionService,
-        workoutSessionService,
+        repository: createTrainingSessionRepository({ db }),
     });
 
     return {
+        backupService,
+        sampleDataService: createSampleDataService({ db, clock, isDevelopment }),
+        gymStatisticsService: createGymStatisticsService({
+            repository: createGymStatisticsRepository({ db }),
+        }),
         exerciseDefinitionDataRepository,
         exerciseDefinitionService,
         exerciseDefinitionStatsRepository,

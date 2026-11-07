@@ -7,6 +7,8 @@ export const DEFAULT_ARC_SIZE = 280;
 
 interface RunPhaseSectionStyleProps {
     layoutMode: RunLayoutMode;
+    availableWidth: number;
+    timerLength: number;
 }
 
 interface RunPhaseSectionMetrics {
@@ -19,39 +21,55 @@ interface RunPhaseSectionMetrics {
 
 export const metricsForRunLayout = (
     mode: RunLayoutMode,
+    availableWidth = Number.POSITIVE_INFINITY,
 ): RunPhaseSectionMetrics => {
+    let metrics: RunPhaseSectionMetrics;
     if (mode === 'minimal') {
-        return {
+        metrics = {
             arcSize: 210,
             arcContainerPaddingTop: 6,
             arcWrapperPaddingTop: 22,
             exerciseGap: 6,
             timerFontSize: 68,
         };
-    }
-
-    if (mode === 'compact') {
-        return {
+    } else if (mode === 'compact') {
+        metrics = {
             arcSize: 240,
             arcContainerPaddingTop: 18,
             arcWrapperPaddingTop: 42,
             exerciseGap: 8,
             timerFontSize: 80,
         };
+    } else {
+        metrics = {
+            arcSize: DEFAULT_ARC_SIZE,
+            arcContainerPaddingTop: 24,
+            arcWrapperPaddingTop: 60,
+            exerciseGap: 10,
+            timerFontSize: 96,
+        };
     }
-
+    const arcSize = Math.min(metrics.arcSize, Math.max(1, availableWidth));
     return {
-        arcSize: DEFAULT_ARC_SIZE,
-        arcContainerPaddingTop: 24,
-        arcWrapperPaddingTop: 60,
-        exerciseGap: 10,
-        timerFontSize: 96,
+        ...metrics,
+        arcSize,
+        timerFontSize: (metrics.timerFontSize * arcSize) / metrics.arcSize,
     };
 };
 
 export const useRunPhaseSectionStyles = createStyles(
     (theme: AppTheme, props: RunPhaseSectionStyleProps) => {
-        const metrics = metricsForRunLayout(props.layoutMode);
+        const metrics = metricsForRunLayout(
+            props.layoutMode,
+            props.availableWidth,
+        );
+        const timerWidth = Math.max(1, (metrics.arcSize - 64) / 1.08);
+        let timerFontSize = metrics.timerFontSize;
+        if (props.timerLength > 2)
+            timerFontSize = Math.min(
+                metrics.timerFontSize * 0.7,
+                timerWidth / (props.timerLength * 0.68),
+            );
 
         return StyleSheet.create({
             mainContainer: {
@@ -93,8 +111,10 @@ export const useRunPhaseSectionStyles = createStyles(
 
             timer: {
                 position: 'absolute',
+                width: timerWidth,
+                textAlign: 'center',
                 color: theme.palette.text.primary,
-                fontSize: metrics.timerFontSize,
+                fontSize: timerFontSize,
                 fontVariant: ['tabular-nums'],
                 marginTop: metrics.arcWrapperPaddingTop,
             },

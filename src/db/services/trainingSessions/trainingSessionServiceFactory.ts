@@ -1,92 +1,102 @@
 import type {
-    TrainingSessionKind,
     TrainingSessionListItem,
+    TrainingSessionListParams,
 } from '@src/core/entities/trainingSession.interfaces';
-import type { WorkoutSessionService } from '../workoutSessions/workoutSessionServiceFactory';
-import type { GymSessionService } from '../gyms/gymSessionServiceFactory';
+import {
+    getLocalDayStart,
+    type ExerciseUsage,
+    type StatisticsRange,
+    type TrainingAttendance,
+} from '@src/core/statistics/gymStatistics';
+import type { TrainingSessionRepository } from '../../repositories/trainingSessions/trainingSessionRepositoryFactory';
 
-export interface ListTrainingSessionsInput {
-    kind?: TrainingSessionKind;
-    limit?: number;
-}
-
+export interface ListTrainingSessionsInput extends TrainingSessionListParams {}
 export interface TrainingSessionService {
     listItems: (input?: ListTrainingSessionsInput) => TrainingSessionListItem[];
+    getAttendance: (range: StatisticsRange) => TrainingAttendance;
+    getExerciseUsage: (range: StatisticsRange, exerciseDefinitionId?: string) => ExerciseUsage[];
 }
-
 export interface CreateTrainingSessionServiceArgs {
-    gymSessionService: GymSessionService;
-    workoutSessionService: WorkoutSessionService;
+    repository: TrainingSessionRepository;
 }
 
-const DEFAULT_GYM_SESSION_READ_LIMIT = 100;
-
-const normalizeLimit = (limit: number | undefined): number | undefined =>
-    Number.isInteger(limit) && limit != null && limit > 0 ? limit : undefined;
-
-const resolveDurationSec = (
-    startedAtMs: number,
-    endedAtMs: number | undefined,
-): number | undefined => {
-    if (endedAtMs == null) return undefined;
-
-    return Math.max(0, Math.round((endedAtMs - startedAtMs) / 1000));
+const readCount = (stats: unknown, key: string): number => {
+    if (typeof stats !== 'object' || stats === null || !(key in stats)) return 0;
+    const value: unknown = Reflect.get(stats, key);
+    return typeof value === 'number' && Number.isFinite(value) ? value : 0;
 };
 
 export const createTrainingSessionService = ({
-    gymSessionService,
-    workoutSessionService,
-}: CreateTrainingSessionServiceArgs): TrainingSessionService => ({
-    listItems: (
-        input: ListTrainingSessionsInput = {},
-    ): TrainingSessionListItem[] => {
-        const hiitItems: TrainingSessionListItem[] =
-            workoutSessionService.getAll().map((session) => ({
-                id: session.id,
-                kind: 'hiit',
-                title: session.workoutSnapshot.name,
-                startedAtMs: session.startedAtMs,
-                endedAtMs: session.endedAtMs,
-                durationSec: session.totalDurationSec,
-                primaryMetric: `${session.stats?.completedSets ?? 0}`,
-                secondaryMetric: `${session.stats?.completedExercises ?? 0}`,
-                searchText: session.workoutSnapshot.name,
-            }));
-
-        const gymItems: TrainingSessionListItem[] = gymSessionService
-            .listGymSessionItems({ limit: DEFAULT_GYM_SESSION_READ_LIMIT })
-            .map((session) => {
-                const sourceGymPlanName = session.sourceGymPlanName;
-                const title = sourceGymPlanName ?? '';
-
+    repository,
+}: CreateTrainingSessionServiceArgs): TrainingSessionService => {
+    const service: TrainingSessionService = {
+        listItems: (input = {}) => {
+            const limit =
+                Number.isInteger(input.limit) && input.limit !== undefined && input.limit > 0 ? input.limit : undefined;
+            const offset =
+                Number.isInteger(input.offset) && input.offset !== undefined && input.offset > 0 ? input.offset : 0;
+            return repository.listItems({ ...input, limit, offset }).map((row) => {
+                let stats: unknown;
+                if (row.statsJson) {
+                    try {
+                        stats = JSON.parse(row.statsJson);
+                    } catch {
+                        stats = undefined;
+                    }
+                }
+                let primaryMetric = row.exerciseCount;
+                let secondaryMetric = row.setCount;
+                if (row.kind === 'hiit') {
+                    primaryMetric = readCount(stats, 'completedSets');
+                    secondaryMetric = readCount(stats, 'completedExercises');
+                }
+                let durationSec = row.durationSec ?? undefined;
+                if (row.kind === 'gym' && row.endedAtMs !== null)
+                    durationSec = Math.max(
+                        0,
+                        Math.round((row.endedAtMs - row.startedAtMs) / 1000),
+                    );
                 return {
-                    id: session.id,
-                    kind: 'gym',
-                    title,
-                    sourceGymPlanName,
-                    startedAtMs: session.startedAtMs,
-                    endedAtMs: session.endedAtMs,
-                    durationSec: resolveDurationSec(
-                        session.startedAtMs,
-                        session.endedAtMs,
-                    ),
-                    primaryMetric: `${session.exerciseRecordCount}`,
-                    secondaryMetric: `${session.setCount}`,
-                    searchText: title,
+                    id: row.id,
+                    kind: row.kind,
+                    title: row.title,
+                    sourceGymPlanName: row.kind === 'gym' ? row.title : undefined,
+                    startedAtMs: row.startedAtMs,
+                    endedAtMs: row.endedAtMs ?? undefined,
+                    durationSec,
+                    primaryMetric: String(primaryMetric),
+                    secondaryMetric: String(secondaryMetric),
+                    searchText: row.title,
                 };
             });
-
-        const filteredItems = [...hiitItems, ...gymItems].filter((item) => {
-            if (input.kind == null) return true;
-
-            return item.kind === input.kind;
-        });
-
-        const sortedItems = filteredItems.sort(
-            (a, b) => b.startedAtMs - a.startedAtMs,
-        );
-        const limit = normalizeLimit(input.limit);
-
-        return limit == null ? sortedItems : sortedItems.slice(0, limit);
-    },
-});
+        },
+        getAttendance: (range) => {
+            const sessions = service.listItems(range);
+            return {
+                sessions,
+                trainingDayCount: new Set(
+                    sessions.map((session) => getLocalDayStart(session.startedAtMs)),
+                ).size,
+            };
+        },
+        getExerciseUsage: (range, exerciseDefinitionId) => {
+            const usageById = new Map<string, ExerciseUsage>();
+            repository.listExerciseSessions(range, exerciseDefinitionId).forEach((row) => {
+                if (row.exerciseDefinitionId === null) return;
+                const usage = usageById.get(row.exerciseDefinitionId);
+                if (usage) {
+                    usage.sessionCount += 1;
+                    usage.lastUsedAtMs = Math.max(usage.lastUsedAtMs, row.startedAtMs);
+                } else {
+                    usageById.set(row.exerciseDefinitionId, {
+                        id: row.exerciseDefinitionId,
+                        sessionCount: 1,
+                        lastUsedAtMs: row.startedAtMs,
+                    });
+                }
+            });
+            return [...usageById.values()];
+        },
+    };
+    return service;
+};

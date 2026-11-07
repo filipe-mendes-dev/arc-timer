@@ -26,7 +26,8 @@ export const useExerciseDefinitionSuggestions = (
         () => ({
             filters: {
                 availability,
-                namePrefix: debouncedInput,
+                name: debouncedInput,
+                shouldRankNameMatches: true,
             },
             pagination: {
                 limit: QUERY_LIMIT,

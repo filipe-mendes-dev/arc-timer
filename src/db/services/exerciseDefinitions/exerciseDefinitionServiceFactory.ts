@@ -4,6 +4,7 @@ import type {
     ExerciseDefinitionData,
     ExerciseDefinitionListItem,
     ExerciseDefinitionTargetSetData,
+    ExerciseDefinitionSetMetric,
     ExerciseTrackingField,
 } from '@src/core/entities/exerciseDefinition.interfaces';
 import type { Workout } from '@src/core/entities/workout.interfaces';
@@ -68,6 +69,7 @@ export interface ExerciseDefinitionService {
         name: string,
     ) => ExerciseDefinition | null;
     getById: (id: string) => ExerciseDefinition | null;
+    getLastCompletedWeightSet: (id: string) => ExerciseDefinitionSetMetric | null;
     getByNormalizedName: (normalizedName: string) => ExerciseDefinition | null;
     list: (params?: ExerciseDefinitionListParams) => ExerciseDefinitionListItem[];
     mergeExerciseDefinition: (
@@ -266,6 +268,9 @@ export const createExerciseDefinitionService = ({
                 name: trimmedName,
             });
         },
+
+        getLastCompletedWeightSet: (id) =>
+            exerciseDefinitionStatsRepository.getLastCompletedWeightSet(id),
 
         list: ({
             filters,

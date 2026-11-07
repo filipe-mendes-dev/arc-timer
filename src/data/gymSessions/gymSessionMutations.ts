@@ -3,16 +3,22 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { dbServices } from '@src/db/dbServices';
 import type {
     AddExerciseRecordToSessionInput,
+    AddConfiguredExerciseRecordToSessionInput,
     AddSetToExerciseRecordInput,
     StartGymSessionFromPlanInput,
     StartGymSessionFromSessionSnapshotInput,
     UpdateExerciseRecordSetInput,
+    UpdateExerciseRecordTrackingDefaultsInput,
 } from '@src/db/services/gyms/gymSessionServiceFactory';
 
 import { exerciseDefinitionKeys } from '../exerciseDefinitions/exerciseDefinitionKeys';
 import { gymPlanKeys } from '../gymPlans/gymPlanKeys';
 import { trainingSessionKeys } from '../trainingSessions/trainingSessionKeys';
 import { gymSessionKeys } from './gymSessionKeys';
+import {
+    requestGymSessionNotificationPermission,
+    synchronizeGymSessionNotifications,
+} from '@src/notifications/gymSessions/gymSessionNotifications';
 
 export interface AddGymExerciseRecordByNameInput extends AddExerciseRecordToSessionInput {
     name: string;
@@ -36,6 +42,8 @@ export const useStartGymSession = () => {
         mutationFn: async () =>
             dbServices.gymSessionService.startEmptyGymSession(),
         onSuccess: async () => {
+            await requestGymSessionNotificationPermission();
+            await synchronizeGymSessionNotifications();
             await invalidateGymSessionQueries(queryClient);
         },
     });
@@ -48,6 +56,8 @@ export const useStartGymSessionFromPlan = () => {
         mutationFn: async (input: StartGymSessionFromPlanInput) =>
             dbServices.gymSessionService.startGymSessionFromPlan(input),
         onSuccess: async () => {
+            await requestGymSessionNotificationPermission();
+            await synchronizeGymSessionNotifications();
             await Promise.all([
                 invalidateGymSessionQueries(queryClient),
                 queryClient.invalidateQueries({
@@ -67,6 +77,8 @@ export const useStartGymSessionFromSessionSnapshot = () => {
                 input,
             ),
         onSuccess: async () => {
+            await requestGymSessionNotificationPermission();
+            await synchronizeGymSessionNotifications();
             await invalidateGymSessionQueries(queryClient);
         },
     });
@@ -78,6 +90,7 @@ export const useFinishGymSession = () => {
     return useMutation({
         mutationFn: async () => dbServices.gymSessionService.finishGymSession(),
         onSuccess: async () => {
+            await synchronizeGymSessionNotifications();
             await Promise.all([
                 invalidateGymSessionQueries(queryClient),
                 queryClient.invalidateQueries({
@@ -95,6 +108,7 @@ export const useDiscardGymSession = () => {
         mutationFn: async (id: string) =>
             dbServices.gymSessionService.discardGymSession(id),
         onSuccess: async () => {
+            await synchronizeGymSessionNotifications();
             await Promise.all([
                 invalidateGymSessionQueries(queryClient),
                 queryClient.invalidateQueries({
@@ -165,6 +179,25 @@ export const useUpdateGymExerciseRecordSet = () => {
     });
 };
 
+export const useUpdateGymExerciseRecordTrackingDefaults = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (input: UpdateExerciseRecordTrackingDefaultsInput) =>
+            dbServices.gymSessionService.updateExerciseRecordTrackingDefaults(
+                input,
+            ),
+        onSuccess: async () => {
+            await Promise.all([
+                invalidateGymSessionQueries(queryClient),
+                queryClient.invalidateQueries({
+                    queryKey: exerciseDefinitionKeys.all,
+                }),
+            ]);
+        },
+    });
+};
+
 export const useDeleteGymExerciseRecordSet = () => {
     const queryClient = useQueryClient();
 
@@ -185,6 +218,25 @@ export const useAddGymExerciseRecordByName = () => {
     return useMutation({
         mutationFn: async (input: AddGymExerciseRecordByNameInput) =>
             dbServices.gymSessionService.addExerciseRecordToSession(input),
+        onSuccess: async () => {
+            await Promise.all([
+                invalidateGymSessionQueries(queryClient),
+                queryClient.invalidateQueries({
+                    queryKey: exerciseDefinitionKeys.all,
+                }),
+            ]);
+        },
+    });
+};
+
+export const useAddConfiguredGymExerciseRecord = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (input: AddConfiguredExerciseRecordToSessionInput) =>
+            dbServices.gymSessionService.addConfiguredExerciseRecordToSession(
+                input,
+            ),
         onSuccess: async () => {
             await Promise.all([
                 invalidateGymSessionQueries(queryClient),

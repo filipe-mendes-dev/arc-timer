@@ -57,7 +57,7 @@ const scheme = getScheme();
 const config: Config = {
     name,
     slug: 'arc-timer',
-    version: '1.1.1',
+    version: '1.2.0',
     orientation: 'portrait',
     icon: './assets/generated/classic/icon-light.png',
     userInterfaceStyle: 'automatic',
@@ -70,7 +70,7 @@ const config: Config = {
             tinted: './assets/generated/classic/icon-tinted.png',
         },
         bundleIdentifier: bundleId,
-        buildNumber: '4',
+        buildNumber: '5',
         supportsTablet: false,
         infoPlist: {
             ITSAppUsesNonExemptEncryption: false,
@@ -79,7 +79,7 @@ const config: Config = {
     android: {
         icon: './assets/generated/classic/icon-light.png',
         package: bundleId,
-        versionCode: 5,
+        versionCode: 6,
         adaptiveIcon: {
             foregroundImage:
                 './assets/generated/classic/adaptive-foreground.png',
@@ -103,6 +103,11 @@ const config: Config = {
     },
     plugins: [
         'expo-router',
+        // Entitlement mods run in reverse order, so remove APNs after notification setup.
+        './plugins/withGymSessionNotifications',
+        ['expo-notifications', {
+            icon: './assets/generated/classic/notification-logo.png',
+        }],
         [
             'expo-audio',
             {

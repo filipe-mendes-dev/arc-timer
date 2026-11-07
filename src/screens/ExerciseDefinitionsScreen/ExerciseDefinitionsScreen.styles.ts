@@ -7,6 +7,7 @@ export const useExerciseDefinitionsScreenStyles = createStyles(
     (theme: AppTheme) =>
         StyleSheet.create({
             headerContainer: {
+                backgroundColor: theme.palette.background.primary,
                 gap: theme.layout.listItem.gap,
             },
             headerRow: {

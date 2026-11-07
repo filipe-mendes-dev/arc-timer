@@ -14,6 +14,7 @@ export const useSettingsSectionStyles = createStyles((theme) =>
         },
         sectionTitle: {
             color: theme.palette.text.header,
+            flexShrink: 1,
         },
     })
 );

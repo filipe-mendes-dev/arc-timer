@@ -1,6 +1,6 @@
 import type { ReactNode, RefObject } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
-import type { View } from 'react-native';
+import type { ViewInstance } from 'react-native';
 
 export interface DropdownResolvedLayout {
     top?: number;
@@ -43,7 +43,7 @@ export interface DropdownProps {
     visible: boolean;
     children: ReactNode;
     onClose: () => void;
-    anchorRef: RefObject<View | null>;
+    anchorRef: RefObject<ViewInstance | null>;
     position?: DropdownPosition;
     matchAnchorWidth?: boolean;
     dismissMode?: DropdownDismissMode;

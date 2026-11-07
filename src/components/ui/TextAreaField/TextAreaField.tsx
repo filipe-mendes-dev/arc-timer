@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import type { View } from 'react-native';
+import type { ViewInstance } from 'react-native';
 
 import type { TextFieldProps } from '../TextField/TextField.interfaces';
 import { TextField } from '../TextField/TextField';
@@ -9,7 +9,7 @@ export interface TextAreaFieldProps extends Omit<TextFieldProps, 'multiline'> {
     minHeight?: number;
 }
 
-export const TextAreaField = forwardRef<View, TextAreaFieldProps>(
+export const TextAreaField = forwardRef<ViewInstance, TextAreaFieldProps>(
     ({ inputStyle, minHeight, numberOfLines = 4, ...props }, ref) => {
         const st = useTextAreaFieldStyles({ minHeight });
 

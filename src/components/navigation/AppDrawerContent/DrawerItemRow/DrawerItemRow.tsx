@@ -38,7 +38,14 @@ export const DrawerItemRow = ({
             ]}
         >
             <View style={st.contentRow}>
-                {iconId ? <AppIcon id={iconId} size={18} color={tint} /> : null}
+                {iconId && (
+                    <AppIcon
+                        id={iconId}
+                        size={18}
+                        color={tint}
+                        isFilled={focused}
+                    />
+                )}
 
                 <AppText
                     variant="subtitle"

@@ -1,6 +1,6 @@
 import React, { forwardRef, useRef, useState } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
-import { View } from 'react-native';
+import { View, type ViewInstance } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useTheme } from '@src/theme/ThemeProvider';
@@ -25,7 +25,7 @@ interface DismissedBanner {
 
 const COLLAPSE_DURATION_MS = 150;
 
-export const ErrorBanner = forwardRef<View, ErrorBannerProps>(
+export const ErrorBanner = forwardRef<ViewInstance, ErrorBannerProps>(
     (
         {
             message,

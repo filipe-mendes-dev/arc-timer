@@ -4,6 +4,48 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## v1.2.0 - 2026-11-07
+
+### Summary
+
+Track exercise progress and training attendance, back up training data, and follow active gym sessions from the Lock Screen or notification drawer.
+
+### Added
+
+- Add searchable exercise progress graphs for weight, reps, volume, duration and distance, with time-period filters and links to sessions; exclude warmup sets from performance measurements
+- Add a monthly training attendance calendar combining gym and HIIT sessions, counting each training day once
+- Show recent sessions and searchable session history for each exercise across gym sessions and saved HIIT workout snapshots
+- Export and restore training data through versioned `.arcbak` backups in Settings, excluding app settings and language; confirm before replacing existing data and block restore during active sessions
+- Show active gym sessions on the iOS Lock Screen and Dynamic Island and in compact and expanded Android notifications, with live elapsed time, theme colours and logo watermarks
+- Open the active session or its end-session confirmation from session banners; clear banners when the session ends or is discarded
+- Add Strength, Cardio, Timed and Bodyweight tracking presets with icons and confirmation when adding new or unconfigured exercises to gym sessions and plans
+- Show previous-session weight and personal best in the exercise screen, with a shortcut to exercise details and dates on recent sessions
+- Add development-only sample training data for reviewing progress and attendance, with refresh and removal that preserve personal records
+
+### Changed
+
+- Display longer HIIT exercise and rest durations in minutes and seconds, and resize the countdown text to fit the available screen space
+- Set app variants explicitly in Metro, build and export commands, and validate resolved Expo configuration alongside native bundle/package identifiers
+- Unify gym session and exercise headers with theme-aware accent gradients, logo watermarks and consistent footer actions, including selection mode
+- Match exercise suggestions anywhere in the name, prioritizing exact and prefix matches
+- Allow empty gym plan targets and plan-derived incomplete session sets without inserting unrelated reps and weight values
+- Hide the session discard action once a set has been completed
+
+### Compatibility
+
+- Upgrade to Expo SDK 58, React Native 0.88, React 19.3 and TypeScript 6
+- Require iOS 16.4 or newer; Android 7 and newer remain supported
+- Require Node.js `^22.13.0 || ^24.3.0 || >=26.0.0` for local development
+
+### Fixed
+
+- Include system exercises used in gym sessions in active exercise definition lists
+- Preserve selected tracking fields when numeric defaults are absent or cleared
+- Prevent completing a set without at least one positive tracked value
+- Preserve zero-weight values for bodyweight exercises
+- Prevent iOS autocorrect from overwriting a selected exercise suggestion
+- Format distance personal records consistently with exercise set values
+
 ## [v1.1.1] - 2026-06-14
 
 ### Added

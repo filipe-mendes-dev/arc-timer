@@ -1,10 +1,9 @@
-import { useFocusEffect, useNavigation } from 'expo-router';
-import { useCallback, useLayoutEffect, useRef } from 'react';
+import { useFocusEffect, useIsFocused, useNavigation, usePreventRemove } from 'expo-router';
+import { useCallback, useLayoutEffect, useState } from 'react';
 import { BackHandler, Platform } from 'react-native';
-import type { EventArg } from '@react-navigation/native';
 
 export interface UseSystemBackHandlerArgs {
-    onSystemBack: () => boolean; // true => block default back
+    onSystemBack: () => boolean;
     isGestureBackDisabled?: boolean;
 }
 
@@ -13,62 +12,49 @@ export const useSystemBackHandler = ({
     isGestureBackDisabled = true,
 }: UseSystemBackHandlerArgs): { allowNextBack: () => void } => {
     const navigation = useNavigation();
-    const allowNextBackRef = useRef(false);
+    const isFocused = useIsFocused();
+    const [isBackPreventionEnabled, setBackPreventionEnabled] = useState(true);
 
-    const allowNextBack = () => {
-        allowNextBackRef.current = true;
-    };
+    const disablePrevention = usePreventRemove(
+        isFocused && isBackPreventionEnabled,
+        ({ data, repeat }) => {
+            const actionType = data.action.type;
+            const isBackAction = actionType === 'POP' || actionType === 'GO_BACK';
+            if (isBackAction && onSystemBack()) return;
 
-    // Disable iOS swipe-back gesture
+            setBackPreventionEnabled(false);
+            repeat();
+        },
+    );
+
+    const allowNextBack = useCallback(() => {
+        setBackPreventionEnabled(false);
+        disablePrevention();
+    }, [disablePrevention]);
+
     useLayoutEffect(() => {
         navigation.setOptions({
             gestureEnabled: !isGestureBackDisabled,
         });
     }, [navigation, isGestureBackDisabled]);
 
-    // Android hardware back button
+    useFocusEffect(
+        useCallback(() => {
+            setBackPreventionEnabled(true);
+        }, []),
+    );
+
     useFocusEffect(
         useCallback(() => {
             if (Platform.OS !== 'android') return;
 
-            const sub = BackHandler.addEventListener('hardwareBackPress', () =>
-                onSystemBack()
+            const subscription = BackHandler.addEventListener(
+                'hardwareBackPress',
+                () => onSystemBack(),
             );
 
-            return () => sub.remove();
-        }, [onSystemBack])
-    );
-
-    // Intercept navigation back actions (iOS back swipe / header back / goBack)
-    useFocusEffect(
-        useCallback(() => {
-            const unsub = navigation.addListener(
-                'beforeRemove',
-                (
-                    e: EventArg<
-                        'beforeRemove',
-                        true,
-                        { action: { type: string } }
-                    >
-                ) => {
-                    const actionType = e.data.action.type;
-                    const isBackAction =
-                        actionType === 'POP' || actionType === 'GO_BACK';
-
-                    if (!isBackAction) return;
-
-                    if (allowNextBackRef.current) {
-                        allowNextBackRef.current = false;
-                        return;
-                    }
-
-                    const handled = onSystemBack();
-                    if (handled) e.preventDefault();
-                }
-            );
-
-            return () => unsub();
-        }, [navigation, onSystemBack])
+            return () => subscription.remove();
+        }, [onSystemBack]),
     );
 
     return { allowNextBack };

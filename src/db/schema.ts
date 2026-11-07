@@ -45,6 +45,11 @@ export const exerciseDefinitionDefaultTrackingFieldsTable = sqliteTable('exercis
     durationSec: integer('duration_sec'),
     distanceMeters: integer('distance_meters'),
     rpeTenths: integer('rpe_tenths'),
+    hasReps: integer('has_reps', { mode: 'boolean' }).notNull().default(false),
+    hasWeight: integer('has_weight', { mode: 'boolean' }).notNull().default(false),
+    hasDuration: integer('has_duration', { mode: 'boolean' }).notNull().default(false),
+    hasDistance: integer('has_distance', { mode: 'boolean' }).notNull().default(false),
+    hasRpe: integer('has_rpe', { mode: 'boolean' }).notNull().default(false),
     createdAtMs: integer('created_at_ms').notNull(),
     updatedAtMs: integer('updated_at_ms').notNull(),
 });

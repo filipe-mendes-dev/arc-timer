@@ -56,7 +56,7 @@ export const useStyles = createStyles((theme: AppTheme) => ({
         marginRight: 5,
     },
     metricLabel: {
-        color: theme.palette.text.muted,
+        color: theme.palette.text.secondary,
         fontWeight: '500',
     },
     metricDivider: {

@@ -105,12 +105,6 @@ const trackingFieldsFromSelectedFields = (
 ): ExerciseDefinitionTrackingFields =>
     trackingFieldValueFromFields(selectedFields);
 
-const getSelectedFieldsWithValues = (
-    definition: ExerciseDefinition,
-    selectedFields: readonly ExerciseTrackingField[],
-): ExerciseTrackingField[] =>
-    selectedFields.filter((field) => hasDefaultValue(definition, field));
-
 export const useExerciseDefinitionDefaultFields = ({
     definition,
     emptyValue,
@@ -179,18 +173,14 @@ export const useExerciseDefinitionDefaultFields = ({
         if (!definition) return;
 
         const selectedTrackingFields = fieldsFromTrackingValue(value);
-        const defaultTrackingFields = getSelectedFieldsWithValues(
-            definition,
-            selectedTrackingFields,
-        );
 
         await saveData.mutateAsync({
             exerciseDefinitionId: definition.id,
-            defaultTrackingFields,
+            defaultTrackingFields: selectedTrackingFields,
             notes: definition.data?.notes,
             defaultTargetSet: targetSetFromDefinition(
                 definition,
-                defaultTrackingFields,
+                selectedTrackingFields,
             ),
         });
         setSelectedFields(selectedTrackingFields);
@@ -220,31 +210,14 @@ export const useExerciseDefinitionDefaultFields = ({
             targetSetFromDefinition(definition, selectedTrackingFields),
             value,
         );
-        const defaultTrackingFields = selectedTrackingFields.filter(
-            (selectedField) => {
-                if (selectedField === value.field) {
-                    return hasTargetSetValue(defaultTargetSet, selectedField);
-                }
-
-                return hasDefaultValue(definition, selectedField);
-            },
-        );
-        const nextSelectedFields = hasTargetSetValue(
-            defaultTargetSet,
-            value.field,
-        )
-            ? selectedTrackingFields
-            : selectedTrackingFields.filter(
-                  (selectedField) => selectedField !== value.field,
-              );
 
         await saveData.mutateAsync({
             exerciseDefinitionId: definition.id,
-            defaultTrackingFields,
+            defaultTrackingFields: selectedTrackingFields,
             notes: definition.data?.notes,
             defaultTargetSet,
         });
-        setSelectedFields(nextSelectedFields);
+        setSelectedFields(selectedTrackingFields);
         closeDefaultValueModal();
     };
 

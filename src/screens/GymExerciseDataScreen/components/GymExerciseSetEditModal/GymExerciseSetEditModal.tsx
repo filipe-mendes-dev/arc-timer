@@ -84,6 +84,9 @@ export const GymExerciseSetEditModal = ({
                             <Stepper
                                 label={t('gymExerciseData.fields.weightKg')}
                                 value={visibleDraft.weightKg}
+                                onClear={() =>
+                                    onChangeDraft({ ...visibleDraft, weightKg: undefined })
+                                }
                                 onChange={(value) =>
                                     onChangeDraft({
                                         ...visibleDraft,

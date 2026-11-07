@@ -1,14 +1,14 @@
 import { createContext, useContext, type RefObject } from 'react';
-import type { View } from 'react-native';
+import type { ViewInstance } from 'react-native';
 
 export interface MainContainerScrollContextValue {
     canShowInputDropdowns: boolean;
     scrollTargetIntoView: (
-        targetRef: RefObject<View | null>,
+        targetRef: RefObject<ViewInstance | null>,
         viewportRatio?: number,
     ) => void;
     scrollFocusedInputIntoView: (
-        targetRef: RefObject<View | null>,
+        targetRef: RefObject<ViewInstance | null>,
         viewportRatio?: number,
     ) => void;
 }

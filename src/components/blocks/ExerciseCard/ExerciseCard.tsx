@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatDurationLabel } from '@src/helpers/time.helpers';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -81,9 +82,7 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
                         labelTone="primary"
                         value={exercise.value}
                         onChange={setDurationSec}
-                        formatValue={(next) =>
-                            `${next} ${t('editBlock.units.secondsShort')}`
-                        }
+                        formatValue={(next) => formatDurationLabel(next, t)}
                         min={1}
                         step={5}
                     />

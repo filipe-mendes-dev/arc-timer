@@ -10,7 +10,7 @@ import {
     ScrollView,
     View,
     type StyleProp,
-    type View as ReactNativeView,
+    type ViewInstance,
     type ViewStyle,
 } from 'react-native';
 
@@ -41,7 +41,7 @@ type MainContainerProps = {
 
 export interface MainContainerHandle {
     scrollTargetIntoView: (
-        targetRef: RefObject<ReactNativeView | null>,
+        targetRef: RefObject<ViewInstance | null>,
         viewportRatio?: number,
     ) => void;
 }

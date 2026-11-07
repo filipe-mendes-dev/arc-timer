@@ -7,6 +7,8 @@ import type {
     TopBarDirectAction,
     TopBarOption,
 } from '@src/components/navigation/TopBar/TopBar.interfaces';
+import type { ExerciseTrackingPreset } from '@src/core/entities/exerciseDefinition.interfaces';
+import { trackingFieldValueFromFields } from '@src/core/entities/exerciseTrackingFields';
 import type {
     GymPlanExercise,
     GymPlanExerciseTargetSet,
@@ -18,8 +20,11 @@ import {
 import { stripPlaceholderGymPlanExercises } from '@src/core/gyms/gymPlanDrafts';
 import {
     useExerciseDefinition,
+    useExerciseDefinitionByNormalizedName,
+    useSaveExerciseDefinitionData,
     useFindOrCreateGymExerciseDefinitionByName,
     useGymExerciseDefinitions,
+    useExerciseDefinitionSuggestions,
 } from '@src/data/exerciseDefinitions';
 import { useUpsertDraftGymPlan } from '@src/data/gymPlans';
 import { useListSelection } from '@src/hooks/useListSelection';
@@ -59,6 +64,12 @@ interface UseGymPlanExerciseEditScreenResult {
     cancelDeleteSets: () => void;
     closeTrackingFieldsModal: () => void;
     editingDraft: SetDraft | null;
+    committedName: string;
+    shouldShowPresetPicker: boolean;
+    errorMessage: string;
+    canSave: boolean;
+    presetFields: ExerciseTrackingPreset['fields'] | undefined;
+    selectPreset: (preset: ExerciseTrackingPreset) => void;
     exerciseSuggestions: TextFieldSuggestionItem[];
     fieldsWithData: (keyof TrackingFields)[];
     goBack: () => void;
@@ -104,6 +115,10 @@ export const useGymPlanExerciseEditScreen =
         const upsertDraft = useUpsertDraftGymPlan();
         const findOrCreateExerciseDefinition =
             useFindOrCreateGymExerciseDefinitionByName();
+        const saveDefinitionData = useSaveExerciseDefinitionData();
+        const [committedName, setCommittedName] = useState('');
+        const [selectedPreset, setSelectedPreset] =
+            useState<ExerciseTrackingPreset | null>(null);
         const draft = useGymPlanBuilderStore((state) => state.draft);
         const checkpointDraft = useGymPlanBuilderStore(
             (state) => state.checkpointDraft,
@@ -131,18 +146,23 @@ export const useGymPlanExerciseEditScreen =
         const hydratedExerciseIdRef = useRef<string | null>(null);
         const createExerciseDraftRef = useRef<GymPlanExercise | null>(null);
         const shouldSkipNameBlurCommitRef = useRef(false);
-        const pendingDefaultsExerciseDefinitionIdRef = useRef<string | null>(
-            null,
-        );
+        const seededDefaultsKeyRef = useRef<string | null>(null);
         const trimmedNameInput = nameInput.trim();
         const suggestionQuery = getSuggestionQuery(
             hasEnteredNameInput,
             trimmedNameInput,
         );
-        const { data: selectedExerciseDefinition } =
-            useExerciseDefinition(selectedExerciseDefinitionId);
-        const { data: suggestedExerciseDefinitions = [] } =
-            useGymExerciseDefinitions(suggestionQuery);
+        const { data: exactDefinition } =
+            useExerciseDefinitionByNormalizedName(committedName);
+        const resolvedId = selectedExerciseDefinitionId ?? exactDefinition?.id;
+        const { data: selectedExerciseDefinition } = useExerciseDefinition(resolvedId);
+        const presetFields =
+            selectedPreset?.fields ??
+            selectedExerciseDefinition?.data?.defaultTrackingFields;
+        const suggestedExerciseDefinitions = useExerciseDefinitionSuggestions(
+            suggestionQuery ?? '',
+            { availability: 'gym' },
+        );
         const {
             enterSelectMode,
             exitSelectMode,
@@ -165,6 +185,9 @@ export const useGymPlanExerciseEditScreen =
                 ),
             [draft, exerciseId, sectionId],
         );
+        const isConfiguringNewExercise =
+            !!lookup &&
+            (lookup.isCreating || !lookup.exercise.exerciseDefinitionId);
 
         const exerciseDefinitionName = getExerciseDefinitionName(
             lookup?.exercise.exerciseDefinitionId,
@@ -217,6 +240,7 @@ export const useGymPlanExerciseEditScreen =
             );
             setNameInput(savedExerciseName);
             setDisplayExerciseName(savedExerciseName);
+            setCommittedName(savedExerciseName);
             setSelectedExerciseDefinitionId(
                 getSelectedExerciseDefinitionId(lookup.exercise),
             );
@@ -228,25 +252,50 @@ export const useGymPlanExerciseEditScreen =
         }, [lookup, savedExerciseName]);
 
         useEffect(() => {
-            if (!selectedExerciseDefinition) return;
-            if (
-                pendingDefaultsExerciseDefinitionIdRef.current !==
-                selectedExerciseDefinition.id
-            ) {
+            if (!selectedExerciseDefinition || !lookup || selectedPreset) return;
+            const defaultsKey = `${selectedExerciseDefinition.id}:${selectedExerciseDefinition.data?.updatedAtMs ?? 0}`;
+            if (seededDefaultsKeyRef.current === defaultsKey) {
                 return;
             }
+            seededDefaultsKeyRef.current = defaultsKey;
 
-            pendingDefaultsExerciseDefinitionIdRef.current = null;
-            setTargetSets([
-                createTargetSetFromDefinition(
-                    selectedExerciseDefinition,
-                    createGymPlanTargetSet(0),
-                ),
-            ]);
-            setTrackingFields(
-                trackingFieldsFromDefinition(selectedExerciseDefinition),
-            );
-        }, [selectedExerciseDefinition]);
+            if (isConfiguringNewExercise) {
+                setTargetSets((current) =>
+                    current.map((set) => ({
+                        ...createTargetSetFromDefinition(
+                            selectedExerciseDefinition,
+                            createGymPlanTargetSet(set.setIndex),
+                        ),
+                        id: set.id,
+                        createdAtMs: set.createdAtMs,
+                    })),
+                );
+                setTrackingFields(
+                    trackingFieldsFromDefinition(selectedExerciseDefinition),
+                );
+            } else {
+                const hasTargetValues = getGymPlanExerciseTargetSets(
+                    lookup.exercise,
+                ).some(
+                    (set) =>
+                        set.reps !== undefined ||
+                        set.weightGrams !== undefined ||
+                        set.durationSec !== undefined ||
+                        set.distanceMeters !== undefined ||
+                        set.rpeTenths !== undefined,
+                );
+                if (!hasTargetValues) {
+                    setTrackingFields(
+                        trackingFieldsFromDefinition(selectedExerciseDefinition),
+                    );
+                }
+            }
+        }, [
+            selectedExerciseDefinition,
+            lookup,
+            selectedPreset,
+            isConfiguringNewExercise,
+        ]);
 
         const goBack = (): void => {
             router.back();
@@ -276,18 +325,25 @@ export const useGymPlanExerciseEditScreen =
                 return;
             }
 
-            setNameInput((current) => {
-                const trimmed = current.trim();
-                setDisplayExerciseName(trimmed);
-                return trimmed;
-            });
+            const trimmed = nameInput.trim();
+            setNameInput(trimmed);
+            setDisplayExerciseName(trimmed);
+            setCommittedName(trimmed);
             setHasEnteredNameInput(false);
         };
 
         const handleNameChange = (value: string): void => {
+            shouldSkipNameBlurCommitRef.current = false;
             setNameInput(value);
             setSelectedExerciseDefinitionId(undefined);
-            pendingDefaultsExerciseDefinitionIdRef.current = null;
+            seededDefaultsKeyRef.current = null;
+            setCommittedName('');
+            setSelectedPreset(null);
+            saveDefinitionData.reset();
+            if (isConfiguringNewExercise) {
+                setTargetSets([createGymPlanTargetSet(0)]);
+                setTrackingFields(trackingFieldValueFromFields([]));
+            }
             setHasEnteredNameInput(value.trim().length > 0);
             setNameError(undefined);
             findOrCreateExerciseDefinition.reset();
@@ -300,7 +356,10 @@ export const useGymPlanExerciseEditScreen =
             setNameInput(suggestion.label);
             setDisplayExerciseName(suggestion.label);
             setSelectedExerciseDefinitionId(suggestion.id);
-            pendingDefaultsExerciseDefinitionIdRef.current = suggestion.id;
+            seededDefaultsKeyRef.current = null;
+            setCommittedName(suggestion.label);
+            setSelectedPreset(null);
+            saveDefinitionData.reset();
             setHasEnteredNameInput(false);
             setNameError(undefined);
             findOrCreateExerciseDefinition.reset();
@@ -388,30 +447,57 @@ export const useGymPlanExerciseEditScreen =
             setTrackingFieldsModalVisible(false);
         };
 
-        const saveExercise = (): void => {
-            if (!lookup) return;
+        const selectPreset = (preset: ExerciseTrackingPreset): void => {
+            setSelectedPreset(preset);
+            if (!isConfiguringNewExercise) return;
+            setTrackingFields(trackingFieldValueFromFields(preset.fields));
+            setTargetSets((current) =>
+                current.map((set) => ({
+                    ...createGymPlanTargetSet(set.setIndex),
+                    id: set.id,
+                    createdAtMs: set.createdAtMs,
+                    ...preset.defaultTargetSet,
+                })),
+            );
+        };
 
-            if (selectedExerciseDefinitionId) {
-                commitExercise(selectedExerciseDefinitionId);
-                return;
-            }
-
+        const saveExercise = async (): Promise<void> => {
+            if (!lookup || !presetFields?.length) return;
             if (trimmedNameInput.length === 0) {
                 setNameError(t('gymPlanExerciseEdit.errors.nameRequired'));
                 return;
             }
 
-            findOrCreateExerciseDefinition.mutate(
-                { name: trimmedNameInput },
-                {
-                    onSuccess: (definition) => {
-                        commitExercise(definition.id);
-                    },
-                },
-            );
+            try {
+                let definition = selectedExerciseDefinition;
+                definition ??=
+                    await findOrCreateExerciseDefinition.mutateAsync({
+                        name: trimmedNameInput,
+                    });
+                if (selectedPreset) {
+                    await saveDefinitionData.mutateAsync({
+                        defaultTargetSet: selectedPreset.defaultTargetSet,
+                        defaultTrackingFields: selectedPreset.fields,
+                        exerciseDefinitionId: definition.id,
+                        notes: definition.data?.notes,
+                    });
+                }
+                commitExercise(definition.id);
+            } catch {
+                // Mutation errors remain available to the screen.
+            }
         };
 
-        const topBarOptions = getTopBarOptions(
+        let errorMessage = '';
+        if (
+            saveDefinitionData.error ||
+            findOrCreateExerciseDefinition.error ||
+            upsertDraft.error
+        ) {
+            errorMessage = t('gymPlanExerciseEdit.errors.saveFailed');
+        }
+
+        const topBarOptions = [...getTopBarOptions(
             isSelectMode,
             targetSets,
             {
@@ -420,7 +506,18 @@ export const useGymPlanExerciseEditScreen =
                 selectAll,
             },
             t,
-        );
+        )];
+        if (!isSelectMode && committedName && selectedExerciseDefinition?.data?.defaultTrackingFields.length) {
+            topBarOptions.push({
+                id: 'change-defaults',
+                label: t('exerciseDefinitions.trackingSetup.changeDefaults'),
+                icon: 'edit',
+                onPress: () => router.push({
+                    pathname: '/exercise-definitions/[id]',
+                    params: { id: selectedExerciseDefinition.id },
+                }),
+            });
+        }
         const topBarConfig = getTopBarConfig(
             screenBaseTitle,
             isSelectMode,
@@ -443,6 +540,12 @@ export const useGymPlanExerciseEditScreen =
             closeTrackingFieldsModal,
             confirmDeleteSets,
             editingDraft,
+            committedName,
+            shouldShowPresetPicker: !!committedName && (!selectedExerciseDefinition?.data?.defaultTrackingFields.length || selectedPreset !== null),
+            errorMessage,
+            canSave: !!committedName && !!presetFields?.length,
+            presetFields,
+            selectPreset,
             exerciseSuggestions,
             fieldsWithData,
             getSetDetails,
@@ -453,7 +556,8 @@ export const useGymPlanExerciseEditScreen =
             isNotFound: !lookup,
             isSaving:
                 upsertDraft.isPending ||
-                findOrCreateExerciseDefinition.isPending,
+                findOrCreateExerciseDefinition.isPending ||
+                saveDefinitionData.isPending,
             isSelectMode,
             isSetSelected: isSelected,
             isTrackingFieldsModalVisible,
