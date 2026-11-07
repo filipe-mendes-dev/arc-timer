@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { TextInput, View } from 'react-native';
+import { TextInput, View, type ViewInstance } from 'react-native';
 
 import { useStepperStyles } from './Stepper.styles';
 import { MiniButton } from './MiniButton';
@@ -8,8 +8,9 @@ import type { TextTone } from '@src/components/ui/Typography/AppText';
 import { useMainContainerScroll } from '@src/components/layout/MainContainer/MainContainerScrollContext';
 
 interface Props {
-    value: number;
+    value: number | undefined;
     onChange: (next: number) => void;
+    onClear?: () => void;
     allowDecimal?: boolean;
     decimalPlaces?: number;
     min?: number;
@@ -67,6 +68,7 @@ const parseInputValue = (txt: string, allowDecimal: boolean): number => {
 export const Stepper: React.FC<Props> = ({
     value,
     onChange,
+    onClear,
     allowDecimal = false,
     decimalPlaces,
     min = 0,
@@ -78,15 +80,16 @@ export const Stepper: React.FC<Props> = ({
     testID,
 }) => {
     const [isFocused, setIsFocused] = useState(false);
-    const [inputText, setInputText] = useState(String(value));
+    const [inputText, setInputText] = useState(value === undefined ? '' : String(value));
+    const numericValue = value ?? 0;
     const st = useStepperStyles({ isFocused });
     const scrollContext = useMainContainerScroll();
-    const anchorRef = useRef<View | null>(null);
+    const anchorRef = useRef<ViewInstance | null>(null);
 
     const inc = useCallback(
         () => {
             const next = clamp(
-                roundToDecimalPlaces(value + step, decimalPlaces),
+                roundToDecimalPlaces(numericValue + step, decimalPlaces),
                 min,
                 max,
             );
@@ -94,13 +97,13 @@ export const Stepper: React.FC<Props> = ({
             setInputText(String(next));
             onChange(next);
         },
-        [decimalPlaces, max, min, onChange, step, value],
+        [decimalPlaces, max, min, onChange, step, numericValue],
     );
 
     const dec = useCallback(
         () => {
             const next = clamp(
-                roundToDecimalPlaces(value - step, decimalPlaces),
+                roundToDecimalPlaces(numericValue - step, decimalPlaces),
                 min,
                 max,
             );
@@ -108,23 +111,28 @@ export const Stepper: React.FC<Props> = ({
             setInputText(String(next));
             onChange(next);
         },
-        [decimalPlaces, max, min, onChange, step, value],
+        [decimalPlaces, max, min, onChange, step, numericValue],
     );
 
     const onText = useCallback(
         (txt: string) => {
             setInputText(txt);
+            if (txt.trim().length === 0 && onClear) {
+                onClear();
+                return;
+            }
             const parsed = parseInputValue(txt, allowDecimal);
             const rounded = roundToDecimalPlaces(parsed, decimalPlaces);
 
             onChange(clamp(rounded, min, max));
         },
-        [allowDecimal, decimalPlaces, max, min, onChange],
+        [allowDecimal, decimalPlaces, max, min, onChange, onClear],
     );
 
-    const disableDec = value <= min;
-    const disableInc = max !== undefined && value >= max;
-    const formattedValue = formatValue ? formatValue(value) : String(value);
+    const disableDec = value !== undefined && value <= min;
+    const disableInc = max !== undefined && numericValue >= max;
+    let formattedValue = '';
+    if (value !== undefined) formattedValue = formatValue ? formatValue(value) : String(value);
     const inputValue = isFocused ? inputText : formattedValue;
 
     return (
@@ -148,7 +156,7 @@ export const Stepper: React.FC<Props> = ({
                     onChangeText={onText}
                     style={st.input}
                     onFocus={() => {
-                        setInputText(String(value));
+                        setInputText(value === undefined ? '' : String(value));
                         setIsFocused(true);
                         scrollContext?.scrollFocusedInputIntoView(
                             anchorRef,

@@ -1,5 +1,6 @@
-import React from 'react';
-import { View } from 'react-native';
+import { formatDuration } from '../../helpers';
+import React, { useState } from 'react';
+import { View, useWindowDimensions } from 'react-native';
 import Animated, {
     useAnimatedStyle,
     type SharedValue,
@@ -66,8 +67,17 @@ export const RunPhaseSection = ({
 }: RunPhaseSectionProps) => {
     const { t } = useTranslation();
     const { mode, shouldShowNextExercise } = useRunLayout();
-    const st = useRunPhaseSectionStyles({ layoutMode: mode });
-    const metrics = metricsForRunLayout(mode);
+    const { width } = useWindowDimensions();
+    const [availableWidth, setAvailableWidth] = useState(width);
+    const remainingTime = Math.max(0, isFinished ? 0 : remainingSec);
+    let timerLabel = String(remainingTime);
+    if (remainingTime >= 60) timerLabel = formatDuration(remainingTime);
+    const st = useRunPhaseSectionStyles({
+        layoutMode: mode,
+        availableWidth,
+        timerLength: timerLabel.length,
+    });
+    const metrics = metricsForRunLayout(mode, availableWidth);
 
     const isBlockPause = awaitingBlockContinue && !!currentBlock;
     const isCompact = mode !== 'default';
@@ -78,7 +88,7 @@ export const RunPhaseSection = ({
     const timerAnimatedStyle = useAnimatedStyle(() => {
         const breathingValue = isFinished ? 0 : breathingPhase.value;
         return { transform: [{ scale: 1 + breathingValue * 0.08 }] };
-    }, [isFinished]);
+    });
 
     const pillLabel = isFinished ? t('run.donePill') : phaseLabel;
 
@@ -110,6 +120,10 @@ export const RunPhaseSection = ({
             <AppearingView
                 visible={!isBlockPause}
                 style={st.arcContainer}
+                onLayout={(event) => {
+                    const nextWidth = event.nativeEvent.layout.width;
+                    if (nextWidth > 0) setAvailableWidth(nextWidth);
+                }}
                 delay={260}
             >
                 <PhasePill
@@ -131,9 +145,12 @@ export const RunPhaseSection = ({
                     />
                     <AnimatedAppText
                         variant="title1"
+                        numberOfLines={1}
+                        adjustsFontSizeToFit
+                        minimumFontScale={0.45}
                         style={[st.timer, timerAnimatedStyle]}
                     >
-                        {isFinished ? 0 : Math.max(0, remainingSec)}
+                        {timerLabel}
                     </AnimatedAppText>
                 </View>
 
@@ -157,12 +174,12 @@ export const RunPhaseSection = ({
                     {shouldShowNextExercise &&
                         nextExerciseName &&
                         nextExerciseName.length > 0 && (
-                        <NextExerciseCarousel
-                            phase={phase}
-                            label={nextExerciseName}
-                            layoutMode={mode}
-                        />
-                    )}
+                            <NextExerciseCarousel
+                                phase={phase}
+                                label={nextExerciseName}
+                                layoutMode={mode}
+                            />
+                        )}
                 </AppearingView>
                 {/* )} */}
 

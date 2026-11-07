@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
-import type { DrawerContentComponentProps } from '@react-navigation/drawer';
+import type { DrawerContentComponentProps } from 'expo-router/drawer';
 import type { IconId } from '@src/components/ui/Icon/AppIcon';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { useTheme } from '@src/theme/ThemeProvider';
@@ -25,6 +25,7 @@ const ICONS_BY_ROUTE: Record<string, IconId> = {
     'gym/index': 'gym',
     'exercise-definitions/index': 'exercise',
     'history/index': 'history',
+    'statistics/index': 'stats',
     'settings/index': 'settings',
 };
 

@@ -13,6 +13,7 @@ export interface TopBarOption {
 
 /** A direct icon-button action that replaces the default left or right slot. */
 export interface TopBarDirectAction {
+    accessibilityLabel?: string;
     icon: IconId;
     color?: string;
     disabled?: boolean;

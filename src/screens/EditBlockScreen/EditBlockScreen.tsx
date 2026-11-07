@@ -1,3 +1,4 @@
+import { formatDurationLabel } from '@src/helpers/time.helpers';
 import { useCallback, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -33,9 +34,7 @@ const EditBlockScreen = () => {
     const router = useRouter();
 
     const draft = useWorkoutDraftStore((state) => state.draft);
-    const updateDraftBlock = useWorkoutDraftStore(
-        (state) => state.updateDraftBlock,
-    );
+    const updateDraftBlock = useWorkoutDraftStore((state) => state.updateDraftBlock);
 
     const {
         block,
@@ -57,9 +56,7 @@ const EditBlockScreen = () => {
     } = useBlockEditor({ draft, blockId });
 
     const st = useBlockEditStyles();
-    const [exerciseToRemove, setExerciseToRemove] = useState<number | null>(
-        null,
-    );
+    const [exerciseToRemove, setExerciseToRemove] = useState<number | null>(null);
     const [dismissalKey, setDismissalKey] = useState(0);
     const mainContainerRef = useRef<MainContainerHandle | null>(null);
 
@@ -163,11 +160,7 @@ const EditBlockScreen = () => {
         <>
             <MainContainer
                 ref={mainContainerRef}
-                title={
-                    isQuick
-                        ? t('editBlock.title.quick')
-                        : t('editBlock.title.edit')
-                }
+                title={isQuick ? t('editBlock.title.quick') : t('editBlock.title.edit')}
             >
                 {/* Block setup section */}
                 <ScreenSection
@@ -214,15 +207,11 @@ const EditBlockScreen = () => {
                             />
 
                             <Stepper
-                                label={t(
-                                    'editBlock.fields.exerciseDurationSec',
-                                )}
+                                label={t('editBlock.fields.exerciseDurationSec')}
                                 labelTone="primary"
                                 value={block.exercises[0]?.value ?? 20}
                                 onChange={onExerciseLength}
-                                formatValue={(next) =>
-                                    `${next} ${t('editBlock.units.secondsShort')}`
-                                }
+                                formatValue={(next) => formatDurationLabel(next, t)}
                                 min={5}
                                 step={5}
                             />
@@ -240,15 +229,11 @@ const EditBlockScreen = () => {
 
                         <View style={st.setupGroupBody}>
                             <Stepper
-                                label={t(
-                                    'editBlock.fields.restBetweenExercisesSec',
-                                )}
+                                label={t('editBlock.fields.restBetweenExercisesSec')}
                                 labelTone="primary"
                                 value={block.restBetweenExercisesSec}
                                 onChange={onRestBetweenExercises}
-                                formatValue={(next) =>
-                                    `${next} ${t('editBlock.units.secondsShort')}`
-                                }
+                                formatValue={(next) => formatDurationLabel(next, t)}
                                 min={0}
                                 step={5}
                             />
@@ -258,9 +243,7 @@ const EditBlockScreen = () => {
                                 labelTone="primary"
                                 value={block.restBetweenSetsSec}
                                 onChange={onRestBetweenSets}
-                                formatValue={(next) =>
-                                    `${next} ${t('editBlock.units.secondsShort')}`
-                                }
+                                formatValue={(next) => formatDurationLabel(next, t)}
                                 min={0}
                                 step={5}
                             />
@@ -278,9 +261,7 @@ const EditBlockScreen = () => {
                                 <ExerciseCard
                                     index={ei}
                                     exercise={ex}
-                                    nameErrorText={getExerciseNameErrorText(
-                                        ex.id,
-                                    )}
+                                    nameErrorText={getExerciseNameErrorText(ex.id)}
                                     onChange={(next) => onExChange(ei, next)}
                                     onRemove={() => setExerciseToRemove(ei)}
                                 />
@@ -310,11 +291,7 @@ const EditBlockScreen = () => {
                     flex={1}
                 />
                 <Button
-                    title={
-                        isQuick
-                            ? t('editBlock.actions.startWorkout')
-                            : t('editBlock.actions.saveBlock')
-                    }
+                    title={isQuick ? t('editBlock.actions.startWorkout') : t('editBlock.actions.saveBlock')}
                     variant="primary"
                     onPress={onSave}
                     loading={saving}

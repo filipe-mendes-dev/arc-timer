@@ -14,6 +14,7 @@ import type {
 } from './TrackingFieldsModal.types';
 
 interface TrackingFieldsModalProps<FieldValues extends TrackingFieldsValue> {
+    errorMessage?: string;
     copy: TrackingFieldsModalCopy;
     fieldsWithData: readonly (keyof FieldValues)[];
     isSaving: boolean;
@@ -34,6 +35,7 @@ const getFieldsWithDataToRemove = <FieldValues extends TrackingFieldsValue>(
 
 export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
     copy,
+    errorMessage,
     fieldsWithData,
     isSaving,
     value,
@@ -62,6 +64,8 @@ export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
     const warningMessage = t(copy.removeDataWarning, {
         fields: fieldNames,
     });
+    let modalMessage = hasFieldsWithDataToRemove ? warningMessage : '';
+    if (errorMessage) modalMessage = errorMessage;
     const saveLabel = t('common.actions.save');
     const removeSaveLabel = t(copy.removeDataAndSave);
     const primaryButtonTitle = hasFieldsWithDataToRemove
@@ -93,7 +97,7 @@ export const TrackingFieldsModal = <FieldValues extends TrackingFieldsValue>({
             title={t(copy.title)}
             description={t(copy.description)}
             error={{
-                message: hasFieldsWithDataToRemove ? warningMessage : '',
+                message: modalMessage,
                 isDismissible: true,
                 dismissalKey,
             }}

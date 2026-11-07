@@ -142,11 +142,20 @@ const seedWorkoutSessionReferencingExerciseDefinition = (
         id: `workout-session-content-referencing-${definition.id}`,
     });
 
-    workout.blocks[0].exercises[0] = {
-        ...workout.blocks[0].exercises[0],
-        exerciseDefinitionId: definition.id,
-        name: undefined,
-    };
+    workout.blockCount = 1;
+    workout.exerciseCount = 1;
+    workout.blocks = [
+        {
+            ...workout.blocks[0],
+            exercises: [
+                {
+                    ...workout.blocks[0].exercises[0],
+                    exerciseDefinitionId: definition.id,
+                    name: undefined,
+                },
+            ],
+        },
+    ];
 
     seedWorkoutSession(
         context.testDb,
@@ -261,6 +270,61 @@ describe('exerciseDefinitionService integration', () => {
 
     afterEach(() => {
         context.testDb.close();
+    });
+
+    describe('upsertExerciseDefinitionData', () => {
+        it('persists tracking fields independently from numeric defaults', () => {
+            const definition = seedExerciseDefinition(
+                context.testDb,
+                createExerciseDefinitionFixture({
+                    id: 'definition-fields-without-values',
+                    name: 'Fields Without Values',
+                    availability: 'gym',
+                }),
+            );
+            const { exerciseDefinitionService } = context.testDb.dbServices;
+
+            exerciseDefinitionService.upsertExerciseDefinitionData({
+                defaultTrackingFields: ['distance', 'duration'],
+                exerciseDefinitionId: definition.id,
+            });
+
+            expect(exerciseDefinitionService.getById(definition.id)?.data).toMatchObject(
+                {
+                    defaultTrackingFields: ['duration', 'distance'],
+                    defaultTargetSet: undefined,
+                },
+            );
+        });
+
+        it('preserves a selected field when its numeric default is removed', () => {
+            const definition = seedExerciseDefinition(
+                context.testDb,
+                createExerciseDefinitionFixture({
+                    id: 'definition-cleared-default',
+                    name: 'Cleared Default',
+                    availability: 'gym',
+                }),
+            );
+            const { exerciseDefinitionService } = context.testDb.dbServices;
+
+            exerciseDefinitionService.upsertExerciseDefinitionData({
+                defaultTrackingFields: ['duration'],
+                defaultTargetSet: { durationSec: 300 },
+                exerciseDefinitionId: definition.id,
+            });
+            exerciseDefinitionService.upsertExerciseDefinitionData({
+                defaultTrackingFields: ['duration'],
+                exerciseDefinitionId: definition.id,
+            });
+
+            expect(exerciseDefinitionService.getById(definition.id)?.data).toMatchObject(
+                {
+                    defaultTrackingFields: ['duration'],
+                    defaultTargetSet: undefined,
+                },
+            );
+        });
     });
 
     describe('createUserExerciseDefinition', () => {
@@ -413,46 +477,38 @@ describe('exerciseDefinitionService integration', () => {
 
     describe('list', () => {
         describe('when listing active definitions', () => {
-            it('returns user definitions and referenced system definitions ordered by name', () => {
+            it('returns user definitions and system definitions referenced by workout and gym sessions ordered by name', () => {
                 const userDefinition = createExerciseDefinitionFixture({
                     id: 'definition-z-press',
                     name: 'Z Press',
                 });
-                const referencedSystemDefinition =
+                const workoutSessionDefinition =
                     readExerciseDefinitionByNormalizedNameOrThrow(
                         context,
                         'burpee',
                     );
-                const workoutBase = createWorkoutFixture({
-                    id: 'referenced-workout',
-                });
-                const workout: Workout = {
-                    ...workoutBase,
-                    blocks: [
-                        {
-                            ...workoutBase.blocks[0],
-                            exercises: [
-                                {
-                                    id: 'referenced-workout-exercise-1',
-                                    exerciseDefinitionId:
-                                        referencedSystemDefinition.id,
-                                    mode: 'time',
-                                    value: 30,
-                                },
-                            ],
-                        },
-                    ],
-                };
+                const gymSessionDefinition =
+                    readExerciseDefinitionByNormalizedNameOrThrow(
+                        context,
+                        'plank',
+                    );
                 const { exerciseDefinitionService } = context.testDb.dbServices;
 
                 seedExerciseDefinition(context.testDb, userDefinition);
-                seedPersistedWorkout(context.testDb, workout);
+                seedWorkoutSessionReferencingExerciseDefinition(
+                    context,
+                    workoutSessionDefinition,
+                );
+                seedGymSessionReferencingExerciseDefinition(
+                    context,
+                    gymSessionDefinition,
+                );
 
                 const definitions = exerciseDefinitionService.list();
 
                 expect(
                     definitions.map((definition) => definition.name),
-                ).toEqual(['Burpee', 'Z Press']);
+                ).toEqual(['Burpee', 'Plank', 'Z Press']);
             });
         });
 

@@ -65,7 +65,7 @@ export const exportWorkoutToFile = async (
     const file = new File(Paths.cache, filename);
 
     try {
-        file.write(json);
+        await file.write(json);
     } catch (err) {
         console.warn('Export write failed', err);
         return { ok: false, error: 'WRITE_FAILED' };

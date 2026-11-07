@@ -11,8 +11,8 @@ import {
     Platform,
     type NativeScrollEvent,
     type NativeSyntheticEvent,
-    type ScrollView,
-    type View,
+    type ScrollViewInstance,
+    type ViewInstance,
 } from 'react-native';
 
 import type { MainContainerScrollContextValue } from './MainContainerScrollContext';
@@ -25,18 +25,18 @@ interface UseMainContainerScrollResult {
     monitorScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
     scrollContextValue: MainContainerScrollContextValue;
     scrollTargetIntoView: (
-        targetRef: RefObject<View | null>,
+        targetRef: RefObject<ViewInstance | null>,
         viewportRatio?: number,
     ) => void;
-    scrollViewRef: RefObject<ScrollView | null>;
-    viewportRef: RefObject<View | null>;
+    scrollViewRef: RefObject<ScrollViewInstance | null>;
+    viewportRef: RefObject<ViewInstance | null>;
 }
 
 export const useMainContainerScroll = (): UseMainContainerScrollResult => {
-    const scrollViewRef = useRef<ScrollView | null>(null);
-    const viewportRef = useRef<View | null>(null);
+    const scrollViewRef = useRef<ScrollViewInstance | null>(null);
+    const viewportRef = useRef<ViewInstance | null>(null);
     const focusedInputTargetRef = useRef<{
-        ref: RefObject<View | null>;
+        ref: RefObject<ViewInstance | null>;
         viewportRatio?: number;
     } | null>(null);
     const currentScrollYRef = useRef(0);
@@ -63,7 +63,7 @@ export const useMainContainerScroll = (): UseMainContainerScrollResult => {
 
     const scrollMeasuredTargetIntoView = useCallback(
         (
-            targetRef: RefObject<View | null>,
+            targetRef: RefObject<ViewInstance | null>,
             viewportRatio: number | undefined,
             shouldScrollUp: boolean,
         ): void => {
@@ -105,7 +105,7 @@ export const useMainContainerScroll = (): UseMainContainerScrollResult => {
     );
 
     const scrollTargetIntoView = useCallback(
-        (targetRef: RefObject<View | null>, viewportRatio?: number): void => {
+        (targetRef: RefObject<ViewInstance | null>, viewportRatio?: number): void => {
             scrollMeasuredTargetIntoView(targetRef, viewportRatio, true);
         },
         [scrollMeasuredTargetIntoView],
@@ -165,7 +165,7 @@ export const useMainContainerScroll = (): UseMainContainerScrollResult => {
     }, [clearPendingTimeouts, scheduleScrollAndDropdown]);
 
     const scrollFocusedInputIntoView = useCallback(
-        (targetRef: RefObject<View | null>, viewportRatio?: number): void => {
+        (targetRef: RefObject<ViewInstance | null>, viewportRatio?: number): void => {
             focusedInputTargetRef.current = { ref: targetRef, viewportRatio };
 
             if (isKeyboardVisibleRef.current) {

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 import type {
     GymPlanExercise,
@@ -36,7 +37,7 @@ interface UseGymPlanSectionEditScreenResult {
 
 const getSectionLabel = (
     section: GymPlanSection | null,
-    t: ReturnType<typeof useTranslation>['t'],
+    t: TFunction,
 ): string => {
     if (!section) return t('gymPlanBuilder.sectionEditor.title');
 

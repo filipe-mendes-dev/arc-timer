@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { useRouter } from 'expo-router';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import type { GymExerciseRecord } from '@src/core/entities/gymSession.interfaces';
@@ -16,6 +16,10 @@ import { useElapsedDuration } from '@src/hooks/useElapsedDuration';
 export const useGymActiveSessionScreen = () => {
     const { i18n, t } = useTranslation();
     const router = useRouter();
+    const params = useLocalSearchParams<{
+        sessionId?: string;
+        notificationAction?: string;
+    }>();
     const { data: activeSession } = useActiveGymSession();
     const { data: exerciseDefinitions = [] } = useGymExerciseDefinitions();
     const finishGymSession = useFinishGymSession();
@@ -26,6 +30,12 @@ export const useGymActiveSessionScreen = () => {
     const [pendingRemoveRecord, setPendingRemoveRecord] =
         useState<GymExerciseRecord | null>(null);
     const elapsedDuration = useElapsedDuration(activeSession?.startedAtMs);
+
+    useEffect(() => {
+        if (params.notificationAction !== 'end') return;
+        if (params.sessionId && params.sessionId === activeSession?.id) setEndSessionModalVisible(true);
+        router.setParams({ notificationAction: undefined, sessionId: undefined });
+    }, [activeSession?.id, params.notificationAction, params.sessionId, router]);
 
     const exerciseNameById = useMemo(
         () =>
@@ -66,7 +76,12 @@ export const useGymActiveSessionScreen = () => {
     };
 
     const handleBack = () => {
-        router.back();
+        if (router.canGoBack()) {
+            router.back();
+            return;
+        }
+
+        handleBackToGym();
     };
 
     const handleAddExercise = () => {

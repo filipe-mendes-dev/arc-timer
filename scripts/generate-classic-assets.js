@@ -214,6 +214,22 @@ const main = () => {
 
     const files = [
         {
+            name: 'notification-logo',
+            svg: buildSvg({
+                withBackground: false,
+                background: THEME.light.base,
+                roundedBackground: false,
+                roundedRadius: 0,
+                darkColor: THEME.dark.ink,
+                progressColor: THEME.dark.ink,
+                innerColor: THEME.dark.ink,
+                logoScale: 1,
+                logoTranslateY: 0,
+            }),
+            transparent: true,
+            pageBackground: 'transparent',
+        },
+        {
             name: 'icon-light',
             svg: buildSvg({
                 withBackground: true,
@@ -321,12 +337,34 @@ const main = () => {
         },
     ];
 
-    files.forEach((asset) => {
+    const selectedFiles = files.filter((asset) =>
+        !process.argv.includes('--vectors-only') &&
+        (!process.argv.includes('--notifications-only') || asset.name === 'notification-logo')
+    );
+    selectedFiles.forEach((asset) => {
         const htmlPath = writeHtml(asset.name, asset.svg, asset.pageBackground);
         const pngPath = path.join(ASSETS_DIR, `${asset.name}.png`);
         renderPng(chromeBin, htmlPath, pngPath, asset.transparent);
         console.log(`generated: ${path.relative(PROJECT_ROOT, pngPath)}`);
     });
+
+    const midRadius = (LOGO.rOuter + LOGO.rInner) / 2;
+    const halfGap = (LOGO.separatorGapDeg + (LOGO.separatorGapPx / midRadius) * (180 / Math.PI)) / 2;
+    const ring = { cx: LOGO.cx, cy: LOGO.cy, rOuter: LOGO.rOuter, rInner: LOGO.rInner };
+    const paths = [
+        arcRingPath({ ...ring, startDeg: LOGO.darkStartDeg, endDeg: normalizeDeg(LOGO.splitDeg - halfGap) }),
+        arcRingPath({ ...ring, startDeg: normalizeDeg(LOGO.splitDeg + halfGap), endDeg: LOGO.progressEndDeg }),
+        LOGO.innerPath,
+    ];
+    const drawableDirectory = path.join(PROJECT_ROOT, 'modules/gym-session-notifications/android/src/main/res/drawable');
+    fs.mkdirSync(drawableDirectory, { recursive: true });
+    const vectorPaths = paths.map((value) => `<path android:fillColor="@android:color/white" android:pathData="${value}" />`).join('');
+    fs.writeFileSync(path.join(drawableDirectory, 'arc_notification_logo.xml'),
+        `<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="512" android:viewportHeight="512">${vectorPaths}</vector>\n`
+    );
+    fs.writeFileSync(path.join(drawableDirectory, 'arc_notification_watermark.xml'),
+        `<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="174dp" android:height="131dp" android:viewportWidth="400" android:viewportHeight="300"><group android:translateX="-56" android:translateY="-100">${vectorPaths}</group></vector>\n`
+    );
 };
 
 main();

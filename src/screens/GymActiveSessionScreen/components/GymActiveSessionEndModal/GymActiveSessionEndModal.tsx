@@ -95,13 +95,15 @@ export const GymActiveSessionEndModal = ({
                         />
                     )}
 
-                    <Button
-                        title={content.discardLabel}
-                        variant="danger"
-                        loading={isDiscardingSession}
-                        disabled={isFinishingSession}
-                        onPress={onDiscard}
-                    />
+                    {!content.hasCompletedSet && (
+                        <Button
+                            title={content.discardLabel}
+                            variant="danger"
+                            loading={isDiscardingSession}
+                            disabled={isFinishingSession}
+                            onPress={onDiscard}
+                        />
+                    )}
 
                     <Button
                         title={content.cancelLabel}

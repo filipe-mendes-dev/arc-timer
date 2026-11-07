@@ -3,7 +3,7 @@ import {
     buildLightPalette,
     buildDarkPalette,
     type ThemePalette,
-    type AccentTokens,
+    type AccentPresetTokens,
     CLASSIC_ACCENT,
 } from './palette';
 import { createLayout, type ThemeLayout } from './layout';
@@ -31,7 +31,7 @@ export const buildTheme = ({
     name: ThemeName;
     uiScale: number;
     insets: EdgeInsets;
-    accent?: AccentTokens;
+    accent?: AccentPresetTokens;
 }): AppTheme => {
     const palette =
         name === 'dark' ? buildDarkPalette(accent) : buildLightPalette(accent);

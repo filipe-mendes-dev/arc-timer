@@ -1,5 +1,116 @@
 export interface I18nResource {
+    statistics: {
+        heading: string;
+        subtitle: string;
+        showExercises: string;
+        sessionCountInPeriod_one: string;
+        sessionCountInPeriod_other: string;
+        noSessionsInPeriod: string;
+
+        exerciseProgressDescription: string;
+        trainedExercises: string;
+        allExercises: string;
+        choosePeriod: string;
+        chooseMetric: string;
+        chooseMonth: string;
+        previousYear: string;
+        nextYear: string;
+        sessionPeriod: string;
+
+        title: string;
+        overview: string;
+        trainingOverview: string;
+        exerciseUsage: string;
+        sessionsIncludingExercise: string;
+        usageHint: string;
+        noGymMeasurements: string;
+        gymMeasurementsDescription: string;
+        exerciseProgress: string;
+        progress: string;
+        attendance: string;
+        attendanceDescription: string;
+        attendanceHint: string;
+        trainingDays: string;
+        sessions: string;
+        workingSets: string;
+        totalReps: string;
+        lastTrained: string;
+        sessionCount_one: string;
+        sessionCount_other: string;
+        workingSetCount_one: string;
+        workingSetCount_other: string;
+        noExerciseSessionsTitle: string;
+        noExerciseSessionsDescription: string;
+        emptyPeriodTitle: string;
+        emptyPeriodDescription: string;
+        viewAllTime: string;
+        noMetricInPeriod: string;
+        noMetricPeriodDescription: string;
+        noMeasurementInPeriod: string;
+        noMeasurementPeriodDescription: string;
+        emptyTitle: string;
+        emptyDescription: string;
+        noMeasurement: string;
+        noMeasurementDescription: string;
+        noSessions: string;
+        noSessionsDescription: string;
+        warmupsExcluded: string;
+        viewProgress: string;
+        viewSession: string;
+        previous: string;
+        next: string;
+        previousMonth: string;
+        nextMonth: string;
+        retry: string;
+        weightWithReps_one: string;
+        weightWithReps_other: string;
+        chartDescription_one: string;
+        chartDescription_other: string;
+        calendarDay_one: string;
+        calendarDay_other: string;
+        period: {
+            month: string;
+            threeMonths: string;
+            year: string;
+            all: string;
+        };
+        metrics: {
+            weight: string;
+            reps: string;
+            volume: string;
+            duration: string;
+            distance: string;
+        };
+        units: {
+            weight: string;
+            reps: string;
+            volume: string;
+            duration: string;
+            distance: string;
+        };
+        metricDescriptions: {
+            weight: string;
+            reps: string;
+            volume: string;
+            duration: string;
+            distance: string;
+        };
+        values: {
+            volume: string;
+            weight: string;
+            duration: string;
+            distance: string;
+            reps_one: string;
+            reps_other: string;
+        };
+    };
+    gymNotifications: {
+        activeTitle: string;
+        elapsed: string;
+        channelName: string;
+    };
     common: {
+        duration: { seconds: string; minutes: string; minutesSeconds: string };
         actions: {
             back: string;
             cancel: string;
@@ -9,12 +120,14 @@ export interface I18nResource {
             start: string;
             share: string;
             done: string;
+            details: string;
         };
         status: {
             noTimeEstimate: string;
             mixedTimeAndReps: string;
         };
         units: {
+            kg: string;
             block_one: string;
             block_other: string;
             set_one: string;
@@ -422,6 +535,7 @@ export interface I18nResource {
         notFoundDescription: string;
         actions: {
             addSet: string;
+            openExerciseDetails: string;
             backToSession: string;
             completeSet: string;
             deleteSet: string;
@@ -451,6 +565,11 @@ export interface I18nResource {
         editSet: {
             description: string;
             title: string;
+        };
+        history: {
+            lastSession: string;
+            weightPr: string;
+            reps: string;
         };
         status: {
             complete: string;
@@ -650,7 +769,43 @@ export interface I18nResource {
         };
     };
     settings: {
+        development: {
+            title: string;
+            description: string;
+            load: string;
+            remove: string;
+            loaded: string;
+            removed: string;
+            failed: string;
+            sampleBench: string;
+            samplePullUp: string;
+            samplePlank: string;
+            sampleRun: string;
+            sampleHiit: string;
+            sampleIntervals: string;
+        };
         title: string;
+        backup: {
+            description: string;
+            title: string;
+            export: string;
+            restore: string;
+            shareTitle: string;
+            confirmTitle: string;
+            confirmMessage: string;
+            confirm: string;
+            restored: string;
+            errors: {
+                invalidExtension: string;
+                invalidData: string;
+                incompatible: string;
+                activeSession: string;
+                readFailed: string;
+                exportFailed: string;
+                sharingUnavailable: string;
+                restoreFailed: string;
+            };
+        };
         sections: {
             appearance: string;
             sound: string;
@@ -780,6 +935,20 @@ export interface I18nResource {
             duration: string;
             distance: string;
             rpe: string;
+        };
+        trackingSetup: {
+            confirm: string;
+            changeDefaults: string;
+            description: string;
+            fields: string;
+            presets: {
+                bodyweight: string;
+                cardio: string;
+                custom: string;
+                strength: string;
+                timed: string;
+            };
+            title: string;
         };
         source: {
             system: string;

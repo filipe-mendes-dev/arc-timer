@@ -7,6 +7,7 @@ import { AppIcon, type IconId } from '@src/components/ui/Icon/AppIcon';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { useTheme } from '@src/theme/ThemeProvider';
 
+import { formatSessionDate } from '../ExerciseDefinitionDetailsScreen.helpers';
 import { useExerciseDefinitionDetailsScreenStyles } from '../ExerciseDefinitionDetailsScreen.styles';
 
 interface RecentTrainingSessionRowProps {
@@ -18,13 +19,14 @@ export const RecentTrainingSessionRow = ({
     onPress,
     session,
 }: RecentTrainingSessionRowProps) => {
-    const { t } = useTranslation();
+    const { i18n, t } = useTranslation();
     const { theme } = useTheme();
     const st = useExerciseDefinitionDetailsScreenStyles();
+    const sessionDate = formatSessionDate(
+        session.startedAtMs,
+        i18n.resolvedLanguage ?? i18n.language,
+    );
     let title = session.title;
-    if (title.length === 0 && session.sourceGymPlanName != null) {
-        title = session.sourceGymPlanName;
-    }
     if (title.length === 0 && session.kind === 'gym') {
         title = t('gymHistory.sessionTitle');
     }
@@ -43,6 +45,14 @@ export const RecentTrainingSessionRow = ({
                     style={st.sessionTitle}
                 >
                     {title}
+                </AppText>
+                <AppText
+                    variant="caption"
+                    tone="secondary"
+                    numberOfLines={1}
+                    style={st.sessionDate}
+                >
+                    {sessionDate}
                 </AppText>
             </View>
 

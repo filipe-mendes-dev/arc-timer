@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { View } from 'react-native';
+import { View, type ViewInstance } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
 
@@ -27,7 +27,7 @@ export const ShareWorkoutModal = ({
     runStats,
 }: ShareWorkoutModalProps) => {
     const { t } = useTranslation();
-    const shareCardRef = useRef<View | null>(null);
+    const shareCardRef = useRef<ViewInstance | null>(null);
     const st = useShareWorkoutModalStyles();
 
     const handleConfirmShare = async () => {

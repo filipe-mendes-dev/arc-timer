@@ -4,11 +4,6 @@ import type {
 } from '@src/core/entities/gymPlan.interfaces';
 import { uid } from '@src/core/id';
 
-const DEFAULT_TARGET_WEIGHT_KG = 5;
-
-export const getDefaultGymPlanTargetWeightKg = (): number =>
-    DEFAULT_TARGET_WEIGHT_KG;
-
 export const createGymPlanTargetSet = (
     setIndex: number,
 ): GymPlanExerciseTargetSet => {
@@ -17,8 +12,6 @@ export const createGymPlanTargetSet = (
     return {
         id: uid(),
         setIndex,
-        reps: 10,
-        weightGrams: DEFAULT_TARGET_WEIGHT_KG * 1000,
         createdAtMs: nowMs,
         updatedAtMs: nowMs,
     };

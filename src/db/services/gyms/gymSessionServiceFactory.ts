@@ -1,4 +1,9 @@
 import type {
+    ExerciseDefinitionTargetSetData,
+    ExerciseTrackingField,
+} from '@src/core/entities/exerciseDefinition.interfaces';
+import { createStarterTargetSet } from '@src/core/exercises/exerciseTrackingPresets';
+import type {
     GymExerciseRecord,
     GymExerciseRecordSet,
     GymSession,
@@ -20,7 +25,9 @@ import type {
 } from '../../repositories/gyms/gymSessionRepositoryFactory';
 import { systemClock, type Clock } from '../../repositories/repositoryClock';
 import type { ExerciseDefinitionService } from '../exerciseDefinitions/exerciseDefinitionServiceFactory';
+import { createExerciseDefinitionDataRepository } from '../../repositories/exerciseDefinitions/exerciseDefinitionDataRepositoryFactory';
 import type { ExerciseDefinitionStatsRepository } from '../../repositories/exerciseDefinitions/exerciseDefinitionStatsRepositoryFactory';
+import type { RepositoryDb } from '../../repositories/workouts/workoutRepositoryFactory';
 
 export interface ListGymSessionsInput {
     limit?: number;
@@ -45,6 +52,16 @@ export interface StartGymSessionFromSessionSnapshotInput {
 export interface AddExerciseRecordToSessionInput {
     exerciseDefinitionId?: string;
     name?: string;
+    notes?: string;
+    sessionId: string;
+    startedAtMs?: number;
+}
+
+export interface AddConfiguredExerciseRecordToSessionInput {
+    defaultTargetSet?: ExerciseDefinitionTargetSetData;
+    defaultTrackingFields: ExerciseTrackingField[];
+    exerciseDefinitionId?: string;
+    name: string;
     notes?: string;
     sessionId: string;
     startedAtMs?: number;
@@ -74,6 +91,12 @@ export interface UpdateExerciseRecordSetInput {
     weightGrams?: number | null;
 }
 
+export interface UpdateExerciseRecordTrackingDefaultsInput {
+    defaultTargetSet?: ExerciseDefinitionTargetSetData;
+    defaultTrackingFields: ExerciseTrackingField[];
+    exerciseRecordId: string;
+}
+
 export interface FinishGymSessionInput {
     endedAtMs?: number;
     notes?: string;
@@ -93,12 +116,18 @@ export interface GymSessionService {
     addExerciseRecordToSession: (
         input: AddExerciseRecordToSessionInput,
     ) => GymExerciseRecord;
+    addConfiguredExerciseRecordToSession: (
+        input: AddConfiguredExerciseRecordToSessionInput,
+    ) => GymExerciseRecord;
     addSetToExerciseRecord: (
         input: AddSetToExerciseRecordInput,
     ) => GymExerciseRecordSet;
     updateExerciseRecordSet: (
         input: UpdateExerciseRecordSetInput,
     ) => GymExerciseRecordSet;
+    updateExerciseRecordTrackingDefaults: (
+        input: UpdateExerciseRecordTrackingDefaultsInput,
+    ) => GymExerciseRecord;
     finishGymSession: (input?: FinishGymSessionInput) => GymSession;
     discardGymSession: (id: string) => void;
     deleteGymSession: (id: string) => void;
@@ -108,6 +137,7 @@ export interface GymSessionService {
 
 export interface CreateGymSessionServiceArgs {
     clock?: Clock;
+    db: RepositoryDb;
     exerciseDefinitionService: ExerciseDefinitionService;
     exerciseDefinitionStatsRepository: ExerciseDefinitionStatsRepository;
     gymExerciseRecordRepository: GymExerciseRecordRepository;
@@ -183,10 +213,27 @@ const hasMeaningfulSetValue = (set: GymSetValidationInput): boolean =>
     set.distanceMeters != null ||
     set.rpeTenths != null;
 
+const gymSetValueKeys: Record<
+    ExerciseTrackingField,
+    keyof ExerciseDefinitionTargetSetData
+> = {
+    reps: 'reps',
+    weight: 'weightGrams',
+    duration: 'durationSec',
+    distance: 'distanceMeters',
+    rpe: 'rpeTenths',
+};
+
+const assertSetCanBeCompleted = (set: GymSetValidationInput): void => {
+    if (!Object.values(gymSetValueKeys).some((key) => (set[key] ?? 0) > 0)) {
+        throw createGymError(gymErrors.invalidGymSet);
+    }
+};
+
 const hasCompletedSet = (record: PersistedGymExerciseRecord): boolean =>
     record.sets.some((set) => set.completedAtMs !== undefined);
 
-const assertSetIsValid = (set: GymSetValidationInput): void => {
+const assertSetValuesAreValid = (set: GymSetValidationInput): void => {
     const values = [
         set.distanceMeters,
         set.durationSec,
@@ -202,7 +249,9 @@ const assertSetIsValid = (set: GymSetValidationInput): void => {
     if (set.rpeTenths != null && set.rpeTenths > 100) {
         throw createGymError(gymErrors.invalidGymSet);
     }
+};
 
+const assertSetHasMeaningfulValue = (set: GymSetValidationInput): void => {
     if (!hasMeaningfulSetValue(set)) {
         throw createGymError(gymErrors.invalidGymSet);
     }
@@ -210,6 +259,7 @@ const assertSetIsValid = (set: GymSetValidationInput): void => {
 
 export const createGymSessionService = ({
     clock = systemClock,
+    db,
     exerciseDefinitionService,
     exerciseDefinitionStatsRepository,
     gymExerciseRecordRepository,
@@ -600,6 +650,46 @@ export const createGymSessionService = ({
             return gymExerciseRecordFromPersisted(record);
         },
 
+        addConfiguredExerciseRecordToSession: ({
+            defaultTargetSet,
+            defaultTrackingFields,
+            ...recordInput
+        }: AddConfiguredExerciseRecordToSessionInput): GymExerciseRecord =>
+            db.transaction((tx) => {
+                if (defaultTrackingFields.length === 0) {
+                    throw createGymError(gymErrors.invalidGymSet);
+                }
+
+                const record = service.addExerciseRecordToSession(recordInput);
+                const definition = exerciseDefinitionService.getById(
+                    record.exerciseDefinitionId,
+                );
+                if (!definition) {
+                    throw createGymError(gymErrors.exerciseDefinitionNotFound);
+                }
+
+                createExerciseDefinitionDataRepository({ db: tx }).upsert({
+                    defaultTargetSet,
+                    defaultTrackingFields,
+                    exerciseDefinitionId: definition.id,
+                    notes: definition.data?.notes,
+                    updatedAtMs: clock.now(),
+                });
+                service.addSetToExerciseRecord({
+                    ...createStarterTargetSet(
+                        defaultTrackingFields,
+                        defaultTargetSet,
+                    ),
+                    exerciseRecordId: record.id,
+                });
+                const persisted = gymExerciseRecordRepository.getById(record.id);
+                if (!persisted) {
+                    throw createGymError(gymErrors.exerciseRecordNotFound);
+                }
+
+                return gymExerciseRecordFromPersisted(persisted);
+            }),
+
         addSetToExerciseRecord: ({
             completedAtMs,
             distanceMeters,
@@ -612,13 +702,16 @@ export const createGymSessionService = ({
             weightGrams,
         }: AddSetToExerciseRecordInput): GymExerciseRecordSet => {
             getRecordInActiveSessionOrThrow(exerciseRecordId);
-            assertSetIsValid({
+            const setValues = {
                 distanceMeters,
                 durationSec,
                 reps,
                 rpeTenths,
                 weightGrams,
-            });
+            };
+            assertSetValuesAreValid(setValues);
+            assertSetHasMeaningfulValue(setValues);
+            if (completedAtMs !== undefined) assertSetCanBeCompleted(setValues);
 
             const nowMs = clock.now();
             const id = uid();
@@ -688,7 +781,24 @@ export const createGymSessionService = ({
                 weightGrams: nextWeightGrams,
             };
 
-            assertSetIsValid(nextSet);
+            assertSetValuesAreValid(nextSet);
+            let effectiveCompletedAtMs = currentSet.completedAtMs;
+            if ('completedAtMs' in input) {
+                effectiveCompletedAtMs = completedAtMs ?? undefined;
+            }
+            if (effectiveCompletedAtMs !== undefined) assertSetCanBeCompleted(nextSet);
+            if (!hasMeaningfulSetValue(nextSet)) {
+                const record = getRecordInActiveSessionOrThrow(
+                    currentSet.gymExerciseRecordId,
+                );
+
+                if (
+                    effectiveCompletedAtMs !== undefined ||
+                    record.sourceGymPlanExerciseId === undefined
+                ) {
+                    throw createGymError(gymErrors.invalidGymSet);
+                }
+            }
 
             gymExerciseRecordRepository.updateSet({
                 id,
@@ -711,6 +821,76 @@ export const createGymSessionService = ({
 
             return gymExerciseRecordSetFromPersisted(updated);
         },
+
+        updateExerciseRecordTrackingDefaults: ({
+            defaultTargetSet,
+            defaultTrackingFields,
+            exerciseRecordId,
+        }: UpdateExerciseRecordTrackingDefaultsInput): GymExerciseRecord =>
+            db.transaction((tx) => {
+                const record = getRecordInActiveSessionOrThrow(exerciseRecordId);
+                const definition = exerciseDefinitionService.getById(
+                    record.exerciseDefinitionId,
+                );
+                if (!definition) {
+                    throw createGymError(gymErrors.exerciseDefinitionNotFound);
+                }
+                if (defaultTrackingFields.length === 0) {
+                    throw createGymError(gymErrors.invalidGymSet);
+                }
+                assertExerciseDefinitionCanBeUsed(definition.id);
+
+                const incompleteSets = record.sets.filter(
+                    (set) => set.completedAtMs === undefined,
+                );
+                const currentFields = Object.entries(gymSetValueKeys)
+                    .filter(([, key]) => incompleteSets.some((set) => set[key] !== undefined))
+                    .map(([field]) => field);
+                if (currentFields.length === 0) {
+                    currentFields.push(...(definition.data?.defaultTrackingFields ?? []));
+                }
+                const addedFields = defaultTrackingFields.filter(
+                    (field) => !currentFields.includes(field),
+                );
+                const starterValues = createStarterTargetSet(
+                    addedFields,
+                    defaultTargetSet,
+                );
+                const nextDefaults = { ...defaultTargetSet, ...starterValues };
+                const updates = incompleteSets.map((set) => {
+                    const values: GymSetValidationInput = {
+                        distanceMeters: null,
+                        durationSec: null,
+                        reps: null,
+                        rpeTenths: null,
+                        weightGrams: null,
+                    };
+                    defaultTrackingFields.forEach((field) => {
+                        const key = gymSetValueKeys[field];
+                        values[key] = set[key] ?? starterValues[key] ?? null;
+                    });
+                    assertSetValuesAreValid(values);
+                    if (record.sourceGymPlanExerciseId === undefined) {
+                        assertSetHasMeaningfulValue(values);
+                    }
+                    return { id: set.id, ...values, updatedAtMs: clock.now() };
+                });
+
+                createExerciseDefinitionDataRepository({ db: tx }).upsert({
+                    defaultTargetSet: nextDefaults,
+                    defaultTrackingFields,
+                    exerciseDefinitionId: definition.id,
+                    notes: definition.data?.notes,
+                    updatedAtMs: clock.now(),
+                });
+                updates.forEach((update) =>
+                    gymExerciseRecordRepository.updateSet(update),
+                );
+
+                const updatedRecord = gymExerciseRecordRepository.getById(record.id);
+                if (!updatedRecord) throw createGymError(gymErrors.exerciseRecordNotFound);
+                return gymExerciseRecordFromPersisted(updatedRecord);
+            }),
 
         finishGymSession: (input: FinishGymSessionInput = {}): GymSession => {
             const session = getActiveSessionOrThrow();

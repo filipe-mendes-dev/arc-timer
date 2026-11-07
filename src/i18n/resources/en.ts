@@ -3,7 +3,129 @@ import type { I18nResource } from './interfaces';
 const exerciseNameRequired = 'Exercise name required.';
 
 export const en: I18nResource = {
+    statistics: {
+        heading: 'Your progress',
+        subtitle: 'Review your training over time.',
+        showExercises: 'Show exercises',
+        sessionCountInPeriod_one: '{{count}} session · {{period}}',
+        sessionCountInPeriod_other: '{{count}} sessions · {{period}}',
+        noSessionsInPeriod: 'No sessions · {{period}}',
+
+        exerciseProgressDescription: 'Follow each exercise over time.',
+        trainedExercises: 'With history',
+        allExercises: 'All exercises',
+        choosePeriod: 'Time period',
+        chooseMetric: 'Show on graph',
+        chooseMonth: 'Choose month',
+        previousYear: 'Previous year',
+        nextYear: 'Next year',
+        sessionPeriod: '{{start}} to {{end}}',
+
+        title: 'Progress',
+        overview: 'Gym overview',
+        trainingOverview: 'Training overview',
+        exerciseUsage: 'Exercise usage',
+        sessionsIncludingExercise: 'Sessions including this exercise',
+        usageHint: 'HIIT counts exercises included in the saved workout.',
+        noGymMeasurements: 'No gym measurements in this period',
+        gymMeasurementsDescription: 'Performance graphs use gym measurements. HIIT sessions count towards exercise usage.',
+        exerciseProgress: 'Exercise progress',
+        progress: 'Progress',
+        attendance: 'Training attendance',
+        attendanceDescription: 'Gym and HIIT sessions by day.',
+        attendanceHint:
+            'Highlighted days have recorded training sessions. Each day counts once.',
+        trainingDays: 'Training days',
+        sessions: 'Sessions',
+        workingSets: 'Working sets',
+        totalReps: 'Total reps',
+        lastTrained: 'Last session {{date}}',
+        sessionCount_one: '{{count}} session',
+        sessionCount_other: '{{count}} sessions',
+        workingSetCount_one: '{{count}} working set',
+        workingSetCount_other: '{{count}} working sets',
+        noExerciseSessionsTitle: 'No sessions yet',
+        noExerciseSessionsDescription: 'Save a gym or HIIT session including this exercise to see its usage.',
+        emptyPeriodTitle: 'No sessions in this period',
+        emptyPeriodDescription: 'No sessions recorded for this exercise during {{period}}.',
+        viewAllTime: 'View all time',
+        noMetricInPeriod: 'No {{metric}} recorded in this period',
+        noMetricPeriodDescription: 'No {{metric}} measurements were recorded for this exercise during {{period}}.',
+        noMeasurementInPeriod: 'No measurements in this period',
+        noMeasurementPeriodDescription: 'Sessions were recorded during {{period}}, but their working sets have no measurements to show.',
+        emptyTitle: 'No exercises found',
+        emptyDescription:
+            'Try another search or filter, or save a gym or HIIT session.',
+        noMeasurement: 'No measurements yet',
+        noMeasurementDescription:
+            'Log measurements in your working sets to see progress.',
+        noSessions: 'No sessions on this day',
+        noSessionsDescription:
+            'Choose a highlighted day to see its recorded training sessions.',
+        warmupsExcluded:
+            'Warmups are excluded. Missing measurements stay blank.',
+        viewProgress: 'View progress',
+        viewSession: 'View session',
+        previous: 'Previous',
+        next: 'Next',
+        previousMonth: 'Previous month',
+        nextMonth: 'Next month',
+        retry: 'Could not load progress. Tap to retry.',
+        weightWithReps_one: '{{weight}} × {{count}} rep',
+        weightWithReps_other: '{{weight}} × {{count}} reps',
+        chartDescription_one:
+            '{{exercise}}, {{metric}} across {{count}} session. Use the previous and next buttons for exact values.',
+        chartDescription_other:
+            '{{exercise}}, {{metric}} across {{count}} sessions. Use the previous and next buttons for exact values.',
+        calendarDay_one: '{{date}}, {{count}} recorded session',
+        calendarDay_other: '{{date}}, {{count}} recorded sessions',
+        period: {
+            month: 'This month',
+            threeMonths: 'Last 3 months',
+            year: 'This year',
+            all: 'All time',
+        },
+        metrics: {
+            weight: 'Weight',
+            reps: 'Reps',
+            volume: 'Volume',
+            duration: 'Duration',
+            distance: 'Distance',
+        },
+        units: {
+            weight: 'kg',
+            reps: 'reps',
+            volume: 'kg·reps',
+            duration: 'min:sec',
+            distance: 'm',
+        },
+        metricDescriptions: {
+            weight: 'Heaviest working set per session',
+            reps: 'Total reps per session',
+            volume: 'Total weight × reps per session',
+            duration: 'Total duration per session',
+            distance: 'Total distance per session',
+        },
+        values: {
+            volume: '{{value}} kg·reps',
+            weight: '{{value}} kg',
+            duration: '{{value}} s',
+            distance: '{{value}} m',
+            reps_one: '{{count}} rep',
+            reps_other: '{{count}} reps',
+        },
+    },
+    gymNotifications: {
+        activeTitle: 'Gym session active',
+        elapsed: 'elapsed',
+        channelName: 'Active gym session',
+    },
     common: {
+        duration: {
+            seconds: '{{seconds}} s',
+            minutes: '{{minutes}} min',
+            minutesSeconds: '{{minutes}} min {{seconds}} s',
+        },
         actions: {
             back: 'Back',
             cancel: 'Cancel',
@@ -13,12 +135,14 @@ export const en: I18nResource = {
             start: 'Start',
             share: 'Share',
             done: 'Done',
+            details: 'Details',
         },
         status: {
             noTimeEstimate: 'No time estimate',
             mixedTimeAndReps: 'Mixed (time + reps)',
         },
         units: {
+            kg: 'kg',
             block_one: '{{count}} block',
             block_other: '{{count}} blocks',
             set_one: '{{count}} set',
@@ -446,6 +570,7 @@ export const en: I18nResource = {
         notFoundDescription: 'This exercise is not in the active gym session.',
         actions: {
             addSet: 'Add set',
+            openExerciseDetails: 'Open details for {{name}}',
             backToSession: 'Back to session',
             completeSet: 'Done',
             deleteSet: 'Delete',
@@ -467,8 +592,7 @@ export const en: I18nResource = {
             hasWeight: 'Weight',
         },
         defaults: {
-            description:
-                'Choose what this exercise tracks. Reps and weight are enabled by default.',
+            description: 'Choose which fields to track for this exercise.',
             removeDataAndSave: 'Remove data and save',
             removeDataWarning:
                 'Saving will remove existing values for: {{fields}}.',
@@ -477,6 +601,11 @@ export const en: I18nResource = {
         editSet: {
             description: 'Update the values tracked for this set.',
             title: 'Edit set',
+        },
+        history: {
+            lastSession: 'Last session',
+            weightPr: 'Personal best',
+            reps: '× {{count}}',
         },
         status: {
             complete: 'Complete',
@@ -578,14 +707,14 @@ export const en: I18nResource = {
     },
     workoutBlockItem: {
         summary: {
-            timeEach: '{{value}}s each',
+            timeEach: '{{value}} each',
             repsEach: '{{value}} reps each',
         },
         exerciseMeta: {
-            time: '{{value}}s',
+            time: '{{value}}',
             reps_one: '{{count}} rep',
             reps_other: '{{count}} reps',
-            rest: 'Rest {{value}}s',
+            rest: 'Rest {{value}}',
         },
         labels: {
             exerciseWithIndex: 'Exercise {{index}}',
@@ -650,7 +779,7 @@ export const en: I18nResource = {
         },
         fields: {
             blockTitle: 'Block name',
-            durationSec: 'Duration',
+            durationSec: 'Duration (seconds)',
             exerciseDurationSec: 'Default duration',
             restBetweenExercisesSec: 'Between exercises',
             setsInBlock: 'Sets',
@@ -680,7 +809,48 @@ export const en: I18nResource = {
         },
     },
     settings: {
+        development: {
+            title: 'Development',
+            description:
+                'Load sample gym and HIIT workouts and sessions across recent months. Your own records are preserved.',
+            load: 'Load sample training data',
+            remove: 'Remove sample training data',
+            loaded: 'Sample training data loaded.',
+            removed: 'Sample training data removed.',
+            failed: 'Could not update sample data. Try again.',
+            sampleBench: 'Sample · Bench Press',
+            samplePullUp: 'Sample · Pull Up',
+            samplePlank: 'Sample · Plank',
+            sampleRun: 'Sample · Run',
+            sampleHiit: 'Sample · HIIT circuit',
+            sampleIntervals: 'Sample · Short intervals',
+        },
         title: 'Settings',
+        backup: {
+            description: 'Save or restore your training data.',
+            title: 'Backup',
+            export: 'Export',
+            restore: 'Restore',
+            shareTitle: 'Export Arc Timer backup',
+            confirmTitle: 'Replace all data?',
+            confirmMessage:
+                'Restoring this backup will replace all workout, gym, exercise, and history data on this device. This cannot be undone.',
+            confirm: 'Replace all data',
+            restored: 'Backup restored.',
+            errors: {
+                invalidExtension: 'Choose an .arcbak backup file.',
+                invalidData: 'This is not a valid Arc Timer backup.',
+                incompatible:
+                    'This backup is not compatible with this version of Arc Timer.',
+                activeSession:
+                    'Finish or discard the active session before restoring a backup.',
+                readFailed: 'Could not open the backup file.',
+                exportFailed: 'Could not export the backup.',
+                sharingUnavailable: 'Sharing is not available on this device.',
+                restoreFailed:
+                    'Could not restore the backup. Your current data has not changed.',
+            },
+        },
         sections: {
             appearance: 'Appearance',
             sound: 'Sound',
@@ -815,6 +985,21 @@ export const en: I18nResource = {
             duration: 'Duration',
             distance: 'Distance',
             rpe: 'RPE',
+        },
+        trackingSetup: {
+            confirm: 'Confirm',
+            changeDefaults: 'Change defaults',
+            description:
+                'These defaults are used for future plans and gym sessions.',
+            fields: 'Tracking fields',
+            presets: {
+                bodyweight: 'Bodyweight',
+                cardio: 'Cardio',
+                custom: 'Custom',
+                strength: 'Strength',
+                timed: 'Timed',
+            },
+            title: 'Exercise defaults',
         },
         source: {
             system: 'System',

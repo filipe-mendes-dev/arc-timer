@@ -62,7 +62,7 @@ export const useBlockEditor = ({ draft, blockId }: UseBlockEditorArgs) => {
         value: WorkoutBlock[K]
     ) =>
         setBlock((prev) =>
-            prev ? ({ ...prev, [key]: value } as WorkoutBlock) : prev
+            prev ? { ...prev, [key]: value } : prev
         );
 
     const onTitle = (v: string) => setField('title', v);

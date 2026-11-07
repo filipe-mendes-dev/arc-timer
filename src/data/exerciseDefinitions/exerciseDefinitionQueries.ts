@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import type { ExerciseDefinitionListItem } from '@src/core/entities/exerciseDefinition.interfaces';
+import { normalizeExerciseName } from '@src/core/exercises/normalizeExerciseName';
 import { dbServices } from '@src/db/dbServices';
 import type { ExerciseDefinitionListParams } from '@src/db/services/exerciseDefinitions/exerciseDefinitionServiceFactory';
 
@@ -43,3 +44,29 @@ export const useExerciseDefinition = (id?: string) =>
         initialData: () =>
             id ? dbServices.exerciseDefinitionService.getById(id) : null,
     });
+
+export const useExerciseDefinitionLastWeightSet = (id?: string) =>
+    useQuery({
+        queryKey: exerciseDefinitionKeys.lastWeightSet(id),
+        queryFn: () => id ? dbServices.exerciseDefinitionService.getLastCompletedWeightSet(id) : null,
+        enabled: !!id,
+        initialData: () => id ? dbServices.exerciseDefinitionService.getLastCompletedWeightSet(id) : null,
+    });
+
+export const useExerciseDefinitionByNormalizedName = (name: string) => {
+    const normalizedName = normalizeExerciseName(name);
+    const getDefinition = () => {
+        if (normalizedName.length === 0) return null;
+
+        return dbServices.exerciseDefinitionService.getByNormalizedName(
+            normalizedName,
+        );
+    };
+
+    return useQuery({
+        queryKey: exerciseDefinitionKeys.normalizedName(normalizedName),
+        queryFn: getDefinition,
+        enabled: normalizedName.length > 0,
+        initialData: getDefinition,
+    });
+};

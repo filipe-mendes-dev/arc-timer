@@ -1,17 +1,22 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { FlatList, View } from 'react-native';
+import { ActivityIndicator, FlatList, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { MainContainer } from '@src/components/layout/MainContainer/MainContainer';
 import ConfirmDialog from '@src/components/modals/ConfirmDialog/ConfirmDialog';
 import type { TrainingSessionKind } from '@src/core/entities/trainingSession.interfaces';
-import { useTrainingSessionListItems } from '@src/data/trainingSessions';
+import { useTrainingSessionHistory } from '@src/data/trainingSessions';
 import { useStyles } from './HistoryScreen.styles';
 import { TrainingSessionListItem } from './components/TrainingSessionListItem';
 import { SearchField } from '@src/components/ui/SearchField/SearchField';
 import { useTranslation } from 'react-i18next';
 import { ListEmptyState } from '@src/components/layout/ListEmptyState';
 import { useHistorySelection } from './useHistorySelection';
+import { useDebouncedValue } from '@src/hooks/useDebouncedValue';
+import { useExerciseDefinition } from '@src/data/exerciseDefinitions';
+import { AppText } from '@src/components/ui/Typography/AppText';
+import { Button } from '@src/components/ui/Button/Button';
+import { useTheme } from '@src/theme/ThemeProvider';
 import { ErrorBanner } from '@src/components/ui/ErrorBanner/ErrorBanner';
 
 type HistoryFilterKind = TrainingSessionKind | 'all';
@@ -34,10 +39,8 @@ const parseHistoryFilterKind = (
     return 'all';
 };
 
-const getSessionKey = (
-    kind: TrainingSessionKind,
-    sessionId: string,
-): string => `${kind}:${sessionId}`;
+const getSessionKey = (kind: TrainingSessionKind, sessionId: string): string =>
+    `${kind}:${sessionId}`;
 
 const getSessionRoute = (
     kind: TrainingSessionKind,
@@ -49,14 +52,24 @@ const getSessionRoute = (
 };
 
 const HistoryScreen = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const { theme } = useTheme();
     const router = useRouter();
-    const { kind } = useLocalSearchParams();
+    const { kind, exerciseDefinitionId, startedAtMs, endedBeforeMs } =
+        useLocalSearchParams<{
+            kind?: string;
+            exerciseDefinitionId?: string;
+            startedAtMs?: string;
+            endedBeforeMs?: string;
+        }>();
+    const { data: definition } = useExerciseDefinition(exerciseDefinitionId);
+    const locale = i18n.resolvedLanguage ?? i18n.language;
     const st = useStyles();
 
     const [search, setSearch] = useState('');
-    const [selectedKind, setSelectedKind] =
-        useState<HistoryFilterKind>(() => parseHistoryFilterKind(kind));
+    const [selectedKind, setSelectedKind] = useState<HistoryFilterKind>(() =>
+        parseHistoryFilterKind(kind),
+    );
 
     useEffect(() => {
         setSelectedKind(parseHistoryFilterKind(kind));
@@ -66,21 +79,27 @@ const HistoryScreen = () => {
         queryKind = selectedKind;
     }
 
-    const { data: sessions = [] } = useTrainingSessionListItems({
+    const debouncedSearch = useDebouncedValue(search.trim(), 150);
+    const start = startedAtMs ? Number(startedAtMs) : undefined;
+    const end = endedBeforeMs ? Number(endedBeforeMs) : undefined;
+    const {
+        data: history,
+        isPending,
+        isError,
+        isFetchingNextPage,
+        hasNextPage,
+        fetchNextPage,
+        refetch,
+    } = useTrainingSessionHistory({
         kind: queryKind,
-        limit: 100,
+        exerciseDefinitionId,
+        search: debouncedSearch,
+        startedAtMs: Number.isFinite(start) ? start : undefined,
+        endedBeforeMs: Number.isFinite(end) ? end : undefined,
     });
-
-    const data = useMemo(() => {
-        const searchTerm = search.trim().toLowerCase();
-
-        if (!searchTerm) return sessions;
-        return sessions.filter((session) => {
-            return session.searchText.toLowerCase().includes(searchTerm);
-        });
-    }, [search, sessions]);
+    const data = useMemo(() => history?.pages.flat() ?? [], [history]);
     const hasSearch = search.trim().length > 0;
-    const hasAnySessions = sessions.length > 0;
+    const hasAnySessions = data.length > 0;
 
     const {
         screenTitle,
@@ -118,6 +137,7 @@ const HistoryScreen = () => {
     return (
         <MainContainer
             title={screenTitle}
+            topBarLeftMode={exerciseDefinitionId ? 'back' : undefined}
             scroll={false}
             noPadding
             topBarOptions={topBarOptions}
@@ -131,6 +151,20 @@ const HistoryScreen = () => {
                 contentContainerStyle={st.listContent}
                 ListHeaderComponent={
                     <View style={st.headerContainer}>
+                        {definition && (
+                            <AppText variant="subtitle">{definition.name}</AppText>
+                        )}
+                        {end !== undefined && Number.isFinite(end) && (
+                            <AppText variant="caption" tone="secondary">
+                                {t('statistics.sessionPeriod', {
+                                    start:
+                                        start === undefined ? t('statistics.period.all') : new Date(start).toLocaleDateString( locale, ),
+                                    end: new Date(end - 1).toLocaleDateString(
+                                        locale,
+                                    ),
+                                })}
+                            </AppText>
+                        )}
                         <SearchField<HistoryFilterKey, HistoryFilterKind>
                             value={search}
                             onChangeText={setSearch}
@@ -143,9 +177,7 @@ const HistoryScreen = () => {
                                 sections: [
                                     {
                                         key: 'kind',
-                                        title: t(
-                                            'history.filters.sessionType',
-                                        ),
+                                        title: t('history.filters.sessionType'),
                                         options: filterOptions,
                                     },
                                 ],
@@ -169,20 +201,38 @@ const HistoryScreen = () => {
                             router.push(getSessionRoute(item.kind, item.id))
                         }
                         isSelectMode={isSelectMode}
-                        isSelected={isSelected(
-                            getSessionKey(item.kind, item.id),
-                        )}
+                        isSelected={isSelected(getSessionKey(item.kind, item.id))}
                         onSelect={() =>
                             toggleItem(getSessionKey(item.kind, item.id))
                         }
                     />
                 )}
                 ListEmptyComponent={
-                    <ListEmptyState
-                        title={emptyTitle}
-                        description={emptyDescription}
-                    />
+                    !isPending && !isError ? ( <ListEmptyState title={emptyTitle} description={emptyDescription} /> ) : undefined
                 }
+                ListFooterComponent={
+                    <>
+                        {(isPending || isFetchingNextPage) && (
+                            <ActivityIndicator
+                                color={theme.palette.accent.primary}
+                            />
+                        )}
+                        {isError && (
+                            <Button
+                                title={t('statistics.retry')}
+                                variant="secondary"
+                                onPress={async () => {
+                                    await refetch();
+                                }}
+                            />
+                        )}
+                    </>
+                }
+                onEndReached={async () => {
+                    if (hasNextPage && !isFetchingNextPage && !isError)
+                        await fetchNextPage();
+                }}
+                onEndReachedThreshold={0.4}
             />
 
             <ConfirmDialog

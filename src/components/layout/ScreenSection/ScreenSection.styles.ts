@@ -34,11 +34,15 @@ export const useScreenSectionStyles = createStyles(
             },
             headerRow: {
                 flexDirection: 'row',
+                flexWrap: 'wrap',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                columnGap: 12,
+                rowGap: 4,
                 marginBottom: 14,
             },
             title: {
+                flexShrink: 1,
                 color: theme.palette.text.header,
             },
             content: {

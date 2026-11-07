@@ -15,10 +15,10 @@ export const useSearchFieldStyles = createStyles((theme: AppTheme) =>
             borderColor: theme.palette.border.subtle,
         },
 
-        // Opt-in when used inside a row that should be filled
         containerFullWidth: {
-            flex: 1,
-            height: '100%',
+            flexGrow: 1,
+            flexShrink: 1,
+            minWidth: 0,
         },
 
         iconLeft: {
@@ -42,10 +42,10 @@ export const useSearchFieldStyles = createStyles((theme: AppTheme) =>
         },
 
         filterButton: {
+            alignSelf: 'stretch',
             alignItems: 'center',
             justifyContent: 'center',
             paddingHorizontal: 16,
-            height: '100%',
             marginRight: -6,
             borderRadius: 999,
             borderWidth: 1,
@@ -74,6 +74,8 @@ export const useSearchFieldStyles = createStyles((theme: AppTheme) =>
             lineHeight: 12,
         },
 
+        filterModal: { maxHeight: '100%' },
+        filterScroll: { flexShrink: 1, flexGrow: 0 },
         filterSections: {
             gap: 18,
         },

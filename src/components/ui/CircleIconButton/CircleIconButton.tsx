@@ -13,6 +13,7 @@ type CircleIconButtonProps = {
     backgroundColor?: string; // optional override, e.g. phaseColor
     disabled?: boolean;
     style?: StyleProp<ViewStyle>;
+    accessibilityLabel?: string;
 };
 
 export const CircleIconButton = ({
@@ -23,6 +24,7 @@ export const CircleIconButton = ({
     backgroundColor,
     disabled = false,
     style,
+    accessibilityLabel,
 }: CircleIconButtonProps) => {
     const st = useCircleIconButtonStyles();
 
@@ -32,6 +34,8 @@ export const CircleIconButton = ({
 
     return (
         <GuardedPressable
+            accessibilityRole="button"
+            accessibilityLabel={accessibilityLabel}
             onPress={disabled ? undefined : onPress}
             disabled={disabled}
             style={({ pressed }) => [
