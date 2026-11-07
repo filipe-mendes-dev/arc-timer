@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
 
 Track exercise progress and training attendance, back up training data, and follow active gym sessions from the Lock Screen or notification drawer.
 
+iOS build: `6`.
+
 ### Added
 
 - Add searchable exercise progress graphs for weight, reps, volume, duration and distance, with time-period filters and links to sessions; exclude warmup sets from performance measurements
@@ -24,6 +26,8 @@ Track exercise progress and training attendance, back up training data, and foll
 
 ### Changed
 
+- Remove Expo development-server local-network declarations from production iOS builds
+- Exclude unused Android push-receive and reboot permissions while retaining local session notifications
 - Display longer HIIT exercise and rest durations in minutes and seconds, and resize the countdown text to fit the available screen space
 - Set app variants explicitly in Metro, build and export commands, and validate resolved Expo configuration alongside native bundle/package identifiers
 - Unify gym session and exercise headers with theme-aware accent gradients, logo watermarks and consistent footer actions, including selection mode

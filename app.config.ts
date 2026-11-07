@@ -70,7 +70,7 @@ const config: Config = {
             tinted: './assets/generated/classic/icon-tinted.png',
         },
         bundleIdentifier: bundleId,
-        buildNumber: '5',
+        buildNumber: '6',
         supportsTablet: false,
         infoPlist: {
             ITSAppUsesNonExemptEncryption: false,
@@ -92,6 +92,8 @@ const config: Config = {
             'android.permission.SYSTEM_ALERT_WINDOW',
             'android.permission.FOREGROUND_SERVICE',
             'android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK',
+            'com.google.android.c2dm.permission.RECEIVE',
+            'android.permission.RECEIVE_BOOT_COMPLETED',
         ],
         predictiveBackGestureEnabled: false,
     },
@@ -102,6 +104,8 @@ const config: Config = {
         appVariant: variant,
     },
     plugins: [
+        // Info.plist mods run in reverse order, so register production cleanup first.
+        ...(variant === 'production' ? ['./plugins/withProductionIosPermissions'] : []),
         'expo-router',
         // Entitlement mods run in reverse order, so remove APNs after notification setup.
         './plugins/withGymSessionNotifications',
@@ -119,6 +123,7 @@ const config: Config = {
         'expo-font',
         'expo-localization',
         'expo-asset',
+        'expo-sharing',
         [
             'expo-splash-screen',
             {
