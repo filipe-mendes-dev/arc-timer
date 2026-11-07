@@ -25,7 +25,7 @@ jest.mock('expo-file-system', () => ({
             this.uri = `file:///${path.join('/')}`;
             this.name = path[path.length - 1];
         }
-        get modificationTime() {
+        get lastModified() {
             return mockModificationTime(this.name);
         }
         write(contents: unknown) {

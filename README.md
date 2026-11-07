@@ -5,10 +5,10 @@
 </p>
 
 <p align="center">
-  <img alt="Expo 55" src="https://img.shields.io/badge/Expo-55-1B1F23?logo=expo&logoColor=white" />
-  <img alt="React Native 0.83" src="https://img.shields.io/badge/React_Native-0.83-20232A?logo=react&logoColor=61DAFB" />
-  <img alt="React 19.2" src="https://img.shields.io/badge/React-19.2-149ECA?logo=react&logoColor=white" />
-  <img alt="TypeScript 5.9" src="https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white" />
+  <img alt="Expo 58" src="https://img.shields.io/badge/Expo-58-1B1F23?logo=expo&logoColor=white" />
+  <img alt="React Native 0.88" src="https://img.shields.io/badge/React_Native-0.88-20232A?logo=react&logoColor=61DAFB" />
+  <img alt="React 19.3" src="https://img.shields.io/badge/React-19.3-149ECA?logo=react&logoColor=white" />
+  <img alt="TypeScript 6.0" src="https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white" />
   <img alt="TanStack Query 5" src="https://img.shields.io/badge/TanStack_Query-5-FF4154" />
   <img alt="Drizzle" src="https://img.shields.io/badge/Drizzle-SQLite-C5F74F" />
   <img alt="Zustand 5.0" src="https://img.shields.io/badge/Zustand-5.0-4B3621" />
@@ -44,7 +44,7 @@ ARC Timer is a React Native training app built with Expo and Expo Router. It cov
 
 ## Tech Stack
 
-- **Application framework:** Expo 55, React Native 0.83, React 19.2
+- **Application framework:** Expo 58, React Native 0.88, React 19.3
 - **Navigation:** Expo Router
 - **Language:** TypeScript
 - **Server-state/data cache:** TanStack Query

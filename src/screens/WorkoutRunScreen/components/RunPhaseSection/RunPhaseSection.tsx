@@ -88,7 +88,7 @@ export const RunPhaseSection = ({
     const timerAnimatedStyle = useAnimatedStyle(() => {
         const breathingValue = isFinished ? 0 : breathingPhase.value;
         return { transform: [{ scale: 1 + breathingValue * 0.08 }] };
-    }, [isFinished]);
+    });
 
     const pillLabel = isFinished ? t('run.donePill') : phaseLabel;
 

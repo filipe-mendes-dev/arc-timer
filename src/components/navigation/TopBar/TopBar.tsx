@@ -1,9 +1,9 @@
 import { useMemo, useRef, useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
-import { StatusBar, View } from 'react-native';
+import { StatusBar, View, type ViewInstance } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
-import { useRouter, useSegments } from 'expo-router';
+import { DrawerActions } from 'expo-router/react-navigation';
+import { useNavigation, useRouter, useSegments } from 'expo-router';
 
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { AppIcon } from '@src/components/ui/Icon/AppIcon';
@@ -61,7 +61,7 @@ export const TopBar = ({
     const segments = useSegments();
     const { theme, themeName } = useTheme();
     const st = useStyles();
-    const optionsAnchorRef = useRef<View | null>(null);
+    const optionsAnchorRef = useRef<ViewInstance | null>(null);
 
     const isInDrawer = segments[0] === '(drawer)';
     const canGoBack = typeof nav.canGoBack === 'function' && nav.canGoBack();

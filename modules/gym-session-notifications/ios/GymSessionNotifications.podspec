@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
   s.license = 'MIT'
   s.author = 'Arc Timer'
   s.homepage = 'https://expo.dev'
-  s.platform = :ios, '15.1'
+  s.platform = :ios, '16.4'
   s.swift_version = '5.9'
   s.source = { :git => '' }
   s.static_framework = true

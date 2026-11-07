@@ -1,11 +1,10 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/gym_root" android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:background="@drawable/gym_session_card" android:clipToOutline="true">
+    android:background="@drawable/gym_session_outline" android:clipToOutline="true">
     <ImageView android:id="@+id/gym_background" android:layout_width="match_parent" android:layout_height="match_parent"
         android:src="@drawable/gym_session_card" android:scaleType="fitXY" android:importantForAccessibility="no" />
     <ImageView android:id="@+id/gym_watermark" android:layout_width="174dp" android:layout_height="131dp"
         android:layout_gravity="end|bottom" android:src="@drawable/arc_notification_watermark" android:alpha="0.12"
-        android:translationX="20dp" android:translationY="14dp"
         android:importantForAccessibility="no" />
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="12dp">
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">

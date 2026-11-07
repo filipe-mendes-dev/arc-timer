@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useRef, useState } from 'react';
-import { Pressable, TextInput, View, Text } from 'react-native';
+import { Pressable, TextInput, type TextInputInstance, View, type ViewInstance, Text } from 'react-native';
 
 import type { TextFieldProps } from './TextField.interfaces';
 import { useTextFieldStyles } from './TextField.styles';
@@ -15,7 +15,7 @@ interface FieldMessage {
     isError: boolean;
 }
 
-export const TextField = forwardRef<View, TextFieldProps>(({
+export const TextField = forwardRef<ViewInstance, TextFieldProps>(({
     label,
     labelTone = 'primary',
     helperText,
@@ -33,8 +33,8 @@ export const TextField = forwardRef<View, TextFieldProps>(({
 }, ref) => {
     const { theme } = useTheme();
     const scrollContext = useMainContainerScroll();
-    const anchorRef = useRef<View | null>(null);
-    const inputRef = useRef<TextInput | null>(null);
+    const anchorRef = useRef<ViewInstance | null>(null);
+    const inputRef = useRef<TextInputInstance | null>(null);
     const hasSelectedSuggestionRef = useRef(false);
     const [isFocused, setIsFocused] = useState(false);
     const [areSuggestionsDismissed, setAreSuggestionsDismissed] =

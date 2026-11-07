@@ -40,4 +40,4 @@ const _createStyles = <T extends NamedStyles<T>, P>(
 };
 
 // 3) Export with the overloaded type
-export const createStyles: CreateStyles = _createStyles as CreateStyles;
+export const createStyles: CreateStyles = _createStyles;

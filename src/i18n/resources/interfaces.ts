@@ -108,9 +108,6 @@ export interface I18nResource {
         activeTitle: string;
         elapsed: string;
         channelName: string;
-        reminderChannelName: string;
-        reminderTitle: string;
-        reminderBody: string;
     };
     common: {
         duration: { seconds: string; minutes: string; minutesSeconds: string };

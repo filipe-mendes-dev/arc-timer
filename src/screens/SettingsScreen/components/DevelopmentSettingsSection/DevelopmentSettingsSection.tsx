@@ -6,6 +6,7 @@ import { Button } from '@src/components/ui/Button/Button';
 import { AppText } from '@src/components/ui/Typography/AppText';
 import { useDevelopmentSettingsSectionStyles } from './DevelopmentSettingsSection.styles';
 import { View } from 'react-native';
+import { resources } from '@src/i18n';
 
 export const DevelopmentSettingsSection = () => {
     const { t } = useTranslation();
@@ -29,8 +30,12 @@ export const DevelopmentSettingsSection = () => {
                                     t('settings.development.sampleRun'),
                                 ],
                                 hiitWorkoutNames: [
-                                    t('settings.development.sampleHiit'),
-                                    t('settings.development.sampleIntervals'),
+                                    t('settings.development.sampleHiit', {
+                                        defaultValue: resources.en.translation.settings.development.sampleHiit,
+                                    }),
+                                    t('settings.development.sampleIntervals', {
+                                        defaultValue: resources.en.translation.settings.development.sampleIntervals,
+                                    }),
                                 ],
                             })
                         }

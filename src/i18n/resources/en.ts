@@ -119,9 +119,6 @@ export const en: I18nResource = {
         activeTitle: 'Gym session active',
         elapsed: 'elapsed',
         channelName: 'Active gym session',
-        reminderChannelName: 'Gym session reminders',
-        reminderTitle: 'Still training?',
-        reminderBody: 'Your gym session started 90 minutes ago.',
     },
     common: {
         duration: {

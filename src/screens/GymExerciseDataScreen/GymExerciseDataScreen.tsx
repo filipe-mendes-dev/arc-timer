@@ -125,7 +125,7 @@ const GymExerciseDataScreen = () => {
                             )}
                         />
                     }
-                    ListFooterComponent={completedActionFooter}
+                    ListFooterComponent={completedActionFooter ?? undefined}
                     keyboardShouldPersistTaps="handled"
                 />
 

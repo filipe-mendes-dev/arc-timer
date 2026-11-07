@@ -4,24 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Unreleased]
+## v1.2.0 - 2026-11-07
+
+### Summary
+
+Track exercise progress and training attendance, back up training data, and follow active gym sessions from the Lock Screen or notification drawer.
 
 ### Added
 
-- Add a Progress section with a searchable exercise list and time-period filters defaulting to All time
-- Show Gym exercise progress graphs for weight, reps, volume, duration and distance, with metric selection, units and links to individual sessions; exclude warmup sets from performance measurements
-- Add a training attendance calendar combining Gym and HIIT sessions, counting each training day once, with monthly navigation, loading skeletons and previous-month preloading
-- Track per-exercise session inclusion across Gym sessions and saved HIIT workout snapshots, with recent-session previews and searchable, paginated session history
-- Add development-only sample training data with two reusable HIIT workouts, 144 Gym sessions and 72 HIIT sessions across recent months; support refresh and removal while preserving personal records
-- Export all workout, gym, exercise and history data from Settings to versioned `.arcbak` files without including app settings or language
-- Restore compatible `.arcbak` backups after destructive confirmation, replacing existing data atomically and blocking restore during active sessions
-- Show active gym sessions on the iOS Lock Screen and Dynamic Island and in compact and expanded Android notifications, with live elapsed time and session details
-- Match gym session banners to the selected accent and light/dark theme, with app logo watermarks and English/Portuguese text
-- Open the active session or its end-session confirmation directly from session banners
-- Send one local reminder after 90 minutes and remove session banners and reminders when the session is finished or discarded
+- Add searchable exercise progress graphs for weight, reps, volume, duration and distance, with time-period filters and links to sessions; exclude warmup sets from performance measurements
+- Add a monthly training attendance calendar combining gym and HIIT sessions, counting each training day once
+- Show recent sessions and searchable session history for each exercise across gym sessions and saved HIIT workout snapshots
+- Export and restore training data through versioned `.arcbak` backups in Settings, excluding app settings and language; confirm before replacing existing data and block restore during active sessions
+- Show active gym sessions on the iOS Lock Screen and Dynamic Island and in compact and expanded Android notifications, with live elapsed time, theme colours and logo watermarks
+- Open the active session or its end-session confirmation from session banners; clear banners when the session ends or is discarded
 - Add Strength, Cardio, Timed and Bodyweight tracking presets with icons and confirmation when adding new or unconfigured exercises to gym sessions and plans
-- Show previous-session weight and personal best in the exercise screen, with a shortcut to exercise details
-- Show dates alongside recent training sessions in exercise details
+- Show previous-session weight and personal best in the exercise screen, with a shortcut to exercise details and dates on recent sessions
+- Add development-only sample training data for reviewing progress and attendance, with refresh and removal that preserve personal records
 
 ### Changed
 
@@ -32,13 +31,17 @@ All notable changes to this project will be documented in this file.
 - Allow empty gym plan targets and plan-derived incomplete session sets without inserting unrelated reps and weight values
 - Hide the session discard action once a set has been completed
 
+### Compatibility
+
+- Upgrade to Expo SDK 58, React Native 0.88, React 19.3 and TypeScript 6
+- Require iOS 16.4 or newer; Android 7 and newer remain supported
+- Require Node.js `^22.13.0 || ^24.3.0 || >=26.0.0` for local development
+
 ### Fixed
 
-- Include system exercises referenced by HIIT or gym sessions in active exercise definition lists
-- Preserve selected tracking fields when numeric defaults are absent or cleared, with migration backfill for existing defaults
-- Create configured session exercises and populated initial sets atomically using saved defaults or starter values
-- Apply tracking-field changes atomically to incomplete sets while preserving completed sets and showing save errors
-- Reject empty manual session sets and require at least one positive tracked value before completing a set
+- Include system exercises used in gym sessions in active exercise definition lists
+- Preserve selected tracking fields when numeric defaults are absent or cleared
+- Prevent completing a set without at least one positive tracked value
 - Preserve zero-weight values for bodyweight exercises
 - Prevent iOS autocorrect from overwriting a selected exercise suggestion
 - Format distance personal records consistently with exercise set values
