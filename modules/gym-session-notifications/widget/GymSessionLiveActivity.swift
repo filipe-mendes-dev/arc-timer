@@ -22,12 +22,11 @@ private struct ArcLogo: View {
 private struct GymSessionBanner: View {
   let content: GymSessionAttributes.ContentState
   let startedAt: Date
-  var isDynamicIsland = false
 
   var body: some View {
     let accent = Color(hex: content.accentColor)
-    let foreground = isDynamicIsland ? Color.white : Color(hex: content.textColor)
-    let secondary = isDynamicIsland ? Color.white.opacity(0.7) : Color(hex: content.secondaryTextColor)
+    let foreground = Color(hex: content.textColor)
+    let secondary = Color(hex: content.secondaryTextColor)
     VStack(alignment: .leading, spacing: 0) {
       HStack(spacing: 6) {
         ArcLogo().frame(width: 20, height: 15).foregroundStyle(accent)
@@ -83,24 +82,65 @@ struct GymSessionLiveActivity: Widget {
         .widgetURL(URL(string: context.state.openUrl))
     } dynamicIsland: { context in
       DynamicIsland {
-        DynamicIslandExpandedRegion(.leading) {
-          ArcLogo(assetName: "ArcNotificationIsland").foregroundStyle(Color(hex: context.state.accentColor)).frame(width: 26, height: 20)
-        }
-        DynamicIslandExpandedRegion(.trailing) {
-          Text(context.attributes.startedAt, style: .timer).monospacedDigit().frame(width: 100)
-        }
         DynamicIslandExpandedRegion(.bottom) {
-          GymSessionBanner(content: context.state, startedAt: context.attributes.startedAt, isDynamicIsland: true)
+          VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 8) {
+              HStack(spacing: 5) {
+                ArcLogo(assetName: "ArcNotificationIsland")
+                  .foregroundStyle(Color(hex: context.state.accentColor)).frame(width: 18, height: 14)
+                Text(context.state.title).font(.system(size: 13, weight: .semibold))
+                  .lineLimit(1).minimumScaleFactor(0.85)
+              }
+              Spacer(minLength: 0)
+              HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text(context.attributes.startedAt, style: .timer).monospacedDigit()
+                  .font(.system(size: 22, weight: .bold)).lineLimit(1).minimumScaleFactor(0.7)
+                  .multilineTextAlignment(.trailing).frame(width: 90, alignment: .trailing)
+                Text(context.state.elapsedLabel).font(.system(size: 10)).lineLimit(1)
+                  .foregroundStyle(.white.opacity(0.7))
+              }
+            }
+            if context.state.planName != context.state.title {
+              Text(context.state.planName).font(.system(size: 13)).lineLimit(1)
+            }
+            HStack(spacing: 8) {
+              Text(context.state.startedAtLabel).font(.system(size: 11)).lineLimit(1)
+                .minimumScaleFactor(0.85).foregroundStyle(.white.opacity(0.7))
+              Spacer(minLength: 0)
+              if let url = URL(string: context.state.endUrl) {
+                Link(destination: url) {
+                  Text(context.state.endLabel).font(.system(size: 13, weight: .semibold)).lineLimit(1)
+                    .padding(.horizontal, 12).padding(.vertical, 9).frame(minHeight: 42)
+                    .foregroundStyle(Color(hex: context.state.buttonTextColor))
+                    .background(Color(hex: context.state.accentColor), in: Capsule())
+                }.fixedSize(horizontal: true, vertical: false)
+              }
+            }.padding(.top, 4)
+          }
+          .foregroundStyle(.white)
+          .background(alignment: .bottomTrailing) {
+            ArcLogo(assetName: "ArcNotificationWatermark")
+              .foregroundStyle(Color(hex: context.state.accentColor)).opacity(0.14)
+              .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+          }
+          .clipped()
+          .padding(4)
         }
       } compactLeading: {
-        ArcLogo(assetName: "ArcNotificationIsland").foregroundStyle(Color(hex: context.state.accentColor)).frame(width: 24, height: 18)
+        ArcLogo(assetName: "ArcNotificationIsland").foregroundStyle(Color(hex: context.state.accentColor)).frame(width: 18, height: 14)
       } compactTrailing: {
         Text(context.attributes.startedAt, style: .timer).monospacedDigit()
-          .foregroundStyle(Color(hex: context.state.accentColor)).lineLimit(1).minimumScaleFactor(0.7).frame(width: 72)
+          .font(.system(size: 12, weight: .semibold))
+          .foregroundStyle(Color(hex: context.state.accentColor)).lineLimit(1).minimumScaleFactor(0.7)
+          .multilineTextAlignment(.trailing).frame(width: 36, alignment: .trailing)
       } minimal: {
         ArcLogo(assetName: "ArcNotificationIsland").foregroundStyle(Color(hex: context.state.accentColor)).frame(width: 22, height: 18)
       }
       .widgetURL(URL(string: context.state.openUrl))
+      .contentMargins(.leading, 12, for: .compactLeading)
+      .contentMargins(.trailing, 4, for: .compactLeading)
+      .contentMargins(.leading, 4, for: .compactTrailing)
+      .contentMargins(.trailing, 12, for: .compactTrailing)
       .keylineTint(Color(hex: context.state.accentColor))
     }
   }

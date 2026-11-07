@@ -22,7 +22,7 @@ const withGymSessionNotifications = (config) => {
     ];
 
     config = withEntitlementsPlist(config, (result) => {
-        // Local reminders and locally updated Live Activities do not use APNs.
+        // Live Activities are updated locally and do not use APNs.
         delete result.modResults['aps-environment'];
         return result;
     });

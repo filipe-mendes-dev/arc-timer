@@ -119,9 +119,6 @@ export const ptPT: I18nResource = {
         activeTitle: 'Sessão de ginásio ativa',
         elapsed: 'decorridos',
         channelName: 'Sessão de ginásio ativa',
-        reminderChannelName: 'Lembretes de sessões de ginásio',
-        reminderTitle: 'Ainda estás a treinar?',
-        reminderBody: 'A tua sessão de ginásio começou há 90 minutos.',
     },
     common: {
         duration: {

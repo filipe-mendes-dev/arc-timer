@@ -117,9 +117,6 @@ export const i18nKeys = {
         activeTitle: 'gymNotifications.activeTitle',
         elapsed: 'gymNotifications.elapsed',
         channelName: 'gymNotifications.channelName',
-        reminderChannelName: 'gymNotifications.reminderChannelName',
-        reminderTitle: 'gymNotifications.reminderTitle',
-        reminderBody: 'gymNotifications.reminderBody',
     },
     common: {
         duration: {

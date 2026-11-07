@@ -6,7 +6,7 @@ This local Expo module presents an Android custom notification and an iOS Live A
 - iOS uses ActivityKit and SwiftUI's date timer. The app requires iOS 16.4 or newer.
 - Both presentations open the active session. End session opens the existing confirmation modal after validating the session ID.
 - Dismissing a presentation does not finish the workout. A dismissed presentation is not recreated for that session.
-- The 90-minute local reminder is managed independently by `expo-notifications`. Android delivery can be delayed by power management.
+- Session banners provide ongoing session information without a separate timed reminder. Old scheduled reminders are cancelled when the app opens or returns to the foreground.
 
 Regenerate the logo with `node scripts/generate-classic-assets.js --notifications-only`. Run Expo prebuild after native or widget changes, then rebuild the app. The config plugin recreates the iOS extension and embeds its assets; generated `ios/` and `android/` files are not the source of truth.
 
