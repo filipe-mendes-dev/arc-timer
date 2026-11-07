@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { File } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
@@ -55,6 +56,10 @@ beforeEach(() => {
     });
 });
 
+afterEach(() => {
+    jest.restoreAllMocks();
+});
+
 describe('importBackupFromFile', () => {
     it('reads and validates a picked .arcbak file', async () => {
         await expect(importBackupFromFile()).resolves.toEqual(createBackupFixture());
@@ -109,7 +114,8 @@ describe('importBackupFromFile', () => {
 });
 
 describe('exportBackupToFile', () => {
-    it('writes only the backup data and opens the native share sheet', async () => {
+    it.each(['ios', 'android'] as const)('preserves .arcbak exports on %s', async (platform) => {
+        jest.replaceProperty(Platform, 'OS', platform);
         const fixture = createBackupFixture();
         await exportBackupToFile(fixture, 'Export backup');
         const written: unknown = mockWrite.mock.calls[0][0];
@@ -117,8 +123,7 @@ describe('exportBackupToFile', () => {
         if (typeof written !== 'string') throw new Error('Expected a JSON backup');
         expect(JSON.parse(written)).toEqual(fixture);
         expect(Sharing.shareAsync).toHaveBeenCalledWith(expect.stringMatching(/\.arcbak$/), {
-            mimeType: ARC_BACKUP_MIME,
-            UTI: 'public.json',
+            mimeType: platform === 'ios' ? undefined : ARC_BACKUP_MIME,
             dialogTitle: 'Export backup',
         });
         expect(mockDelete).not.toHaveBeenCalled();

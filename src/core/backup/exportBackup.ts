@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 
@@ -45,8 +46,8 @@ export const exportBackupToFile = async (
 
     try {
         await Sharing.shareAsync(file.uri, {
-            mimeType: ARC_BACKUP_MIME,
-            UTI: 'public.json',
+            // iOS type hints can append an extension to the shared filename.
+            mimeType: Platform.OS === 'ios' ? undefined : ARC_BACKUP_MIME,
             dialogTitle,
         });
     } catch {
