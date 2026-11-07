@@ -14,7 +14,7 @@ const removeExpiredBackups = (): void => {
             if (!(entry instanceof File)) continue;
             if (!entry.name.startsWith(BACKUP_FILE_PREFIX)) continue;
             if (!entry.name.endsWith(ARC_BACKUP_EXTENSION)) continue;
-            const modifiedAt = entry.modificationTime;
+            const modifiedAt = entry.lastModified;
             if (modifiedAt !== null && modifiedAt < expiresBefore) entry.delete();
         }
     } catch {
@@ -38,7 +38,7 @@ export const exportBackupToFile = async (
     const timestamp = backup.exportedAt.replace(/[:.]/g, '-');
     const file = new File(Paths.cache, `${BACKUP_FILE_PREFIX}${timestamp}${ARC_BACKUP_EXTENSION}`);
     try {
-        file.write(JSON.stringify(backup));
+        await file.write(JSON.stringify(backup));
     } catch {
         throw new BackupError('WRITE_FAILED');
     }

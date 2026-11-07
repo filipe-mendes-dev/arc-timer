@@ -5,7 +5,7 @@ import {
     type PressableProps,
     type PressableStateCallbackType,
     type StyleProp,
-    type View,
+    type ViewInstance,
     type ViewStyle,
 } from 'react-native';
 
@@ -15,7 +15,7 @@ export interface GuardedPressableProps extends PressableProps {
     preventDoublePress?: boolean;
 }
 
-export const GuardedPressable = React.forwardRef<View, GuardedPressableProps>(
+export const GuardedPressable = React.forwardRef<ViewInstance, GuardedPressableProps>(
     (
         {
             cooldownMs = 300,

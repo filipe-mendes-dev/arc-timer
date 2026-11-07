@@ -101,7 +101,7 @@ const withGymSessionNotifications = (config) => {
         for (const configuration of configurations.buildConfigurations) {
             Object.assign(settings[configuration.value].buildSettings, {
                 PRODUCT_BUNDLE_IDENTIFIER: `"${result.ios.bundleIdentifier}.GymSessionActivity"`,
-                IPHONEOS_DEPLOYMENT_TARGET: '16.1',
+                IPHONEOS_DEPLOYMENT_TARGET: '16.4',
                 SWIFT_VERSION: '5.0',
                 TARGETED_DEVICE_FAMILY: '1',
                 APPLICATION_EXTENSION_API_ONLY: 'YES',

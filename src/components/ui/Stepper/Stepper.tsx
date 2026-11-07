@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { TextInput, View } from 'react-native';
+import { TextInput, View, type ViewInstance } from 'react-native';
 
 import { useStepperStyles } from './Stepper.styles';
 import { MiniButton } from './MiniButton';
@@ -84,7 +84,7 @@ export const Stepper: React.FC<Props> = ({
     const numericValue = value ?? 0;
     const st = useStepperStyles({ isFocused });
     const scrollContext = useMainContainerScroll();
-    const anchorRef = useRef<View | null>(null);
+    const anchorRef = useRef<ViewInstance | null>(null);
 
     const inc = useCallback(
         () => {

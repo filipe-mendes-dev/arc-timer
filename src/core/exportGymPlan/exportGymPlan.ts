@@ -103,7 +103,7 @@ export const exportGymPlanToFile = async (
     const file = new File(Paths.cache, filename);
 
     try {
-        file.write(json);
+        await file.write(json);
     } catch (error: unknown) {
         console.warn('Gym plan export write failed', error);
         return { ok: false, error: 'WRITE_FAILED' };

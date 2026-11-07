@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`backup schema V1 compatibility requires a compatibility decision when the data schema changes: schema-version-1 1`] = `
 [

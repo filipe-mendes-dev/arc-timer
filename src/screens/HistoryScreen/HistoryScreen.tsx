@@ -208,7 +208,7 @@ const HistoryScreen = () => {
                     />
                 )}
                 ListEmptyComponent={
-                    !isPending && !isError ? ( <ListEmptyState title={emptyTitle} description={emptyDescription} /> ) : null
+                    !isPending && !isError ? ( <ListEmptyState title={emptyTitle} description={emptyDescription} /> ) : undefined
                 }
                 ListFooterComponent={
                     <>

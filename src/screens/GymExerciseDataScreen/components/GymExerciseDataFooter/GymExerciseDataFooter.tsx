@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
-import type { View } from 'react-native';
+import type { ViewInstance } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { GymSessionAction } from '@src/components/gym/GymSessionAction/GymSessionAction';
@@ -33,7 +33,7 @@ export const GymExerciseDataFooter = ({
     onTrackingFields,
 }: GymExerciseDataFooterProps) => {
     const { t } = useTranslation();
-    const optionsAnchorRef = useRef<View | null>(null);
+    const optionsAnchorRef = useRef<ViewInstance | null>(null);
     const [isOptionsVisible, setOptionsVisible] = useState(false);
     const options = useMemo<readonly TopBarOption[]>(
         () => [

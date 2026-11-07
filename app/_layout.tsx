@@ -13,6 +13,10 @@ import { sqliteDb } from '@src/db/client';
 import { DatabaseBootstrapErrorScreen } from '@src/components/bootstrap/DatabaseBootstrapErrorScreen/DatabaseBootstrapErrorScreen';
 import { GymSessionNotificationsCoordinator } from '@src/notifications/gymSessions/GymSessionNotificationsCoordinator';
 
+export const unstable_settings = {
+    initialRouteName: '(drawer)',
+};
+
 const SPLASH_MIN_DURATION_MS = 1000;
 const splashStartedAtMs = Date.now();
 
@@ -115,7 +119,6 @@ const RootLayout = () => {
                 <SafeAreaProvider>
                     <GymSessionNotificationsCoordinator />
                     <Stack
-                        initialRouteName="(drawer)" // <— ensure we start at the drawer
                         screenOptions={{
                             headerShown: false,
                             animation:

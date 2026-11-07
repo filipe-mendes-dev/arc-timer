@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View } from 'react-native';
+import { View, type ViewInstance } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import type { Workout } from '@src/core/entities/workout.interfaces';
@@ -29,7 +29,7 @@ export type ShareRunStats = {
 
 type ShareWorkoutCardProps = {
     workout: Workout;
-    shareRef: React.RefObject<View | null>;
+    shareRef: React.RefObject<ViewInstance | null>;
     runStats: ShareRunStats;
 };
 

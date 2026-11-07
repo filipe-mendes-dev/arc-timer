@@ -1,5 +1,5 @@
 import type { Ref } from 'react';
-import { View } from 'react-native';
+import { View, type ViewInstance } from 'react-native';
 
 import { CircleIconButton } from '@src/components/ui/CircleIconButton/CircleIconButton';
 import { AppIcon, type IconId } from '@src/components/ui/Icon/AppIcon';
@@ -16,7 +16,7 @@ interface GymSessionActionProps {
     isWide?: boolean;
     isDisabled?: boolean;
     isDestructive?: boolean;
-    anchorRef?: Ref<View>;
+    anchorRef?: Ref<ViewInstance>;
 }
 
 export const GymSessionAction = ({
